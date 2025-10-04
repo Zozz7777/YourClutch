@@ -67,6 +67,10 @@
     --ring: oklch(0.7080 0 0);
     --sidebar: oklch(0.9850 0 0);
     --sidebar-primary: oklch(0.5770 0.2450 27.3250);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.1450 0 0);
+    --accent: oklch(0.9700 0 0);
+    --accent-foreground: oklch(0.1450 0 0);
     --radius: 0.625rem;
     
     /* Semantic color variants from design.json - exact OKLCH values */
@@ -103,6 +107,10 @@
     --ring: oklch(0.5560 0 0);
     --sidebar: oklch(0.2050 0 0);
     --sidebar-primary: oklch(0.5770 0.2450 27.3250);
+    --popover: oklch(0.2050 0 0);
+    --popover-foreground: oklch(0.9850 0 0);
+    --accent: oklch(0.2690 0 0);
+    --accent-foreground: oklch(0.9850 0 0);
     
     /* Semantic color variants for dark theme from design.json - exact OKLCH values */
     --success: oklch(0.72 0.2 145);
