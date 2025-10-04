@@ -455,6 +455,12 @@ app.use('/api/v1/notifications', require('./routes/notifications').router);
 // Updates routes
 app.use('/api/v1/updates', require('./routes/updates'));
 
+// Careers routes
+app.use('/api/v1/careers', require('./routes/careers'));
+
+// Employee invitations routes
+app.use('/api/v1/employees', require('./routes/employee-invitations'));
+
 app.use('/api/v1', clutchAppRoutes);
 app.use('/api/v1/admin/onboarding', onboardingRoutes);
 app.use('/api/v1/admin/roles', rolesRoutes);
