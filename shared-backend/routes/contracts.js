@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const { uploadFile, getSignedUrl, generateContractKey, generateSignedContractKey, downloadFile } = require('../lib/storage');
 const { mergeTemplate, validateContractFields, prepareTemplateData, convertToPDF } = require('../lib/docx');
+const { notifyLegalTeamSignedContract, notifySalesPersonContractDecision, notifyNewPartnerCreated } = require('../lib/notifications');
 
 // Configure multer for file uploads
 const upload = multer({
@@ -275,8 +276,14 @@ router.post('/:id/upload-signed', authenticateToken, upload.single('signedContra
       });
     }
     
-    // TODO: Send notification to legal/executive team
-    console.log(`📧 Notification: Contract ${id} signed and ready for review`);
+    // Send notification to legal/executive team
+    try {
+      await notifyLegalTeamSignedContract(contract, req.user.email || 'sales@yourclutch.com');
+      console.log(`📧 Notification sent: Contract ${id} signed and ready for review`);
+    } catch (notificationError) {
+      console.error('❌ Failed to send notification:', notificationError);
+      // Don't fail the contract update if notification fails
+    }
     
     res.status(200).json({
       success: true,
@@ -432,8 +439,15 @@ router.post('/:id/approve', authenticateToken, async (req, res) => {
       }
     );
     
-    // TODO: Send notification to sales person and partner
-    console.log(`📧 Notification: Contract ${id} approved, partner ${partnerId} created`);
+    // Send notifications
+    try {
+      await notifySalesPersonContractDecision(contract, 'approved');
+      await notifyNewPartnerCreated(newPartner, req.user.email || 'sales@yourclutch.com');
+      console.log(`📧 Notifications sent: Contract ${id} approved, partner ${partnerId} created`);
+    } catch (notificationError) {
+      console.error('❌ Failed to send notifications:', notificationError);
+      // Don't fail the contract approval if notifications fail
+    }
     
     res.status(200).json({
       success: true,

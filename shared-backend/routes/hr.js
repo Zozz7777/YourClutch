@@ -758,7 +758,13 @@ router.get('/stats', authenticateToken, checkRole(['head_administrator', 'hr_man
       { $group: { _id: null, avgSalary: { $avg: "$salary" } } }
     ]).toArray();
     
+    // Debug: Get all employee salaries to see what's in the database
+    const allEmployees = await employeesCollection.find({}, { projection: { firstName: 1, lastName: 1, salary: 1 } }).toArray();
+    console.log('HR Stats Debug - All employees with salaries:', allEmployees);
+    console.log('HR Stats Debug - Salary aggregation result:', salaryAggregation);
+    
     const averageSalary = salaryAggregation.length > 0 ? salaryAggregation[0].avgSalary : 0;
+    console.log('HR Stats Debug - Calculated average salary:', averageSalary);
     
     // Calculate open positions from applications that are still in progress
     const openPositions = await applicationsCollection.countDocuments({ 
