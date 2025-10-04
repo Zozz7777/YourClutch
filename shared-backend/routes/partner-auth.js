@@ -32,6 +32,21 @@ const validateOTP = [
   body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
 ];
 
+const validatePartnerSignup = [
+  body('partnerId').notEmpty().withMessage('Partner ID is required'),
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('phone').notEmpty().withMessage('Phone is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('businessName').notEmpty().withMessage('Business name is required'),
+  body('ownerName').notEmpty().withMessage('Owner name is required'),
+  body('partnerType').notEmpty().withMessage('Partner type is required'),
+  body('businessAddress').isObject().withMessage('Business address is required'),
+  body('businessAddress.street').notEmpty().withMessage('Street is required'),
+  body('businessAddress.city').notEmpty().withMessage('City is required'),
+  body('businessAddress.state').notEmpty().withMessage('State is required'),
+  body('businessAddress.zipCode').notEmpty().withMessage('Zip code is required')
+];
+
 // Helper function to generate JWT token
 const generateToken = (partnerId, deviceId = null) => {
   return jwt.sign(
@@ -99,6 +114,134 @@ router.post('/validate-id', validatePartnerId, async (req, res) => {
 
   } catch (error) {
     logger.error('Partner ID validation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /api/v1/partners/auth/signup
+// @desc    Partner signup/registration for existing partners
+// @access  Public
+router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const {
+      partnerId,
+      email,
+      phone,
+      password,
+      businessName,
+      ownerName,
+      partnerType,
+      businessAddress,
+      workingHours,
+      businessSettings
+    } = req.body;
+
+    console.log('🔐 Partner signup attempt:', { partnerId, email, businessName });
+
+    // First, verify that the partner exists in the main partners collection
+    const { getCollection } = require('../config/database');
+    const partnersCollection = await getCollection('partners');
+    
+    const existingPartnerRecord = await partnersCollection.findOne({
+      $or: [
+        { partnerId },
+        { 'primaryContact.email': email.toLowerCase() }
+      ]
+    });
+
+    if (!existingPartnerRecord) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found. Please contact the sales team to set up your partner account first.'
+      });
+    }
+
+    // Check if partner user account already exists
+    const existingPartnerUser = await PartnerUser.findOne({
+      $or: [
+        { partnerId },
+        { email: email.toLowerCase() }
+      ]
+    });
+
+    if (existingPartnerUser) {
+      return res.status(409).json({
+        success: false,
+        message: 'Partner account already exists. Please use the sign in option.'
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create partner user account
+    const newPartnerUser = new PartnerUser({
+      partnerId,
+      email: email.toLowerCase(),
+      phone,
+      password: hashedPassword,
+      businessName: existingPartnerRecord.name || businessName,
+      ownerName: existingPartnerRecord.primaryContact?.name || ownerName,
+      partnerType: existingPartnerRecord.type || partnerType,
+      businessAddress: businessAddress || {
+        street: existingPartnerRecord.addresses?.[0]?.line1 || '',
+        city: existingPartnerRecord.addresses?.[0]?.city || '',
+        state: existingPartnerRecord.addresses?.[0]?.state || '',
+        zipCode: existingPartnerRecord.addresses?.[0]?.zipCode || ''
+      },
+      workingHours: workingHours || {},
+      businessSettings: businessSettings || {},
+      status: 'active',
+      isVerified: false,
+      isLocked: false,
+      loginAttempts: 0,
+      lastLogin: null,
+      appPreferences: {
+        language: 'ar',
+        theme: 'light',
+        notifications: {
+          orders: true,
+          payments: true,
+          updates: true
+        }
+      }
+    });
+
+    await newPartnerUser.save();
+
+    console.log('✅ Partner user account created successfully:', partnerId);
+
+    // Generate token
+    const token = generateToken(partnerId);
+
+    // Remove password from response
+    const partnerData = newPartnerUser.toObject();
+    delete partnerData.password;
+    delete partnerData.verificationCode;
+
+    res.status(201).json({
+      success: true,
+      message: 'Partner account created successfully',
+      data: {
+        partner: partnerData,
+        token
+      }
+    });
+
+  } catch (error) {
+    logger.error('Partner signup error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
