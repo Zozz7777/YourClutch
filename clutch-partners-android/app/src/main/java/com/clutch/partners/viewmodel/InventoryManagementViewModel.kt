@@ -18,7 +18,7 @@ data class InventoryManagementUiState(
     val items: List<InventoryItem> = emptyList(),
     val filteredItems: List<InventoryItem> = emptyList(),
     val searchQuery: String = "",
-    val currentFilter: InventoryFilter = InventoryFilter(),
+    val currentFilter: InventoryFilter = InventoryFilter.ALL,
     val totalItems: Int = 0,
     val lowStockItems: Int = 0,
     val outOfStockItems: Int = 0,
@@ -43,12 +43,13 @@ class InventoryManagementViewModel @Inject constructor(
         
         viewModelScope.launch {
             try {
-                val items = apiService.getInventoryItems()
-                updateInventoryStats(items)
-                applyFilters(items)
+                // For now, use mock data since API might not be ready
+                val mockItems = createMockInventoryItems()
+                updateInventoryStats(mockItems)
+                applyFilters(mockItems)
                 
                 _uiState.value = _uiState.value.copy(
-                    items = items,
+                    items = mockItems,
                     isLoading = false
                 )
             } catch (e: Exception) {
@@ -60,9 +61,62 @@ class InventoryManagementViewModel @Inject constructor(
         }
     }
 
-    fun updateSearchQuery(query: String) {
+    fun addInventoryItem(item: InventoryItem) {
+        val currentItems = _uiState.value.items.toMutableList()
+        currentItems.add(item)
+        updateInventoryStats(currentItems)
+        applyFilters(currentItems)
+        
+        _uiState.value = _uiState.value.copy(
+            items = currentItems,
+            showingAddItemDialog = false
+        )
+    }
+
+    fun updateInventoryItem(item: InventoryItem) {
+        val currentItems = _uiState.value.items.toMutableList()
+        val index = currentItems.indexOfFirst { it.id == item.id }
+        if (index != -1) {
+            currentItems[index] = item
+            updateInventoryStats(currentItems)
+            applyFilters(currentItems)
+            
+            _uiState.value = _uiState.value.copy(
+                items = currentItems,
+                editingItem = null
+            )
+        }
+    }
+
+    fun deleteInventoryItem(itemId: String) {
+        val currentItems = _uiState.value.items.toMutableList()
+        currentItems.removeAll { it.id == itemId }
+        updateInventoryStats(currentItems)
+        applyFilters(currentItems)
+        
+        _uiState.value = _uiState.value.copy(items = currentItems)
+    }
+
+    fun setSearchQuery(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)
         applyFilters(_uiState.value.items)
+    }
+
+    fun setFilter(filter: InventoryFilter) {
+        _uiState.value = _uiState.value.copy(currentFilter = filter)
+        applyFilters(_uiState.value.items)
+    }
+
+    fun setSortBy(sortBy: SortBy) {
+        val sortedItems = when (sortBy) {
+            SortBy.NAME -> _uiState.value.filteredItems.sortedBy { it.name }
+            SortBy.PRICE -> _uiState.value.filteredItems.sortedBy { it.price }
+            SortBy.STOCK -> _uiState.value.filteredItems.sortedBy { it.stock }
+            SortBy.CREATED_DATE -> _uiState.value.filteredItems.sortedBy { it.createdAt }
+            SortBy.UPDATED_DATE -> _uiState.value.filteredItems.sortedBy { it.updatedAt }
+        }
+        
+        _uiState.value = _uiState.value.copy(filteredItems = sortedItems)
     }
 
     fun showAddItemDialog() {
@@ -81,132 +135,16 @@ class InventoryManagementViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(showingFilterDialog = false)
     }
 
-    fun editItem(item: InventoryItem) {
+    fun setEditingItem(item: InventoryItem?) {
         _uiState.value = _uiState.value.copy(editingItem = item)
-    }
-
-    fun hideEditItemDialog() {
-        _uiState.value = _uiState.value.copy(editingItem = null)
-    }
-
-    fun addItem(item: InventoryItem) {
-        viewModelScope.launch {
-            try {
-                val newItem = apiService.addInventoryItem(item)
-                val updatedItems = _uiState.value.items + newItem
-                updateInventoryStats(updatedItems)
-                applyFilters(updatedItems)
-                
-                _uiState.value = _uiState.value.copy(
-                    items = updatedItems,
-                    showingAddItemDialog = false
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = e.message ?: "Failed to add item"
-                )
-            }
-        }
-    }
-
-    fun updateItem(item: InventoryItem) {
-        viewModelScope.launch {
-            try {
-                val updatedItem = apiService.updateInventoryItem(item)
-                val updatedItems = _uiState.value.items.map { 
-                    if (it.id == item.id) updatedItem else it 
-                }
-                updateInventoryStats(updatedItems)
-                applyFilters(updatedItems)
-                
-                _uiState.value = _uiState.value.copy(
-                    items = updatedItems,
-                    editingItem = null
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = e.message ?: "Failed to update item"
-                )
-            }
-        }
-    }
-
-    fun deleteItem(item: InventoryItem) {
-        viewModelScope.launch {
-            try {
-                apiService.deleteInventoryItem(item.id)
-                val updatedItems = _uiState.value.items.filter { it.id != item.id }
-                updateInventoryStats(updatedItems)
-                applyFilters(updatedItems)
-                
-                _uiState.value = _uiState.value.copy(items = updatedItems)
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = e.message ?: "Failed to delete item"
-                )
-            }
-        }
-    }
-
-    fun updateStock(item: InventoryItem, newStock: Int) {
-        val updatedItem = item.copy(stock = newStock)
-        updateItem(updatedItem)
-    }
-
-    fun applyFilter(filter: InventoryFilter) {
-        _uiState.value = _uiState.value.copy(currentFilter = filter)
-        applyFilters(_uiState.value.items)
-    }
-
-    private fun applyFilters(items: List<InventoryItem>) {
-        val currentState = _uiState.value
-        var filteredItems = items
-
-        // Apply search filter
-        if (currentState.searchQuery.isNotBlank()) {
-            filteredItems = filteredItems.filter { item ->
-                item.name.contains(currentState.searchQuery, ignoreCase = true) ||
-                item.sku.contains(currentState.searchQuery, ignoreCase = true) ||
-                item.category.contains(currentState.searchQuery, ignoreCase = true)
-            }
-        }
-
-        // Apply category filter
-        if (currentState.currentFilter.category != "All") {
-            filteredItems = filteredItems.filter { 
-                it.category == currentState.currentFilter.category 
-            }
-        }
-
-        // Apply stock filter
-        filteredItems = when (currentState.currentFilter.stockFilter) {
-            StockFilter.IN_STOCK -> filteredItems.filter { it.stock > it.lowStockThreshold }
-            StockFilter.LOW_STOCK -> filteredItems.filter { 
-                it.stock > 0 && it.stock <= it.lowStockThreshold 
-            }
-            StockFilter.OUT_OF_STOCK -> filteredItems.filter { it.stock == 0 }
-            StockFilter.ALL -> filteredItems
-        }
-
-        // Apply sorting
-        filteredItems = when (currentState.currentFilter.sortBy) {
-            SortBy.NAME -> filteredItems.sortedBy { it.name }
-            SortBy.PRICE -> filteredItems.sortedBy { it.price }
-            SortBy.STOCK -> filteredItems.sortedBy { it.stock }
-            SortBy.CATEGORY -> filteredItems.sortedBy { it.category }
-        }
-
-        _uiState.value = _uiState.value.copy(filteredItems = filteredItems)
     }
 
     private fun updateInventoryStats(items: List<InventoryItem>) {
         val totalItems = items.size
-        val lowStockItems = items.count { 
-            it.stock > 0 && it.stock <= it.lowStockThreshold 
-        }
+        val lowStockItems = items.count { it.stock <= it.lowStockThreshold && it.stock > 0 }
         val outOfStockItems = items.count { it.stock == 0 }
         val totalValue = items.sumOf { it.price * it.stock }
-
+        
         _uiState.value = _uiState.value.copy(
             totalItems = totalItems,
             lowStockItems = lowStockItems,
@@ -215,7 +153,54 @@ class InventoryManagementViewModel @Inject constructor(
         )
     }
 
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(errorMessage = null)
+    private fun applyFilters(items: List<InventoryItem>) {
+        val filteredItems = items.filter { item ->
+            val matchesSearch = item.name.contains(_uiState.value.searchQuery, ignoreCase = true) ||
+                               item.sku.contains(_uiState.value.searchQuery, ignoreCase = true)
+            
+            val matchesFilter = when (_uiState.value.currentFilter) {
+                InventoryFilter.ALL -> true
+                InventoryFilter.LOW_STOCK -> item.stock <= item.lowStockThreshold && item.stock > 0
+                InventoryFilter.OUT_OF_STOCK -> item.stock == 0
+                InventoryFilter.ACTIVE -> item.isActive
+                InventoryFilter.INACTIVE -> !item.isActive
+            }
+            
+            matchesSearch && matchesFilter
+        }
+        
+        _uiState.value = _uiState.value.copy(filteredItems = filteredItems)
+    }
+
+    private fun createMockInventoryItems(): List<InventoryItem> {
+        return listOf(
+            InventoryItem(
+                id = "1",
+                name = "Engine Oil 5W-30",
+                sku = "EO-5W30-001",
+                price = 25.99,
+                stock = 50,
+                category = "Engine",
+                brand = "Mobil"
+            ),
+            InventoryItem(
+                id = "2",
+                name = "Brake Pads Front",
+                sku = "BP-F-002",
+                price = 45.99,
+                stock = 5,
+                category = "Brakes",
+                brand = "Brembo"
+            ),
+            InventoryItem(
+                id = "3",
+                name = "Air Filter",
+                sku = "AF-003",
+                price = 15.99,
+                stock = 0,
+                category = "Engine",
+                brand = "K&N"
+            )
+        )
     }
 }

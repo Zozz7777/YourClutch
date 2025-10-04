@@ -1,5 +1,6 @@
 package com.clutch.partners.di
 
+import com.clutch.partners.BuildConfig
 import com.clutch.partners.data.api.AuthApiService
 import com.clutch.partners.data.api.PartnersApiService
 import dagger.Module

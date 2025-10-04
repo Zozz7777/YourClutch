@@ -142,15 +142,13 @@ class OptimizedAIProviderManager {
    * Call OpenAI API
    */
   async callOpenAI(prompt, options) {
-    const { Configuration, OpenAIApi } = require('openai');
+    const OpenAI = require('openai');
     
-    const configuration = new Configuration({
+    const openai = new OpenAI({
       apiKey: this.providers.openai.apiKey,
     });
     
-    const openai = new OpenAIApi(configuration);
-    
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: this.providers.openai.model,
       messages: [
         {

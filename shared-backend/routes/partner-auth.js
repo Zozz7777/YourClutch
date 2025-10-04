@@ -9,6 +9,15 @@ const logger = require('../utils/logger');
 
 const router = express.Router();
 
+// Test endpoint
+router.get('/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Partner auth routes are working',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Validation middleware
 const validatePartnerId = [
   body('partnerId').notEmpty().withMessage('Partner ID is required')

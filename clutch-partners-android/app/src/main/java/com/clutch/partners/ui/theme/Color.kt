@@ -67,3 +67,7 @@ val DarkPending = Color(0xFFF39C12)  // Orange
 val DarkPaid = Color(0xFF27AE60)     // Green
 val DarkRejected = Color(0xFFE74C3C) // Red
 val DarkAmber = Color(0xFFF1C40F)    // Amber
+
+// Additional colors referenced in code
+val PartnersBlue = Color(0xFF3498DB)
+val Orange = Color(0xFFF39C12)

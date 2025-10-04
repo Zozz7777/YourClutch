@@ -1,5 +1,10 @@
 const { logger } = require('../config/logger');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-12-18.acacia', // Latest API version for v19
+  timeout: 30000, // 30 second timeout
+  maxNetworkRetries: 3, // Retry failed requests
+  telemetry: false // Disable telemetry for better performance
+});
 
 /**
  * Subscription Service

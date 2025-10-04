@@ -3,7 +3,7 @@
  * World-class backend developer with ChatGPT integration for automatic issue resolution
  */
 
-const { OpenAI } = require('openai');
+const OpenAI = require('openai');
 const fs = require('fs').promises;
 const path = require('path');
 const axios = require('axios');

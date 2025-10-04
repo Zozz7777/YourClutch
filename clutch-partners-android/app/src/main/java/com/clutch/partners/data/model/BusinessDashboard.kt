@@ -24,20 +24,7 @@ data class RevenueData(
     val weeklyGrowth: Double? = null
 )
 
-data class InventoryItem(
-    @SerializedName("_id")
-    val id: String? = null,
-    @SerializedName("name")
-    val name: String,
-    @SerializedName("quantity")
-    val quantity: Int,
-    @SerializedName("status")
-    val status: String, // Available, Low, Out of Stock
-    @SerializedName("category")
-    val category: String? = null,
-    @SerializedName("lastUpdated")
-    val lastUpdated: String? = null
-)
+// InventoryItem moved to separate file
 
 data class OrderStats(
     @SerializedName("totalOrders")

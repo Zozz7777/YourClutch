@@ -4,7 +4,7 @@
  * Implements cache hit/miss tracking and automatic cleanup
  */
 
-const Redis = require('ioredis');
+const { createClient } = require('redis');
 const winston = require('winston');
 const logger = require('../utils/logger');
 
@@ -22,19 +22,21 @@ class OptimizedRedisCache {
       ]
     });
 
-    // Redis configuration - Render compatible
+    // Redis v5 configuration - Render compatible
     this.config = {
-      host: process.env.REDIS_HOST || process.env.REDIS_URL?.split('://')[1]?.split(':')[0] || 'localhost',
-      port: process.env.REDIS_PORT || process.env.REDIS_URL?.split(':').pop()?.split('/')[0] || 6379,
-      password: process.env.REDIS_PASSWORD || process.env.REDIS_URL?.split('://')[1]?.split('@')[0]?.split(':')[1] || null,
-      db: process.env.REDIS_DB || 0,
+      url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
+      password: process.env.REDIS_PASSWORD,
+      database: process.env.REDIS_DB || 0,
+      socket: {
+        connectTimeout: 5000, // Reduced for Render
+        commandTimeout: 3000, // Reduced for Render
+        keepAlive: 30000,
+        reconnectStrategy: (retries) => Math.min(retries * 100, 3000)
+      },
+      // Redis v5 specific settings
       retryDelayOnFailover: 100,
       maxRetriesPerRequest: 1, // Reduced for Render
       lazyConnect: true,
-      keepAlive: 30000,
-      connectTimeout: 5000, // Reduced for Render
-      commandTimeout: 3000, // Reduced for Render
-      maxMemoryPolicy: 'allkeys-lru',
       // Render-specific optimizations
       enableOfflineQueue: true, // Enable offline queue for better reliability
       maxLoadingTimeout: 2000
@@ -93,7 +95,7 @@ class OptimizedRedisCache {
         return false;
       }
 
-      this.client = new Redis(this.config);
+      this.client = createClient(this.config);
       
       this.client.on('connect', () => {
         this.logger.info('✅ Redis connected successfully');
@@ -110,6 +112,9 @@ class OptimizedRedisCache {
         this.logger.warn('⚠️ Redis connection closed');
         this.isConnected = false;
       });
+
+      // Connect to Redis
+      await this.client.connect();
 
       // Test connection with timeout
       const pingPromise = this.client.ping();
@@ -460,7 +465,7 @@ class OptimizedRedisCache {
   async close() {
     try {
       if (this.client) {
-        await this.client.quit();
+        await this.client.disconnect();
         this.logger.info('✅ Redis connection closed gracefully');
       }
     } catch (error) {
