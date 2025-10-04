@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Search, Filter, Download, Upload, Eye, Edit, Trash2, CheckCircle, XCircle, Clock, FileText, Users, Building2, MapPin, Phone, Mail, Calendar, AlertCircle } from "lucide-react";
 import { apiService } from "@/lib/api";
+import { toast } from "sonner";
 
 // Lead status enum
 enum LeadStatus {
@@ -131,6 +132,107 @@ export default function SalesPage() {
       }
     } catch (error) {
       console.error("Error loading leads:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateLeadStatus = async (leadId: string, newStatus: LeadStatus) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.request(`/api/v1/sales/leads/${leadId}/status`, {
+        method: "PUT",
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (response.success) {
+        await loadLeads();
+        toast.success(`Lead status updated to ${newStatus}`);
+      }
+    } catch (error) {
+      console.error("Error updating lead status:", error);
+      toast.error("Failed to update lead status");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGenerateContract = async (leadId: string) => {
+    try {
+      setIsLoading(true);
+      
+      // First, get available templates for this lead
+      const lead = leads.find(l => l.id === leadId);
+      if (!lead) {
+        toast.error("Lead not found");
+        return;
+      }
+
+      // Get templates for this partner type and contract type
+      const templatesResponse = await apiService.request(`/api/v1/contract-templates?partnerType=${lead.partnerType}&contractType=${lead.contractType}`);
+      
+      if (!templatesResponse.success || !templatesResponse.data.templates || templatesResponse.data.templates.length === 0) {
+        toast.error("No contract templates available for this lead type");
+        return;
+      }
+
+      // Use the first available template
+      const template = templatesResponse.data.templates[0];
+      
+      // Generate contract
+      const response = await apiService.request("/api/v1/contracts/generate", {
+        method: "POST",
+        body: JSON.stringify({ 
+          leadId: leadId,
+          templateId: template._id
+        })
+      });
+
+      if (response.success) {
+        await loadLeads();
+        toast.success("Contract generated successfully");
+      }
+    } catch (error) {
+      console.error("Error generating contract:", error);
+      toast.error("Failed to generate contract");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUploadContract = async (leadId: string, file: File) => {
+    try {
+      setIsLoading(true);
+      
+      // Find the contract for this lead
+      const contractsResponse = await apiService.request("/api/v1/contracts");
+      if (!contractsResponse.success) {
+        toast.error("Failed to load contracts");
+        return;
+      }
+      
+      const contract = contractsResponse.data.contracts?.find((c: any) => c.leadId === leadId);
+      if (!contract) {
+        toast.error("Contract not found for this lead");
+        return;
+      }
+
+      // Upload signed contract
+      const formData = new FormData();
+      formData.append('signedContract', file);
+      
+      const response = await apiService.request(`/api/v1/contracts/${contract._id}/upload-signed`, {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.success) {
+        await loadLeads();
+        toast.success("Signed contract uploaded successfully");
+      }
+    } catch (error) {
+      console.error("Error uploading contract:", error);
+      toast.error("Failed to upload signed contract");
     } finally {
       setIsLoading(false);
     }
@@ -739,4 +841,5 @@ export default function SalesPage() {
       )}
     </div>
   );
+
 }
