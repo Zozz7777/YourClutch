@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { getCollection } = require('../lib/database');
+const { getCollection } = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
 const PDFDocument = require('pdfkit');
 const multer = require('multer');
