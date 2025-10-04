@@ -51,6 +51,7 @@ import com.clutch.partners.ui.theme.*
 import com.clutch.partners.ui.viewmodel.AuthViewModel
 import com.clutch.partners.ui.viewmodel.AuthState
 import com.clutch.partners.utils.LanguageManager
+import com.clutch.partners.ui.screens.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 
@@ -74,25 +75,35 @@ class CompleteMainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var currentScreen by remember { mutableStateOf("splash") }
+    var selectedPartnerType by remember { mutableStateOf<com.clutch.partners.ui.screens.PartnerType?>(null) }
     
     when (currentScreen) {
         "splash" -> SplashScreen(
             onSplashComplete = { currentScreen = "onboarding" }
         )
         "onboarding" -> OnboardingScreen(
-            onGetStarted = { currentScreen = "auth" }
+            onGetStarted = { currentScreen = "partnerType" }
+        )
+        "partnerType" -> PartnerTypeSelectorScreen(
+            onPartnerTypeSelected = { partnerType ->
+                selectedPartnerType = partnerType
+                currentScreen = "auth"
+            }
         )
         "auth" -> AuthScreen(
             onSignUpClick = { currentScreen = "signup" },
             onRequestToJoinClick = { currentScreen = "request" }
         )
         "signup" -> SignUpForm(
-            onAuthenticated = { currentScreen = "dashboard" }
+            onAuthenticated = { currentScreen = "kyc" }
         )
         "request" -> RequestToJoinForm(
-            onAuthenticated = { currentScreen = "dashboard" }
+            onAuthenticated = { currentScreen = "kyc" }
         )
-        "dashboard" -> DashboardScreen()
+        "kyc" -> KYCVerificationScreen(
+            onVerificationComplete = { currentScreen = "main" }
+        )
+        "main" -> MainAppScreen()
     }
 }
 
@@ -937,3 +948,101 @@ data class OnboardingPage(
     val icon: ImageVector,
     val color: Color
 )
+
+@Composable
+fun MainAppScreen() {
+    var selectedTab by remember { mutableStateOf(0) }
+    
+    val tabs = listOf(
+        "Home" to Icons.Filled.Home,
+        "Payments" to Icons.Filled.Payment,
+        "Settings" to Icons.Filled.Settings
+    )
+    
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                tabs.forEachIndexed { index, (title, icon) ->
+                    NavigationBarItem(
+                        icon = { Icon(icon, contentDescription = title) },
+                        label = { Text(title) },
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index }
+                    )
+                }
+            }
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            when (selectedTab) {
+                0 -> HomeScreen()
+                1 -> PaymentsScreen()
+                2 -> StoreSettingsScreen()
+            }
+        }
+    }
+}
+
+@Composable
+fun StoreSettingsScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = if (isRTL) "إعدادات المتجر" else "Store Settings",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Profile Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isRTL) DarkCard else LightCard
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Text(
+                        text = if (isRTL) "معلومات الملف الشخصي" else "Profile Information",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isRTL) DarkForeground else LightForeground
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Profile fields would go here
+                    Text(
+                        text = if (isRTL) "الاسم: أحمد محمد" else "Name: Ahmed Mohamed",
+                        fontSize = 14.sp,
+                        color = if (isRTL) DarkMutedForeground else LightMutedForeground
+                    )
+                    
+                    Text(
+                        text = if (isRTL) "البريد الإلكتروني: ahmed@example.com" else "Email: ahmed@example.com",
+                        fontSize = 14.sp,
+                        color = if (isRTL) DarkMutedForeground else LightMutedForeground
+                    )
+                }
+            }
+        }
+    }
+}

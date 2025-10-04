@@ -69,6 +69,6 @@ val DarkRejected = Color(0xFFE74C3C) // Red
 val DarkAmber = Color(0xFFF1C40F)    // Amber
 
 // Additional colors referenced in code
-// PartnersBlue updated to match design.json primary color: oklch(0.5770 0.2450 27.3250)
-val PartnersBlue = Color(0xFF2C5AA0) // Proper brand blue from design.json
+// Primary brand color from design.json: oklch(0.5770 0.2450 27.3250) - Red/Orange
+val PartnersBlue = Color(0xFFE74C3C) // Proper brand red from design.json OKLCH conversion
 val Orange = Color(0xFFF39C12)
