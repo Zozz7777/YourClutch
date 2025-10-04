@@ -445,6 +445,12 @@ app.use('/api/v1/sales', require('./routes/sales'));
 // Partners routes
 app.use('/api/v1/partners', require('./routes/partners'));
 
+// Contract templates routes
+app.use('/api/v1/contract-templates', require('./routes/contract-templates'));
+
+// Contracts routes
+app.use('/api/v1/contracts', require('./routes/contracts'));
+
 // Updates routes
 app.use('/api/v1/updates', require('./routes/updates'));
 

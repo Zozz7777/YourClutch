@@ -31,6 +31,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         'Dashboard': 'navigation.dashboard',
         'Sales': 'navigation.sales',
         'Partners': 'navigation.partners',
+        'Legal': 'navigation.legal',
         'HR': 'navigation.hr'
       };
       

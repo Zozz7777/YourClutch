@@ -216,6 +216,8 @@ export const PERMISSIONS = {
   MANAGE_LEGAL: "manage_legal",
   VIEW_CONTRACTS: "view_contracts",
   MANAGE_CONTRACTS: "manage_contracts",
+  MANAGE_CONTRACT_TEMPLATES: "manage_contract_templates",
+  APPROVE_CONTRACTS: "approve_contracts",
   VIEW_PARTNERS: "view_partners",
   MANAGE_PARTNERS: "manage_partners",
   VIEW_CUSTOMER_DATA: "view_customer_data",
@@ -484,6 +486,12 @@ export const NAVIGATION_ITEMS = [
     href: "/partners",
     icon: "Users",
     permissions: [PERMISSIONS.VIEW_PARTNERS],
+  },
+  {
+    title: "Legal",
+    href: "/legal",
+    icon: "Scale",
+    permissions: [PERMISSIONS.VIEW_LEGAL],
   },
   {
     title: "HR",
