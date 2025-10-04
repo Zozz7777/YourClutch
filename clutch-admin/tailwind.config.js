@@ -8,52 +8,52 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Design system colors using OKLCH for exact color matching
-        background: "oklch(1 0 0)",
-        foreground: "oklch(0.1450 0 0)",
+        // Design system colors using CSS variables for theme support
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         card: {
-          DEFAULT: "oklch(1 0 0)",
-          foreground: "oklch(0.1450 0 0)",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
         primary: {
-          DEFAULT: "oklch(0.5770 0.2450 27.3250)",
-          foreground: "oklch(0.9850 0 0)",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "oklch(0.5770 0.2450 27.3250)",
+          DEFAULT: "hsl(var(--secondary))",
         },
         muted: {
-          DEFAULT: "oklch(0.9700 0 0)",
-          foreground: "oklch(0.5560 0 0)",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         destructive: {
-          DEFAULT: "oklch(0.5770 0.2450 27.3250)",
-          foreground: "oklch(0.9850 0 0)",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         success: {
-          DEFAULT: "var(--success)",
-          foreground: "var(--success-foreground)",
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
         },
         warning: {
-          DEFAULT: "var(--warning)",
-          foreground: "var(--warning-foreground)",
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
         },
         error: {
-          DEFAULT: "var(--error)",
-          foreground: "var(--error-foreground)",
+          DEFAULT: "hsl(var(--error))",
+          foreground: "hsl(var(--error-foreground))",
         },
         info: {
-          DEFAULT: "var(--info)",
-          foreground: "var(--info-foreground)",
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
         },
-        border: "oklch(0.9220 0 0)",
-        input: "oklch(0.9220 0 0)",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
         ring: {
-          DEFAULT: "oklch(0.5770 0.2450 27.3250)",
+          DEFAULT: "hsl(var(--ring))",
         },
         sidebar: {
-          DEFAULT: "var(--sidebar)",
-          primary: "var(--sidebar-primary)",
+          DEFAULT: "hsl(var(--sidebar))",
+          primary: "hsl(var(--sidebar-primary))",
         },
       },
       fontFamily: {

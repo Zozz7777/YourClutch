@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import design tokens */
-@import '../styles/design-tokens.css';
-
 @layer base {
   /* RTL Support */
   [dir="rtl"] {
@@ -53,35 +50,34 @@
   }
 
   :root {
-    /* Light theme colors from design.json - exact OKLCH values */
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.1450 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.1450 0 0);
-    --primary: oklch(0.5770 0.2450 27.3250);
-    --primary-foreground: oklch(0.9850 0 0);
-    --secondary: oklch(0.5770 0.2450 27.3250);
-    --muted: oklch(0.9700 0 0);
-    --muted-foreground: oklch(0.5560 0 0);
-    --destructive: oklch(0.5770 0.2450 27.3250);
-    --destructive-foreground: oklch(0.9850 0 0);
-    --border: oklch(0.9220 0 0);
-    --input: oklch(0.9220 0 0);
-    --ring: oklch(0.7080 0 0);
-    --ring-ring: oklch(0.7080 0 0);
-    --sidebar: oklch(0.9850 0 0);
-    --sidebar-primary: oklch(0.5770 0.2450 27.3250);
+    /* Light theme colors - HSL format for Tailwind compatibility */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --primary: 24 9.8% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --sidebar: 0 0% 98%;
+    --sidebar-primary: 24 9.8% 10%;
     --radius: 0.625rem;
     
-    /* Semantic color variants from design.json - exact OKLCH values */
-    --success: oklch(0.72 0.2 145);
-    --success-foreground: oklch(0.9850 0 0);
-    --warning: oklch(0.85 0.18 75);
-    --warning-foreground: oklch(0.1450 0 0);
-    --error: oklch(0.5770 0.2450 27.3250); /* Same as destructive */
-    --error-foreground: oklch(0.9850 0 0);
-    --info: oklch(0.75 0.1 220);
-    --info-foreground: oklch(0.9850 0 0);
+    /* Semantic color variants */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 3.9%;
+    --error: 0 84.2% 60.2%;
+    --error-foreground: 0 0% 98%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 98%;
     
     /* Typography from design.json - using next/font/google variables */
     --font-sans: var(--font-roboto), ui-sans-serif, sans-serif, system-ui;
@@ -89,35 +85,34 @@
     --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
   }
 
-  [data-theme="dark"] {
-    /* Dark theme colors from design.json - exact OKLCH values */
-    --background: oklch(0.1450 0 0);
-    --foreground: oklch(0.9850 0 0);
-    --card: oklch(0.2050 0 0);
-    --card-foreground: oklch(0.9710 0.0130 17.3800);
-    --primary: oklch(0.5050 0.2130 27.5180);
-    --primary-foreground: oklch(0.2050 0 0);
-    --secondary: oklch(0.2690 0 0);
-    --muted: oklch(0.2690 0 0);
-    --muted-foreground: oklch(0.8500 0 0); /* Much better contrast for dark theme */
-    --destructive: oklch(0.7040 0.1910 22.2160);
-    --destructive-foreground: oklch(0.9850 0 0);
-    --border: oklch(0.2750 0 0);
-    --input: oklch(0.3750 0 0); /* Slightly lighter for better contrast */
-    --ring: oklch(0.5560 0 0);
-    --ring-ring: oklch(0.5560 0 0);
-    --sidebar: oklch(0.2050 0 0);
-    --sidebar-primary: oklch(0.5770 0.2450 27.3250);
+  .dark {
+    /* Dark theme colors - HSL format for Tailwind compatibility */
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --sidebar: 0 0% 3.9%;
+    --sidebar-primary: 0 0% 98%;
     
-    /* Semantic color variants for dark theme from design.json - exact OKLCH values */
-    --success: oklch(0.72 0.2 145);
-    --success-foreground: oklch(0.2050 0 0);
-    --warning: oklch(0.85 0.18 75);
-    --warning-foreground: oklch(0.2050 0 0);
-    --error: oklch(0.7040 0.1910 22.2160); /* Same as destructive */
-    --error-foreground: oklch(0.9850 0 0);
-    --info: oklch(0.75 0.1 220);
-    --info-foreground: oklch(0.2050 0 0);
+    /* Semantic color variants for dark theme */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 9%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+    --error: 0 62.8% 30.6%;
+    --error-foreground: 0 0% 98%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 9%;
   }
 }
 
