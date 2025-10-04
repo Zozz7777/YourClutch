@@ -11,8 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { apiService } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2, UserPlus, Mail, Building2, Shield, Check } from "lucide-react";
-// Translation system removed - using hardcoded strings
 import { useAuth } from "@/contexts/auth-context";
+import { useLanguage } from "@/contexts/language-context";
 
 interface InvitationFormData {
   name: string;
@@ -91,8 +91,8 @@ const PERMISSION_OPTIONS = [
 ];
 
 export function EmployeeInvitationForm({ onSuccess, onCancel }: EmployeeInvitationFormProps) {
-  // Translation system removed - using hardcoded strings
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<InvitationFormData>({
     name: "",
     email: "",
