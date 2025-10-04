@@ -4361,6 +4361,26 @@
       "ar": "العربية"
     }
   },
+  "notifications": {
+    "title": "الإشعارات",
+    "noNotifications": "لا توجد إشعارات",
+    "markAllRead": "تعيين الكل كمقروء",
+    "viewAll": "عرض جميع الإشعارات",
+    "contractSigned": "تم توقيع العقد",
+    "contractApproved": "تم اعتماد العقد",
+    "contractDeclined": "تم رفض العقد",
+    "partnerCreated": "تم إنشاء شريك جديد",
+    "leadStatusChange": "تم تحديث حالة العميل المحتمل",
+    "contractSignedMessage": "تم توقيع العقد {contractId} وهو جاهز للمراجعة.",
+    "contractApprovedMessage": "تم اعتماد العقد {contractId}.",
+    "contractDeclinedMessage": "تم رفض العقد {contractId}.",
+    "partnerCreatedMessage": "تم إنشاء شريك جديد {partnerId}.",
+    "leadStatusChangeMessage": "تم تغيير حالة العميل المحتمل {leadId} إلى {status}.",
+    "reviewContract": "مراجعة العقد",
+    "viewPartner": "عرض الشريك",
+    "viewLead": "عرض العميل المحتمل",
+    "view": "عرض"
+  },
   "pricing": {
     "plans": "خطط التسعير",
     "mostPopular": "الأكثر شعبية",

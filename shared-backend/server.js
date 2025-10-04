@@ -451,6 +451,9 @@ app.use('/api/v1/contract-templates', require('./routes/contract-templates'));
 // Contracts routes
 app.use('/api/v1/contracts', require('./routes/contracts'));
 
+// Notifications routes
+app.use('/api/v1/notifications', require('./routes/notifications'));
+
 // Updates routes
 app.use('/api/v1/updates', require('./routes/updates'));
 

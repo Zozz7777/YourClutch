@@ -27,6 +27,7 @@ import { type Notification } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/notification-bell";
 import { useLanguage } from "@/contexts/language-context";
 
 interface HeaderProps {
@@ -144,50 +145,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
         <ThemeToggle />
 
         {/* Notifications */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative hover:bg-muted focus:ring-2 focus:ring-ring focus:ring-offset-2">
-              <Bell className="h-5 w-5" />
-              {notifications.length > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {notifications.length}
-                </Badge>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>{t('header.notifications')}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="max-h-64 overflow-y-auto">
-              {notificationsLoading ? (
-                <div className="p-4 text-center text-muted-foreground">
-                  {t('common.loading')}
-                </div>
-              ) : notifications.length === 0 ? (
-                <div className="p-4 text-center text-muted-foreground">
-                  {t('notifications.noNotifications')}
-                </div>
-              ) : (
-                notifications.map((notification) => (
-                  <DropdownMenuItem key={notification.id} className="flex flex-col items-start p-3 hover:bg-muted focus:bg-muted">
-                    <div className="flex items-center justify-between w-full">
-                      <span className="font-medium">{notification.title}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatRelativeTime(notification.timestamp)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {notification.message}
-                    </p>
-                  </DropdownMenuItem>
-                ))
-              )}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <NotificationBell />
 
         {/* User Menu */}
         <DropdownMenu>

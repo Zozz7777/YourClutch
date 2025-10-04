@@ -990,6 +990,26 @@
       "ar": "Arabic"
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "No notifications",
+    "markAllRead": "Mark all read",
+    "viewAll": "View all notifications",
+    "contractSigned": "Contract Signed",
+    "contractApproved": "Contract Approved",
+    "contractDeclined": "Contract Declined",
+    "partnerCreated": "New Partner Created",
+    "leadStatusChange": "Lead Status Updated",
+    "contractSignedMessage": "Contract {contractId} has been signed and is ready for review.",
+    "contractApprovedMessage": "Contract {contractId} has been approved.",
+    "contractDeclinedMessage": "Contract {contractId} has been declined.",
+    "partnerCreatedMessage": "New partner {partnerId} has been created.",
+    "leadStatusChangeMessage": "Lead {leadId} status changed to {status}.",
+    "reviewContract": "Review Contract",
+    "viewPartner": "View Partner",
+    "viewLead": "View Lead",
+    "view": "View"
+  },
   "pendingEmails": {
     "title": "Pending Emails",
     "description": "Manage employee invitation emails that couldn't be sent automatically",

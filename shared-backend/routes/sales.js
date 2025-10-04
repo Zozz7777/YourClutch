@@ -7,6 +7,7 @@ const PDFDocument = require('pdfkit');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { createLeadStatusChangeNotification } = require('./notifications');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -297,13 +298,22 @@ router.put('/leads/:id/status', authenticateToken, async (req, res) => {
       }
     }
 
-    // Send notification to sales person about status change
-    await sendNotification(lead.createdBy, 'LEAD_STATUS_UPDATED', {
-      leadId: id,
-      companyName: lead.companyName,
-      oldStatus: lead.status,
-      newStatus: status
-    });
+        // Send notification to sales person about status change
+        await sendNotification(lead.createdBy, 'LEAD_STATUS_UPDATED', {
+          leadId: id,
+          companyName: lead.companyName,
+          oldStatus: lead.status,
+          newStatus: status
+        });
+
+        // Create in-app notification for lead status change
+        try {
+          await createLeadStatusChangeNotification(lead, lead.status, status, lead.createdBy);
+          console.log(`🔔 In-app notification created: Lead ${id} status changed from ${lead.status} to ${status}`);
+        } catch (notificationError) {
+          console.error('❌ Failed to create in-app notification:', notificationError);
+          // Don't fail the lead update if notification fails
+        }
 
     res.status(200).json({
       success: true,

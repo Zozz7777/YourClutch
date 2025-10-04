@@ -7,6 +7,7 @@ const multer = require('multer');
 const { uploadFile, getSignedUrl, generateContractKey, generateSignedContractKey, downloadFile } = require('../lib/storage');
 const { mergeTemplate, validateContractFields, prepareTemplateData, convertToPDF } = require('../lib/docx');
 const { notifyLegalTeamSignedContract, notifySalesPersonContractDecision, notifyNewPartnerCreated } = require('../lib/notifications');
+const { createContractSignedNotification, createContractDecisionNotification, createPartnerCreatedNotification } = require('./notifications');
 
 // Configure multer for file uploads
 const upload = multer({
@@ -276,12 +277,21 @@ router.post('/:id/upload-signed', authenticateToken, upload.single('signedContra
       });
     }
     
-    // Send notification to legal/executive team
+    // Send email notification to legal/executive team
     try {
       await notifyLegalTeamSignedContract(contract, req.user.email || 'sales@yourclutch.com');
-      console.log(`📧 Notification sent: Contract ${id} signed and ready for review`);
+      console.log(`📧 Email notification sent: Contract ${id} signed and ready for review`);
     } catch (notificationError) {
-      console.error('❌ Failed to send notification:', notificationError);
+      console.error('❌ Failed to send email notification:', notificationError);
+      // Don't fail the contract update if notification fails
+    }
+
+    // Create in-app notification for legal team
+    try {
+      await createContractSignedNotification(contract, req.user.userId);
+      console.log(`🔔 In-app notification created: Contract ${id} signed`);
+    } catch (notificationError) {
+      console.error('❌ Failed to create in-app notification:', notificationError);
       // Don't fail the contract update if notification fails
     }
     
@@ -439,13 +449,23 @@ router.post('/:id/approve', authenticateToken, async (req, res) => {
       }
     );
     
-    // Send notifications
+    // Send email notifications
     try {
       await notifySalesPersonContractDecision(contract, 'approved');
       await notifyNewPartnerCreated(newPartner, req.user.email || 'sales@yourclutch.com');
-      console.log(`📧 Notifications sent: Contract ${id} approved, partner ${partnerId} created`);
+      console.log(`📧 Email notifications sent: Contract ${id} approved, partner ${partnerId} created`);
     } catch (notificationError) {
-      console.error('❌ Failed to send notifications:', notificationError);
+      console.error('❌ Failed to send email notifications:', notificationError);
+      // Don't fail the contract approval if notifications fail
+    }
+
+    // Create in-app notifications
+    try {
+      await createContractDecisionNotification(contract, 'approved', contract.createdBy);
+      await createPartnerCreatedNotification(newPartner, contract.createdBy);
+      console.log(`🔔 In-app notifications created: Contract ${id} approved, partner ${partnerId} created`);
+    } catch (notificationError) {
+      console.error('❌ Failed to create in-app notifications:', notificationError);
       // Don't fail the contract approval if notifications fail
     }
     
@@ -539,8 +559,23 @@ router.post('/:id/decline', authenticateToken, async (req, res) => {
       });
     }
     
-    // TODO: Send notification to sales person
-    console.log(`📧 Notification: Contract ${id} declined: ${reason}`);
+    // Send email notification to sales person
+    try {
+      await notifySalesPersonContractDecision(contract, 'declined', reason);
+      console.log(`📧 Email notification sent: Contract ${id} declined: ${reason}`);
+    } catch (notificationError) {
+      console.error('❌ Failed to send email notification:', notificationError);
+      // Don't fail the contract decline if notification fails
+    }
+
+    // Create in-app notification
+    try {
+      await createContractDecisionNotification(contract, 'declined', contract.createdBy, reason);
+      console.log(`🔔 In-app notification created: Contract ${id} declined`);
+    } catch (notificationError) {
+      console.error('❌ Failed to create in-app notification:', notificationError);
+      // Don't fail the contract decline if notification fails
+    }
     
     res.status(200).json({
       success: true,

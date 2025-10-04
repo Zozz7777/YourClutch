@@ -998,3 +998,5 @@ export default function LegalPage() {
     </div>
   );
 }
+
+export default LegalPage;
