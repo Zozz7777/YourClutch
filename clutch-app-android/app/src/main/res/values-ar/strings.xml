@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">كلتش</string>
+    <string name="app_tagline">أفضل صديق لسيارتك</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_parts">قطع الغيار</string>
+    <string name="nav_maintenance">الصيانة</string>
+    <string name="nav_account">الحساب</string>
+    
+    <!-- Auth -->
+    <string name="login">تسجيل الدخول</string>
+    <string name="signup">إنشاء حساب</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="email_phone">البريد الإلكتروني / رقم الهاتف</string>
+    <string name="password">كلمة المرور</string>
+    <string name="confirm_password">تأكيد كلمة المرور</string>
+    <string name="name">الاسم</string>
+    <string name="mobile_number">رقم الهاتف المحمول</string>
+    <string name="forgot_password">نسيت كلمة المرور؟</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="already_have_account">هل لديك حساب بالفعل؟</string>
+    <string name="sign_in_to_continue">سجل الدخول للمتابعة</string>
+    <string name="create_your_account">أنشئ حسابك</string>
+    <string name="agree_to_terms">أوافق على شروط الخدمة وسياسة الخصوصية</string>
+    <string name="login_with_google">تسجيل الدخول بجوجل</string>
+    <string name="login_with_facebook">تسجيل الدخول بفيسبوك</string>
+    <string name="signup_with_google">إنشاء حساب بجوجل</string>
+    <string name="signup_with_facebook">إنشاء حساب بفيسبوك</string>
+    <string name="or_signup_with">أو سجل مع</string>
+    <string name="welcome_back">مرحباً بعودتك</string>
+    <string name="or_continue_with">أو تابع مع</string>
+    <string name="sign_up">إنشاء حساب</string>
+    <string name="already_have_account_question">هل لديك حساب بالفعل؟</string>
+    <string name="forgot_password_title">نسيت كلمة المرور</string>
+    <string name="forgot_password_description">أدخل بريدك الإلكتروني أو رقم هاتفك لتلقي رمز إعادة التعيين</string>
+    <string name="reset_code_sent">تم إرسال رمز إعادة التعيين!</string>
+    <string name="reset_code_description">لقد أرسلنا رمز إعادة التعيين إلى %s. يرجى التحقق من بريدك الإلكتروني أو الرسائل النصية وإدخال الرمز أدناه.</string>
+    <string name="email_or_phone_number">البريد الإلكتروني أو رقم الهاتف</string>
+    <string name="send_reset_code">إرسال رمز إعادة التعيين</string>
+    <string name="enter_reset_code">أدخل رمز إعادة التعيين</string>
+    <string name="new_password">كلمة المرور الجديدة</string>
+    <string name="reset_password">إعادة تعيين كلمة المرور</string>
+    <string name="didnt_receive_code">لم تستلم الرمز؟ إعادة الإرسال</string>
+    <string name="back_to_login">العودة لتسجيل الدخول</string>
+    <string name="google">جوجل</string>
+    <string name="facebook">فيسبوك</string>
+    
+    <!-- Car Registration -->
+    <string name="add_your_car">أضف سيارتك</string>
+    <string name="year">السنة</string>
+    <string name="brand_name">اسم الماركة</string>
+    <string name="all_models">جميع الموديلات</string>
+    <string name="trim">الطراز</string>
+    <string name="kilometers">الكيلومترات</string>
+    <string name="color">اللون</string>
+    <string name="license_plate">رقم اللوحة</string>
+    <string name="go">ابدأ</string>
+    <string name="your_car">سيارتك</string>
+    <string name="find_your_car">ابحث عن سيارتك</string>
+    <string name="model">الموديل</string>
+    <string name="trims">الطرازات</string>
+    <string name="last_maintenance">آخر صيانة</string>
+    <string name="date">التاريخ</string>
+    <string name="what_did_you_do">ماذا فعلت</string>
+    <string name="what_did_you_do_maintenance">ماذا فعلت في آخر صيانة لك؟</string>
+    <string name="search">بحث</string>
+    <string name="other_things_type_here">أشياء أخرى؟ اكتب هنا</string>
+    <string name="confirm">تأكيد</string>
+    <string name="ok">موافق</string>
+    <string name="cancel">إلغاء</string>
+    
+    <!-- Dashboard -->
+    <string name="car_health">صحة السيارة</string>
+    <string name="find_mechanics">البحث عن ميكانيكي</string>
+    <string name="shop_parts">تسوق قطع الغيار</string>
+    <string name="parts_expiring">قطع غيار تنتهي قريباً</string>
+    <string name="view_all">عرض الكل</string>
+    <string name="car_health_score">درجة صحة السيارة</string>
+    <string name="maintenance_reminders">تذكيرات الصيانة</string>
+    <string name="quick_book">حجز سريع</string>
+    <string name="loyalty_points">نقاط الولاء</string>
+    <string name="active_orders">الطلبات النشطة</string>
+    
+    <!-- Onboarding -->
+    <string name="save_money">وفر المال</string>
+    <string name="extend_car_life">مدد عمر سيارتك</string>
+    <string name="peace_of_mind">راحة البال</string>
+    <string name="onboarding_save_money_desc">تتبع صحة سيارتك، تجنب الأعطال المكلفة، واحصل على أفضل الأسعار لقطع الغيار والخدمات—فقط مع كلتش.</string>
+    <string name="onboarding_extend_life_desc">ابق على اطلاع بالصيانة واستبدل القطع في الوقت المناسب للحفاظ على سيارتك تعمل بسلاسة لسنوات قادمة.</string>
+    <string name="onboarding_peace_mind_desc">من الميكانيكيين الموثوقين إلى المدفوعات الشفافة، كلتش يضمن أن كل رحلة تكون أكثر أماناً وذكاءً وخالية من التوتر.</string>
+    
+        <!-- Community -->
+        <string name="community">المجتمع</string>
+        <string name="book_service">حجز الخدمة</string>
+        <string name="order_parts">طلب قطع الغيار</string>
+    <string name="tips">نصائح</string>
+    <string name="reviews">التقييمات</string>
+    <string name="leaderboard">لوحة المتصدرين</string>
+    
+    <!-- Loyalty -->
+    <string name="loyalty">الولاء</string>
+    <string name="points">النقاط</string>
+    <string name="badges">الشارات</string>
+    <string name="rewards">المكافآت</string>
+    
+    <!-- Common -->
+    <string name="loading">جاري التحميل...</string>
+    <string name="error">خطأ</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="save">حفظ</string>
+    <string name="edit">تعديل</string>
+    <string name="delete">حذف</string>
+    <string name="back">رجوع</string>
+    <string name="next">التالي</string>
+    <string name="previous">السابق</string>
+    <string name="skip">تخطي</string>
+    <string name="get_started">ابدأ الآن</string>
+    <string name="done">تم</string>
+    <string name="try_again">حاول مرة أخرى</string>
+    <string name="go_to_login">اذهب لتسجيل الدخول</string>
+    
+    <!-- Error Messages -->
+    <string name="login_failed">فشل تسجيل الدخول</string>
+    <string name="signup_failed">فشل إنشاء الحساب</string>
+    <string name="email_already_registered">البريد الإلكتروني مسجل بالفعل</string>
+    <string name="invalid_credentials">بيانات الدخول غير صحيحة</string>
+    <string name="network_error">خطأ في الشبكة</string>
+    <string name="google_login_not_implemented">تسجيل الدخول بجوجل غير متاح حالياً</string>
+    <string name="facebook_login_not_implemented">تسجيل الدخول بفيسبوك غير متاح حالياً</string>
+    <string name="google_signup_not_implemented">إنشاء حساب بجوجل غير متاح حالياً</string>
+    <string name="facebook_signup_not_implemented">إنشاء حساب بفيسبوك غير متاح حالياً</string>
+    
+    <!-- Additional strings for hardcoded text fixes -->
+    <string name="no_car_selected">لم يتم اختيار سيارة</string>
+    <string name="your_car_health">صحة سيارتك</string>
+    <string name="parts_expiring_soon">قطع الغيار المنتهية قريباً</string>
+    <string name="engine_oil">زيت المحرك</string>
+    <string name="spark_plugs">شمعات الإشعال</string>
+    <string name="air_filter">فلتر الهواء</string>
+    <string name="brakes">الفرامل</string>
+    <string name="clutch_logo">شعار كلتش</string>
+    <string name="car">سيارة</string>
+    <string name="dropdown">قائمة منسدلة</string>
+    <string name="close">إغلاق</string>
+    <string name="select">اختيار</string>
+    <string name="brand_logo">شعار الماركة</string>
+    <string name="change_brand">تغيير الماركة</string>
+    <string name="change_car">تغيير السيارة</string>
+    <string name="expand">توسيع</string>
+    <string name="collapse">طي</string>
+    <string name="service_group">مجموعة الخدمة</string>
+    <string name="votes">الأصوات</string>
+    <string name="add_tip">إضافة نصيحة</string>
+    <string name="view">عرض</string>
+    <string name="notifications">الإشعارات</string>
+        <string name="select_date">اختيار التاريخ</string>
+        <string name="select_maintenance_type">اختيار نوع الصيانة</string>
+        <string name="select_services">اختيار الخدمات</string>
+        <string name="select_brand">اختيار الماركة</string>
+        <string name="select_model">اختيار الموديل</string>
+        <string name="select_trim">اختيار الطراز</string>
+        
+        <!-- Account Screen -->
+        <string name="profile">الملف الشخصي</string>
+        <string name="your_cars">سياراتك</string>
+        <string name="settings">الإعدادات</string>
+        <string name="get_help">الحصول على المساعدة</string>
+        <string name="about">حول</string>
+        
+        <!-- Additional strings for screens -->
+        <string name="parts">قطع الغيار</string>
+        <string name="search_for_parts">البحث عن قطع الغيار...</string>
+        <string name="parts_categories">فئات قطع الغيار</string>
+        <string name="engine_parts">قطع المحرك</string>
+        <string name="engine_parts_desc">فلاتر الزيت، شمعات الإشعال، الأحزمة</string>
+        <string name="brake_parts">قطع الفرامل</string>
+        <string name="brake_parts_desc">بطانة الفرامل، الأقراص، الكاليبر</string>
+        <string name="tire_wheel">الإطارات والعجلات</string>
+        <string name="tire_wheel_desc">الإطارات، الجنوط، أغطية العجلات</string>
+        <string name="electrical">الكهرباء</string>
+        <string name="electrical_desc">البطاريات، المولدات، المحركات</string>
+        <string name="body_parts">قطع الهيكل</string>
+        <string name="body_parts_desc">المصدات، المرايا، الأضواء</string>
+        
+        <!-- Screen Titles -->
+        <string name="privacy_policy">سياسة الخصوصية</string>
+        <string name="terms_of_service">شروط الخدمة</string>
+        <string name="open_source_licenses">تراخيص المصدر المفتوح</string>
+        <string name="rate_app">تقييم التطبيق</string>
+        <string name="faq">الأسئلة الشائعة</string>
+        <string name="contact_support">اتصل بالدعم</string>
+        <string name="send_feedback">إرسال ملاحظات</string>
+        <string name="share_app">مشاركة التطبيق</string>
+        <string name="language">اللغة</string>
+        <string name="data_storage">البيانات والتخزين</string>
+        <string name="privacy">الخصوصية</string>
+        <string name="security">الأمان</string>
+        
+        <!-- Essential missing strings -->
+        <string name="profile_picture">الصورة الشخصية</string>
+        <string name="wishlist">قائمة الأمنيات</string>
+        <string name="cart">السلة</string>
+        <string name="filter">فلتر</string>
+        <string name="rating">التقييم</string>
+        <string name="add_to_cart">أضف للسلة</string>
+        <string name="navigate">انتقل</string>
+        <string name="edit_mileage">تعديل المسافة</string>
+        <string name="service">الخدمة</string>
+        <string name="edit_profile">تعديل الملف الشخصي</string>
+        <string name="wallet">المحفظة</string>
+        <string name="buy_again">اشتر مرة أخرى</string>
+        <string name="your_lists">قوائمك</string>
+        <string name="keep_shopping">تابع التسوق</string>
+        <string name="saved_addresses">العناوين المحفوظة</string>
+        <string name="sign_out">تسجيل الخروج</string>
+        <string name="star">نجمة</string>
+        <string name="add_address">إضافة عنوان</string>
+        <string name="no_addresses">لا توجد عناوين</string>
+        <string name="location">الموقع</string>
+        <string name="add_money">إضافة أموال</string>
+        <string name="withdraw">سحب</string>
+        <string name="transactions">المعاملات</string>
+        <string name="payment_methods">طرق الدفع</string>
+        <string name="no_transactions">لا توجد معاملات</string>
+        <string name="change_password">تغيير كلمة المرور</string>
+        <string name="two_factor_auth">المصادقة الثنائية</string>
+        <string name="change">تغيير</string>
+        <string name="rate_on_app_store">قيم في متجر التطبيقات</string>
+        <string name="share">مشاركة</string>
+        <string name="mark_complete">وضع علامة مكتمل</string>
+        <string name="search_questions">البحث في الأسئلة...</string>
+        <string name="what_did_you_like">ما الذي أعجبك أو لم يعجبك في التطبيق؟</string>
+        <string name="write_your_own_message">اكتب رسالتك الخاصة...</string>
+        <string name="select_category">اختيار الفئة</string>
+        <string name="tell_us_what_you_think">أخبرنا برأيك...</string>
+        <string name="hide_password">إخفاء كلمة المرور</string>
+        <string name="show_password">إظهار كلمة المرور</string>
+        <string name="search_products">البحث عن قطع غيار السيارات...</string>
+        <string name="categories">الفئات</string>
+        <string name="featured_products">المنتجات المميزة</string>
+        <string name="best_selling">الأكثر مبيعاً</string>
+        <string name="services">الخدمات</string>
+        <string name="add_your_car_to_get_started">أضف سيارتك للبدء</string>
+        <string name="find_service_centers">العثور على مراكز الخدمة</string>
+        <string name="shop_car_parts">تسوق قطع غيار السيارات</string>
+        <string name="expired_850_km_ago">انتهت صلاحيته منذ 850 كم</string>
+        <string name="remaining_km">850 كم متبقي</string>
+        <string name="select_car">اختر سيارة</string>
+        <string name="no_cars_found">لم يتم العثور على سيارات. أضف سيارتك الأولى!</string>
+        
+    </resources>

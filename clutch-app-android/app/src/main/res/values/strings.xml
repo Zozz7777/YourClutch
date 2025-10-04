@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clutch</string>
+    <string name="app_tagline">Your Car\'s Best Friend</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_parts">My Parts</string>
+    <string name="nav_maintenance">Maintenance</string>
+    <string name="nav_account">Account</string>
+    
+    <!-- Auth -->
+    <string name="login">Log in</string>
+    <string name="signup">Sign up</string>
+    <string name="email">Email</string>
+    <string name="email_phone">Email / Phone Number</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="name">Name</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="create_account">Create an account</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="sign_in_to_continue">Sign in to continue</string>
+    <string name="create_your_account">Create your account</string>
+    <string name="agree_to_terms">I Agree to Terms of Service and Privacy Policy</string>
+    <string name="login_with_google">Login with Google</string>
+    <string name="login_with_facebook">Login with Facebook</string>
+    <string name="signup_with_google">Sign up with Google</string>
+    <string name="signup_with_facebook">Sign up with Facebook</string>
+    <string name="or_signup_with">Or sign up with</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="or_continue_with">Or continue with</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="already_have_account_question">Already have an account?</string>
+    <string name="forgot_password_title">Forgot Password</string>
+    <string name="forgot_password_description">Enter your email or phone number to receive a reset code</string>
+    <string name="reset_code_sent">Reset code sent!</string>
+    <string name="reset_code_description">We\'ve sent a reset code to %s. Please check your email or SMS and enter the code below.</string>
+    <string name="email_or_phone_number">Email or Phone Number</string>
+    <string name="send_reset_code">SEND RESET CODE</string>
+    <string name="enter_reset_code">Enter Reset Code</string>
+    <string name="new_password">New Password</string>
+    <string name="reset_password">RESET PASSWORD</string>
+    <string name="didnt_receive_code">Didn\'t receive the code? Resend</string>
+    <string name="back_to_login">Back to Login</string>
+    <string name="google">Google</string>
+    <string name="facebook">Facebook</string>
+    
+    <!-- Car Registration -->
+    <string name="add_your_car">Add Your Car</string>
+    <string name="year">Year</string>
+    <string name="brand_name">Brand Name</string>
+    <string name="all_models">All Models</string>
+    <string name="trim">Trim</string>
+    <string name="kilometers">Kilometers</string>
+    <string name="color">Color</string>
+    <string name="license_plate">License Plate</string>
+    <string name="go">GO</string>
+    <string name="your_car">Your Car</string>
+    <string name="find_your_car">Find your car</string>
+    <string name="model">Model</string>
+    <string name="trims">Trims</string>
+    <string name="last_maintenance">Last Maintenance</string>
+    <string name="date">Date</string>
+    <string name="what_did_you_do">What Did You Do</string>
+    <string name="what_did_you_do_maintenance">What Did Your Do On Your Last Maintenance?</string>
+    <string name="search">Search</string>
+    <string name="other_things_type_here">OTHER THINGS? TYPE HERE</string>
+    <string name="confirm">CONFIRM</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    
+    <!-- Dashboard -->
+    <string name="car_health">Car Health</string>
+    <string name="find_mechanics">Find Mechanics</string>
+    <string name="shop_parts">Shop Car Parts</string>
+    <string name="parts_expiring">Parts Expiring Soon</string>
+    <string name="view_all">View All</string>
+    <string name="car_health_score">Car Health Score</string>
+    <string name="maintenance_reminders">Maintenance Reminders</string>
+    <string name="quick_book">Quick Book</string>
+    <string name="loyalty_points">Loyalty Points</string>
+    <string name="active_orders">Active Orders</string>
+    
+    <!-- Onboarding -->
+    <string name="save_money">Save Money</string>
+    <string name="extend_car_life">Extend the life of your car</string>
+    <string name="peace_of_mind">Peace of mind</string>
+    <string name="onboarding_save_money_desc">Track your car\'s health, avoid costly breakdowns, and get the best prices on parts and services—only with Clutch.</string>
+    <string name="onboarding_extend_life_desc">Stay on top of maintenance and replace parts at the right time to keep your car running smoothly for years to come.</string>
+    <string name="onboarding_peace_mind_desc">From trusted mechanics to transparent payments, Clutch ensures every ride is safer, smarter, and stress-free.</string>
+    
+        <!-- Community -->
+        <string name="community">Community</string>
+        <string name="book_service">Book Service</string>
+        <string name="order_parts">Order Parts</string>
+    <string name="tips">Tips</string>
+    <string name="reviews">Reviews</string>
+    <string name="leaderboard">Leaderboard</string>
+    
+    <!-- Loyalty -->
+    <string name="loyalty">Loyalty</string>
+    <string name="points">Points</string>
+    <string name="badges">Badges</string>
+    <string name="rewards">Rewards</string>
+    
+    <!-- Common -->
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="retry">Retry</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="skip">Skip</string>
+    <string name="get_started">Get Started</string>
+    <string name="done">Done</string>
+    <string name="try_again">Try Again</string>
+    <string name="go_to_login">Go to Login</string>
+    
+    <!-- Error Messages -->
+    <string name="login_failed">Login Failed</string>
+    <string name="signup_failed">Signup Failed</string>
+    <string name="email_already_registered">Email Already Registered</string>
+    <string name="invalid_credentials">Invalid credentials</string>
+    <string name="network_error">Network error</string>
+    <string name="google_login_not_implemented">Google Login not implemented yet</string>
+    <string name="facebook_login_not_implemented">Facebook Login not implemented yet</string>
+    <string name="google_signup_not_implemented">Google Sign-Up not implemented yet</string>
+    <string name="facebook_signup_not_implemented">Facebook Sign-Up not implemented yet</string>
+    
+    <!-- Additional strings for hardcoded text fixes -->
+    <string name="no_car_selected">No Car Selected</string>
+    <string name="your_car_health">Your Car Health</string>
+    <string name="parts_expiring_soon">Parts Expiring Soon</string>
+    <string name="engine_oil">Engine Oil</string>
+    <string name="spark_plugs">Spark Plugs</string>
+    <string name="air_filter">Air Filter</string>
+    <string name="brakes">Brakes</string>
+    <string name="clutch_logo">Clutch Logo</string>
+    <string name="car">Car</string>
+    <string name="dropdown">Dropdown</string>
+    <string name="close">Close</string>
+    <string name="select">Select</string>
+    <string name="brand_logo">Brand Logo</string>
+    <string name="change_brand">Change Brand</string>
+    <string name="change_car">Change Car</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
+    <string name="service_group">Service Group</string>
+    <string name="votes">Votes</string>
+    <string name="add_tip">Add Tip</string>
+    <string name="view">View</string>
+    <string name="notifications">Notifications</string>
+        <string name="select_date">Select Date</string>
+    <string name="select_maintenance_type">Select Maintenance Type</string>
+        <string name="select_services">Select Services</string>
+        <string name="select_brand">Select Brand</string>
+        <string name="select_model">Select Model</string>
+        <string name="select_trim">Select Trim</string>
+        
+        <!-- Account Screen -->
+        <string name="profile">Profile</string>
+        <string name="your_cars">Your Cars</string>
+        <string name="settings">Settings</string>
+        <string name="get_help">Get Help</string>
+        <string name="about">About</string>
+        
+        <!-- Additional strings for screens -->
+        <string name="parts">Parts</string>
+        <string name="search_for_parts">Search for parts...</string>
+        <string name="parts_categories">Parts Categories</string>
+        <string name="engine_parts">Engine Parts</string>
+        <string name="engine_parts_desc">Oil filters, spark plugs, belts</string>
+        <string name="brake_parts">Brake Parts</string>
+        <string name="brake_parts_desc">Brake pads, rotors, calipers</string>
+        <string name="tire_wheel">Tire &amp; Wheel</string>
+        <string name="tire_wheel_desc">Tires, rims, wheel covers</string>
+        <string name="electrical">Electrical</string>
+        <string name="electrical_desc">Batteries, alternators, starters</string>
+        <string name="body_parts">Body Parts</string>
+        <string name="body_parts_desc">Bumpers, mirrors, lights</string>
+        
+        <!-- Screen Titles -->
+        <string name="privacy_policy">Privacy Policy</string>
+        <string name="terms_of_service">Terms of Service</string>
+        <string name="open_source_licenses">Open Source Licenses</string>
+        <string name="rate_app">Rate App</string>
+        <string name="faq">FAQ</string>
+        <string name="contact_support">Contact Support</string>
+        <string name="send_feedback">Send Feedback</string>
+        <string name="share_app">Share App</string>
+        <string name="language">Language</string>
+        <string name="data_storage">Data &amp; Storage</string>
+        <string name="privacy">Privacy</string>
+        <string name="security">Security</string>
+        
+        <!-- Essential missing strings -->
+        <string name="profile_picture">Profile Picture</string>
+        <string name="wishlist">Wishlist</string>
+        <string name="cart">Cart</string>
+        <string name="filter">Filter</string>
+        <string name="rating">Rating</string>
+        <string name="add_to_cart">Add to Cart</string>
+        <string name="navigate">Navigate</string>
+        <string name="edit_mileage">Edit Mileage</string>
+        <string name="service">Service</string>
+        <string name="edit_profile">Edit Profile</string>
+        <string name="wallet">Wallet</string>
+        <string name="buy_again">Buy Again</string>
+        <string name="your_lists">Your Lists</string>
+        <string name="keep_shopping">Keep Shopping</string>
+        <string name="saved_addresses">Saved Addresses</string>
+        <string name="sign_out">Sign Out</string>
+        <string name="star">Star</string>
+        <string name="add_address">Add Address</string>
+        <string name="no_addresses">No Addresses</string>
+        <string name="location">Location</string>
+        <string name="add_money">Add Money</string>
+        <string name="withdraw">Withdraw</string>
+        <string name="transactions">Transactions</string>
+        <string name="payment_methods">Payment Methods</string>
+        <string name="no_transactions">No Transactions</string>
+        <string name="change_password">Change Password</string>
+        <string name="two_factor_auth">Two-Factor Authentication</string>
+        <string name="change">Change</string>
+        <string name="rate_on_app_store">Rate on App Store</string>
+        <string name="share">Share</string>
+        <string name="mark_complete">Mark Complete</string>
+        <string name="search_questions">Search questions...</string>
+        <string name="what_did_you_like">What did you like or dislike about the app?</string>
+        <string name="write_your_own_message">Write your own message...</string>
+        <string name="select_category">Select Category</string>
+        <string name="tell_us_what_you_think">Tell us what you think...</string>
+        <string name="hide_password">Hide password</string>
+        <string name="show_password">Show password</string>
+        <string name="search_products">Search for car parts...</string>
+        <string name="categories">Categories</string>
+        <string name="featured_products">Featured Products</string>
+        <string name="best_selling">Best Selling</string>
+        <string name="services">Services</string>
+        <string name="add_your_car_to_get_started">Add your car to get started</string>
+        <string name="find_service_centers">Find Service Centers</string>
+        <string name="shop_car_parts">Shop Car Parts</string>
+        <string name="expired_850_km_ago">Expired 850 km ago</string>
+        <string name="remaining_km">850 km remaining</string>
+        <string name="select_car">Select a car</string>
+        <string name="no_cars_found">No cars found. Add your first car!</string>
+        
+    </resources>

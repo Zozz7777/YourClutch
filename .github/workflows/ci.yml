@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [ shared-backend, clutch-admin, website/clutch-website-nextjs ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          cd ${{ matrix.project }}
+          npm ci --no-audit --no-fund
+
+      - name: Lint
+        run: |
+          cd ${{ matrix.project }}
+          if [ -f "package.json" ] && jq -e '.scripts.lint' package.json > /dev/null; then npm run -s lint -- .; fi
+
+      - name: Build
+        run: |
+          cd ${{ matrix.project }}
+          if [ -f "package.json" ] && jq -e '.scripts.build' package.json > /dev/null; then npm run -s build; fi
+

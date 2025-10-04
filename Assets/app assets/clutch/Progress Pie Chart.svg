@@ -1,0 +1,15 @@
+<svg width="300" height="150" viewBox="0 0 300 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="mask0_372_2025" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="300" height="150">
+<rect width="300" height="150" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask0_372_2025)">
+<path d="M300 150C300 232.843 232.843 300 150 300C67.1573 300 0 232.843 0 150C0 67.1573 67.1573 0 150 0C232.843 0 300 67.1573 300 150ZM30 150C30 216.274 83.7258 270 150 270C216.274 270 270 216.274 270 150C270 83.7258 216.274 30 150 30C83.7258 30 30 83.7258 30 150Z" fill="#F5F5F5"/>
+<path d="M0 150C3.47789e-06 110.218 15.8035 72.0644 43.934 43.934C72.0644 15.8035 110.218 4.26804e-06 150 0C189.782 -4.26804e-06 227.936 15.8035 256.066 43.934C284.196 72.0644 300 110.217 300 150L270 150C270 118.174 257.357 87.6515 234.853 65.1472C212.348 42.6428 181.826 30 150 30C118.174 30 87.6516 42.6428 65.1472 65.1472C42.6428 87.6516 30 118.174 30 150H0Z" fill="url(#paint0_linear_372_2025)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_372_2025" x1="150" y1="0" x2="150" y2="300" gradientUnits="userSpaceOnUse">
+<stop stop-color="#ED1B24"/>
+<stop offset="1" stop-opacity="0.8"/>
+</linearGradient>
+</defs>
+</svg>
