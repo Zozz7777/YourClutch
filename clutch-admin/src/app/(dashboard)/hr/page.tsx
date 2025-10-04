@@ -419,7 +419,7 @@ export default function HRPage() {
             startDate: emp.startDate || emp.createdAt || new Date().toISOString(),
             hireDate: emp.hireDate || emp.createdAt || new Date().toISOString(),
             endDate: emp.endDate || '',
-            salary: emp.salary || 0,
+            salary: Number(emp.salary) || 0,
             currency: emp.currency || 'EGP',
             role: emp.role || 'employee',
             permissions: emp.permissions || [],
@@ -553,9 +553,20 @@ export default function HRPage() {
           console.log('HR Salary Debug:', {
             employeeCount: employees.length,
             employees: employees,
-            salaries: employees.map(e => ({ name: `${e.firstName} ${e.lastName}`, salary: e.salary, salaryType: typeof e.salary })),
+            salaries: employees.map(e => ({ 
+              name: `${e.firstName} ${e.lastName}`, 
+              salary: e.salary, 
+              salaryType: typeof e.salary,
+              salaryValue: e.salary,
+              salaryNumber: Number(e.salary)
+            })),
             totalSalary: employees.reduce((sum, e) => sum + (Number(e.salary) || 0), 0),
-            averageSalary: averageSalary
+            averageSalary: averageSalary,
+            calculation: {
+              sum: employees.reduce((sum, e) => sum + (Number(e.salary) || 0), 0),
+              count: employees.length,
+              result: employees.reduce((sum, e) => sum + (Number(e.salary) || 0), 0) / employees.length
+            }
           });
 
           setStats({
