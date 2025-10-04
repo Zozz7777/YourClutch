@@ -438,6 +438,9 @@ app.use('/api/v1/auth', partnerLoginRoutes);
 // Community and Loyalty routes
 app.use('/api/v1/community', require('./routes/community'));
 app.use('/api/v1/loyalty', require('./routes/loyalty'));
+
+// Sales routes
+app.use('/api/v1/sales', require('./routes/sales'));
 app.use('/api/v1', clutchAppRoutes);
 app.use('/api/v1/admin/onboarding', onboardingRoutes);
 app.use('/api/v1/admin/roles', rolesRoutes);

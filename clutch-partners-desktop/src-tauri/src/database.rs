@@ -33,11 +33,10 @@ pub struct Database {
 
 impl Database {
     pub async fn new() -> Self {
-        // Use a simple database path in the current directory
-        let database_path = std::env::current_dir()
-            .unwrap()
-            .parent()
-            .unwrap()
+        // Use persistent file database in user's AppData directory
+        let database_path = dirs::data_dir()
+            .unwrap_or_else(|| std::env::current_dir().unwrap())
+            .join("ClutchPartners")
             .join("clutch_partners.db");
         
         // Ensure the directory exists
@@ -45,17 +44,6 @@ impl Database {
             std::fs::create_dir_all(parent).unwrap_or_else(|_| {
                 log::warn!("Could not create database directory");
             });
-        }
-        
-        // Remove any existing empty file and let SQLite create the proper database
-        if database_path.exists() {
-            if let Ok(metadata) = std::fs::metadata(&database_path) {
-                if metadata.len() == 0 {
-                    std::fs::remove_file(&database_path).unwrap_or_else(|_| {
-                        log::warn!("Could not remove empty database file");
-                    });
-                }
-            }
         }
         
         let database_url = format!("sqlite:{}", database_path.display());

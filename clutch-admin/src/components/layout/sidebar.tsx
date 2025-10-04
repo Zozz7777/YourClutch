@@ -25,18 +25,19 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   
   // Navigation items with translations
-  const navigationItems = NAVIGATION_ITEMS.map(item => {
-    // Map English titles to translation keys
-    const titleMap: Record<string, string> = {
-      'Dashboard': 'navigation.dashboard',
-      'HR': 'navigation.hr'
-    };
-    
-    return {
-      ...item,
-      title: t(titleMap[item.title] || `navigation.${item.title.toLowerCase().replace(/\s+/g, '')}`) || item.title
-    };
-  });
+    const navigationItems = NAVIGATION_ITEMS.map(item => {
+      // Map English titles to translation keys
+      const titleMap: Record<string, string> = {
+        'Dashboard': 'navigation.dashboard',
+        'Sales': 'navigation.sales',
+        'HR': 'navigation.hr'
+      };
+      
+      return {
+        ...item,
+        title: t(titleMap[item.title] || `navigation.${item.title.toLowerCase().replace(/\s+/g, '')}`) || item.title
+      };
+    });
 
 
 

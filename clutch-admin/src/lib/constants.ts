@@ -165,6 +165,7 @@ export const PERMISSION_GROUPS = {
 export const PERMISSIONS = {
   // Core System & Dashboard
   VIEW_DASHBOARD: "view_dashboard",
+  VIEW_SALES: "view_sales",
   VIEW_ANALYTICS: "view_analytics",
   EXPORT_ANALYTICS: "export_analytics",
   VIEW_SYSTEM_HEALTH: "view_system_health",
@@ -355,6 +356,7 @@ export const ROLE_PERMISSIONS = {
     ...PERMISSION_GROUPS.CORE_SYSTEM_DASHBOARD,
     ...PERMISSION_GROUPS.ADMINISTRATION_CONFIG.filter(p => p.includes('marketing')),
     ...PERMISSION_GROUPS.BUSINESS_CUSTOMER.filter(p => p.includes('crm')),
+    PERMISSIONS.VIEW_SALES,
   ],
   [USER_ROLES.LEGAL_TEAM]: [
     ...PERMISSION_GROUPS.CORE_SYSTEM_DASHBOARD,
@@ -470,6 +472,12 @@ export const NAVIGATION_ITEMS = [
     href: "/dashboard",
     icon: "LayoutDashboard",
     permissions: [PERMISSIONS.VIEW_DASHBOARD],
+  },
+  {
+    title: "Sales",
+    href: "/sales",
+    icon: "TrendingUp",
+    permissions: [PERMISSIONS.VIEW_SALES],
   },
   {
     title: "HR",
