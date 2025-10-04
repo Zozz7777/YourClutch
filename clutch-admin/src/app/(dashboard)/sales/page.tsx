@@ -246,18 +246,6 @@ export default function SalesPage() {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      companyName: "",
-      contactPerson: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-      partnerType: "",
-      notes: ""
-    });
-  };
 
   const getStatusColor = (status: LeadStatus) => {
     switch (status) {
