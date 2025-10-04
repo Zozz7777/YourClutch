@@ -1,5 +1,5 @@
 const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, HeadBucketCommand } = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { getSignedUrl: getSignedUrlFromAWS } = require('@aws-sdk/s3-request-presigner');
 const path = require('path');
 
 // Configure AWS S3 v3 client
@@ -62,7 +62,7 @@ async function getSignedUrl(key, expiresIn = 3600) {
       Key: key
     });
 
-    const url = await getSignedUrl(s3Client, command, { expiresIn });
+    const url = await getSignedUrlFromAWS(s3Client, command, { expiresIn });
     console.log(`✅ Generated signed URL for: ${key}`);
     return url;
   } catch (error) {

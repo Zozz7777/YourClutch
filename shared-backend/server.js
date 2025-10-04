@@ -558,7 +558,7 @@ const corsOptions = {
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// OPTIONS handler
+// OPTIONS handler - Express v5 compatible
 app.options('*', (req, res) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
@@ -576,7 +576,7 @@ app.get('/Logored.png', (req, res) => {
   res.redirect('https://drive.google.com/uc?export=view&id=1UyOznOrD4lNpeS93t3TBWBhfNMdbykVQ');
 });
 
-// 404 handler
+// 404 handler - Express v5 compatible
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,

@@ -307,8 +307,7 @@ const applyOptimizedMiddleware = (app) => {
     next();
   });
   
-  // Handle preflight requests
-  app.options('/*', optimizedCORS);
+  // Handle preflight requests - Express v5 compatible
   app.use(optimizedCORS);
   
   // Body parsing with limits
