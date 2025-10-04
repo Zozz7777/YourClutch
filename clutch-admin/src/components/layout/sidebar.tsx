@@ -29,34 +29,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
     // Map English titles to translation keys
     const titleMap: Record<string, string> = {
       'Dashboard': 'navigation.dashboard',
-      'User Management': 'navigation.userManagement',
-      'Fleet Management': 'navigation.fleetManagement',
-      'Sales': 'navigation.sales',
-      'Sales Rep Dashboard': 'navigation.salesRepDashboard',
-      'Executive Dashboard': 'navigation.executiveDashboard',
-      'HR Performance': 'navigation.hrPerformance',
-      'Legal Contracts': 'navigation.legalContracts',
-      'Chat & Messaging': 'navigation.chat',
-      'AI & ML Dashboard': 'navigation.aiDashboard',
-      'Enterprise B2B': 'navigation.enterprise',
-      'Finance': 'navigation.finance',
-      'Legal': 'navigation.legal',
-      'HR': 'navigation.hr',
-      'Feature Flags': 'navigation.featureFlags',
-      'Communication': 'navigation.communication',
-      'Analytics': 'navigation.analytics',
-      'Mobile Apps': 'navigation.mobileApps',
-      'CMS': 'navigation.cms',
-      'Marketing': 'navigation.marketing',
-      'Project Management': 'navigation.projects',
-      'Settings': 'navigation.settings',
-      'Reporting': 'navigation.reports',
-      'Integrations': 'navigation.integrations',
-      'Audit Trail': 'navigation.auditTrail',
-      'API Documentation': 'navigation.apiDocs',
-      'Asset Management': 'navigation.assets',
-      'Vendor Management': 'navigation.vendors',
-      'System Health': 'navigation.systemHealth'
+      'HR': 'navigation.hr'
     };
     
     return {
