@@ -1,64 +1,62 @@
 /**
  * Fix HR Salary Data Script
- * This script checks and corrects salary data in the database
+ * Uses the same database connection as the backend
  */
 
-const { MongoClient } = require('mongodb');
+const { getCollection } = require('../config/optimized-database');
 
 async function fixSalaryData() {
-  const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://localhost:27017/clutch');
-  
   try {
-    await client.connect();
-    console.log('🔗 Connected to database');
+    console.log('🔗 Connecting to database...');
     
-    const db = client.db();
-    const employeesCollection = db.collection('employees');
+    // Use the same database connection as the backend
+    const employeesCollection = await getCollection('employees');
+    console.log('✅ Connected to employees collection');
     
-    // Get all employees with their salary data
-    const employees = await employeesCollection.find({}, { 
-      projection: { 
-        _id: 1, 
-        firstName: 1, 
-        lastName: 1, 
-        salary: 1,
-        'employment.salary': 1 
-      } 
+    // Find employees with wrong salary (500000)
+    const wrongSalaryEmployees = await employeesCollection.find({
+      $or: [
+        { salary: 500000 },
+        { 'employment.salary': 500000 },
+        { 'employment.baseSalary': 500000 }
+      ]
     }).toArray();
     
-    console.log('📊 Current employee salary data:');
-    employees.forEach(emp => {
-      console.log(`- ${emp.firstName} ${emp.lastName}:`);
-      console.log(`  - Direct salary: ${emp.salary}`);
-      console.log(`  - Employment salary: ${emp.employment?.salary}`);
-    });
-    
-    // Check if any employee has salary = 500000 (should be 50000)
-    const wrongSalaryEmployees = employees.filter(emp => 
-      emp.salary === 500000 || emp.employment?.salary === 500000
-    );
-    
-    if (wrongSalaryEmployees.length > 0) {
-      console.log('🔧 Found employees with wrong salary (500000), fixing to 50000...');
-      
-      for (const emp of wrongSalaryEmployees) {
-        const updateResult = await employeesCollection.updateOne(
-          { _id: emp._id },
-          { 
-            $set: { 
-              salary: 50000,
-              'employment.salary': 50000 
-            } 
-          }
-        );
-        
-        console.log(`✅ Updated ${emp.firstName} ${emp.lastName}: ${updateResult.modifiedCount} document(s) modified`);
-      }
-      
-      console.log('🎉 Salary data fixed!');
-    } else {
+    if (wrongSalaryEmployees.length === 0) {
       console.log('✅ No salary data issues found');
+      return;
     }
+    
+    console.log(`🔧 Found ${wrongSalaryEmployees.length} employees with wrong salary (500000)`);
+    
+    // Fix the salary data
+    const fixResults = [];
+    for (const emp of wrongSalaryEmployees) {
+      console.log(`   - Fixing ${emp.firstName} ${emp.lastName}...`);
+      
+      const updateResult = await employeesCollection.updateOne(
+        { _id: emp._id },
+        { 
+          $set: { 
+            salary: 50000,
+            'employment.salary': 50000,
+            'employment.baseSalary': 50000
+          } 
+        }
+      );
+      
+      fixResults.push({
+        employeeId: emp._id,
+        name: `${emp.firstName} ${emp.lastName}`,
+        fixed: updateResult.modifiedCount > 0
+      });
+      
+      console.log(`     ✅ Updated: ${updateResult.modifiedCount} document(s) modified`);
+    }
+    
+    console.log('');
+    console.log('🎉 Salary data fixed!');
+    console.log(`   - Total employees fixed: ${fixResults.filter(r => r.fixed).length}`);
     
     // Verify the fix
     const updatedEmployees = await employeesCollection.find({}, { 
@@ -67,20 +65,20 @@ async function fixSalaryData() {
         firstName: 1, 
         lastName: 1, 
         salary: 1,
-        'employment.salary': 1 
+        'employment.salary': 1,
+        'employment.baseSalary': 1
       } 
     }).toArray();
     
+    console.log('');
     console.log('📊 Updated employee salary data:');
     updatedEmployees.forEach(emp => {
-      console.log(`- ${emp.firstName} ${emp.lastName}: ${emp.salary || emp.employment?.salary}`);
+      const salary = emp.salary || emp.employment?.salary || emp.employment?.baseSalary;
+      console.log(`   - ${emp.firstName} ${emp.lastName}: ${salary}`);
     });
     
   } catch (error) {
     console.error('❌ Error fixing salary data:', error);
-  } finally {
-    await client.close();
-    console.log('🔌 Database connection closed');
   }
 }
 
