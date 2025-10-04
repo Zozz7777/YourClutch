@@ -193,7 +193,7 @@ const connectToDatabase = async () => {
           connectTimeoutMS: parseInt(process.env.DB_CONNECT_TIMEOUT_MS) || 30000,
           socketTimeoutMS: parseInt(process.env.DB_SOCKET_TIMEOUT_MS) || 45000,
           serverSelectionTimeoutMS: parseInt(process.env.DB_CONNECT_TIMEOUT_MS) || 30000,
-          bufferMaxEntries: 0,
+          // Removed bufferMaxEntries - not supported in newer Mongoose versions
           bufferCommands: true, // Enable buffering to prevent connection errors
           retryWrites: true,
           retryReads: true

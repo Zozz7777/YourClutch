@@ -1,12 +1,14 @@
-const AWS = require('aws-sdk');
+const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, HeadBucketCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const path = require('path');
 
-// Configure AWS S3
-const s3 = new AWS.S3({
-  accessKeyId: process.env.S3_ACCESS_KEY_ID,
-  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+// Configure AWS S3 v3 client
+const s3Client = new S3Client({
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+  },
   region: process.env.S3_REGION || 'us-east-1',
-  signatureVersion: 'v4'
 });
 
 const BUCKET_NAME = process.env.S3_BUCKET;
@@ -29,17 +31,18 @@ const FOLDERS = {
  */
 async function uploadFile(fileData, key, contentType, metadata = {}) {
   try {
-    const params = {
+    const command = new PutObjectCommand({
       Bucket: BUCKET_NAME,
       Key: key,
       Body: fileData,
       ContentType: contentType,
       Metadata: metadata
-    };
+    });
 
-    const result = await s3.upload(params).promise();
+    const result = await s3Client.send(command);
+    const location = `https://${BUCKET_NAME}.s3.${process.env.S3_REGION || 'us-east-1'}.amazonaws.com/${key}`;
     console.log(`✅ File uploaded to S3: ${key}`);
-    return result.Location;
+    return location;
   } catch (error) {
     console.error(`❌ Error uploading file to S3: ${key}`, error);
     throw new Error(`Failed to upload file: ${error.message}`);
@@ -54,13 +57,12 @@ async function uploadFile(fileData, key, contentType, metadata = {}) {
  */
 async function getSignedUrl(key, expiresIn = 3600) {
   try {
-    const params = {
+    const command = new GetObjectCommand({
       Bucket: BUCKET_NAME,
-      Key: key,
-      Expires: expiresIn
-    };
+      Key: key
+    });
 
-    const url = await s3.getSignedUrlPromise('getObject', params);
+    const url = await getSignedUrl(s3Client, command, { expiresIn });
     console.log(`✅ Generated signed URL for: ${key}`);
     return url;
   } catch (error) {
@@ -76,14 +78,19 @@ async function getSignedUrl(key, expiresIn = 3600) {
  */
 async function downloadFile(key) {
   try {
-    const params = {
+    const command = new GetObjectCommand({
       Bucket: BUCKET_NAME,
       Key: key
-    };
+    });
 
-    const result = await s3.getObject(params).promise();
+    const result = await s3Client.send(command);
+    const chunks = [];
+    for await (const chunk of result.Body) {
+      chunks.push(chunk);
+    }
+    const body = Buffer.concat(chunks);
     console.log(`✅ File downloaded from S3: ${key}`);
-    return result.Body;
+    return body;
   } catch (error) {
     console.error(`❌ Error downloading file from S3: ${key}`, error);
     throw new Error(`Failed to download file: ${error.message}`);
@@ -97,12 +104,12 @@ async function downloadFile(key) {
  */
 async function deleteFile(key) {
   try {
-    const params = {
+    const command = new DeleteObjectCommand({
       Bucket: BUCKET_NAME,
       Key: key
-    };
+    });
 
-    await s3.deleteObject(params).promise();
+    await s3Client.send(command);
     console.log(`✅ File deleted from S3: ${key}`);
     return true;
   } catch (error) {
@@ -123,7 +130,8 @@ async function checkS3Configuration() {
     }
 
     // Test S3 access
-    await s3.headBucket({ Bucket: BUCKET_NAME }).promise();
+    const command = new HeadBucketCommand({ Bucket: BUCKET_NAME });
+    await s3Client.send(command);
     console.log('✅ S3 configuration is valid');
     return true;
   } catch (error) {

@@ -78,6 +78,31 @@ async fn login(email: String, password: String, state: State<'_, AppState>) -> R
 }
 
 #[tauri::command]
+async fn signup(
+    partner_id: String,
+    email: String,
+    phone: String,
+    password: String,
+    business_name: String,
+    owner_name: String,
+    state: State<'_, AppState>
+) -> Result<String, String> {
+    log::info!("Signup attempt for partner: {}", partner_id);
+    
+    let auth = state.auth.lock().await;
+    match auth.signup(&partner_id, &email, &phone, &password, &business_name, &owner_name).await {
+        Ok(response) => {
+            log::info!("✅ Signup successful!");
+            Ok(serde_json::to_string(&response).unwrap_or_else(|_| "{}".to_string()))
+        }
+        Err(e) => {
+            log::error!("❌ Signup failed: {}", e);
+            Err(format!("❌ Signup failed: {}", e))
+        }
+    }
+}
+
+#[tauri::command]
 async fn check_for_updates(state: State<'_, AppState>) -> Result<String, String> {
     log::info!("Checking for updates...");
     
@@ -189,6 +214,7 @@ async fn main() {
             test_connection,
             validate_partner_id,
             login,
+            signup,
             check_for_updates,
             get_products,
             add_product,

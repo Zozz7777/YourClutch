@@ -5,7 +5,7 @@ const { body, validationResult } = require('express-validator');
 const PartnerUser = require('../models/PartnerUser');
 const PartnerDevice = require('../models/PartnerDevice');
 const { authenticateToken } = require('../middleware/auth');
-const logger = require('../config/logger');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
@@ -77,11 +77,54 @@ router.post('/validate-id', validatePartnerId, async (req, res) => {
 
     const { partnerId } = req.body;
 
-    const partner = await PartnerUser.findByPartnerId(partnerId);
+    // First check if partner exists in PartnerUser collection
+    let partner = await PartnerUser.findByPartnerId(partnerId);
+    
+    // If not found in PartnerUser, check main partners collection
     if (!partner) {
-      return res.status(404).json({
-        success: false,
-        message: 'Partner ID not found'
+      const { getCollection } = require('../config/database');
+      const partnersCollection = await getCollection('partners');
+      
+      const mainPartner = await partnersCollection.findOne({ partnerId });
+      if (!mainPartner) {
+        return res.status(404).json({
+          success: false,
+          message: 'Partner ID not found'
+        });
+      }
+
+      // Return basic partner info from main collection
+      const partnerData = {
+        partnerId: mainPartner.partnerId,
+        businessName: mainPartner.name,
+        partnerType: mainPartner.type,
+        businessAddress: {
+          street: mainPartner.addresses?.[0]?.line1 || '',
+          city: mainPartner.addresses?.[0]?.city || '',
+          state: mainPartner.addresses?.[0]?.state || '',
+          zipCode: mainPartner.addresses?.[0]?.postalCode || '',
+          country: mainPartner.addresses?.[0]?.country || 'Egypt'
+        },
+        workingHours: {},
+        businessSettings: {},
+        status: mainPartner.status || 'active',
+        isVerified: false,
+        appPreferences: {
+          language: 'ar',
+          theme: 'light',
+          notifications: {
+            orders: true,
+            payments: true,
+            updates: true
+          }
+        }
+      };
+
+      return res.json({
+        success: true,
+        message: 'Partner ID validated successfully',
+        data: { partner: partnerData },
+        needsSignup: true // Indicate that partner needs to create user account
       });
     }
 
