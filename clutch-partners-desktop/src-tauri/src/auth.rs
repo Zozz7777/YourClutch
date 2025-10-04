@@ -6,8 +6,13 @@ use reqwest::Client;
 pub struct AuthResponse {
     pub success: bool,
     pub message: String,
-    pub data: Option<AuthData>,
+    pub data: Option<AuthDataWrapper>,
     pub needs_signup: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AuthDataWrapper {
+    pub partner: PartnerInfo,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -92,7 +97,7 @@ impl AuthService {
                 return Ok(AuthResponse {
                     success: true,
                     message: "Partner ID validated successfully (offline mode)".to_string(),
-                    data: Some(AuthData {
+                    data: Some(AuthDataWrapper {
                         partner: PartnerInfo {
                             partner_id: partner_id.to_string(),
                             business_name: "Test Auto Parts Shop".to_string(),
@@ -116,8 +121,6 @@ impl AuthService {
                                 },
                             }),
                         },
-                        access_token: Some("demo_token_12345".to_string()),
-                        refresh_token: Some("demo_refresh_token_12345".to_string()),
                     }),
                     needs_signup: Some(false),
                 });
