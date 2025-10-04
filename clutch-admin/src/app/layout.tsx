@@ -59,7 +59,7 @@ export default function RootLayout({
     <html suppressHydrationWarning>
       <body className={`${roboto.variable} ${robotoSerif.variable} ${robotoMono.variable} font-sans`}>
         <ThemeProvider
-          attribute="class"
+          attribute="data-theme"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
