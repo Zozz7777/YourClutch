@@ -269,54 +269,25 @@ class ApiService {
     }
   }
 
-  // Authentication with fallback to emergency auth
+  // Employee authentication for Clutch admin dashboard
   async login(email: string, password: string): Promise<ApiResponse<{ token: string; user: Record<string, unknown>; refreshToken?: string }>> {
     try {
-      // Try main authentication first
-      const response = await this.request<{ token: string; user: Record<string, unknown>; refreshToken?: string }>("/api/v1/auth/login", {
+      // Use employee authentication for admin dashboard
+      const response = await this.request<{ token: string; user: Record<string, unknown>; refreshToken?: string }>("/api/v1/auth/employee-login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
 
       if (response.success && response.data) {
-        // Main auth successful
+        // Employee auth successful
         this.setTokens(response.data.token, response.data.refreshToken);
         return response;
       }
 
-      // If main auth fails, try emergency authentication
-      // Main auth failed, trying emergency auth
-      const emergencyResponse = await this.request<{ token: string; user: Record<string, unknown>; refreshToken?: string }>("/api/v1/emergency-auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (emergencyResponse.success && emergencyResponse.data) {
-        // Emergency auth successful
-        this.setTokens(emergencyResponse.data.token, emergencyResponse.data.refreshToken);
-        return emergencyResponse;
-      }
-
-      // Both failed, return the main auth error
+      // Return the error response
       return response;
     } catch (error) {
       // Login API call failed
-      
-      // Try emergency auth as fallback
-      try {
-        // Trying emergency auth as fallback
-        const emergencyResponse = await this.request<{ token: string; user: Record<string, unknown>; refreshToken?: string }>("/api/v1/emergency-auth/login", {
-          method: "POST",
-          body: JSON.stringify({ email, password }),
-        });
-
-        if (emergencyResponse.success && emergencyResponse.data) {
-          this.setTokens(emergencyResponse.data.token, emergencyResponse.data.refreshToken);
-          return emergencyResponse;
-        }
-      } catch (emergencyError) {
-        // Emergency auth also failed
-      }
       
       // Handle specific error cases
       if (error instanceof Error) {

@@ -784,4 +784,101 @@ router.post('/verify-otp', authRateLimit, async (req, res) => {
   }
 });
 
+// POST /api/v1/auth/employee-login - Employee login for admin dashboard
+router.post('/employee-login', loginRateLimit, async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_CREDENTIALS',
+        message: 'Email and password are required',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Fetch employee from database
+    let employee;
+    try {
+      const employeesCollection = await getCollection('employees');
+      employee = await employeesCollection.findOne({ email: email.toLowerCase() });
+      
+      if (!employee) {
+        return res.status(401).json({
+          success: false,
+          error: 'INVALID_CREDENTIALS',
+          message: 'Invalid email or password',
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      // Verify password
+      const isPasswordValid = await bcrypt.compare(password, employee.password || employee.authentication?.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({
+          success: false,
+          error: 'INVALID_CREDENTIALS',
+          message: 'Invalid email or password',
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      // Update last login
+      await employeesCollection.updateOne(
+        { email: email.toLowerCase() },
+        { $set: { lastLogin: new Date().toISOString() } }
+      );
+    } catch (error) {
+      console.error('❌ Employee lookup error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'DATABASE_ERROR',
+        message: 'Failed to authenticate employee',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        userId: employee._id, 
+        email: employee.email, 
+        role: employee.role,
+        permissions: employee.permissions || [],
+        type: 'employee'
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    res.json({
+      success: true,
+      data: {
+        user: {
+          id: employee._id,
+          email: employee.email,
+          name: employee.name || employee.basicInfo?.name || 'Employee',
+          role: employee.role,
+          permissions: employee.permissions || []
+        },
+        token: token,
+        refreshToken: `refresh_${Date.now()}`,
+        expiresIn: '24h'
+      },
+      message: 'Employee login successful',
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('❌ Employee login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'EMPLOYEE_LOGIN_FAILED',
+      message: 'Employee login failed',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 module.exports = router;
