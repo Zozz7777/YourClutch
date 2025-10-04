@@ -184,8 +184,7 @@ const PERMISSION_OPTIONS = [
 ];
 
 export default function HRPage() {
-  // const { t } = useLanguage(); // Removed to prevent SSR issues
-  const t = (key: string) => key; // Fallback function
+  const { t } = useLanguage();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [stats, setStats] = useState<HRStats | null>(null);

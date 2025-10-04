@@ -289,6 +289,11 @@ Clutch-Auto-Parts-System-Folder/
 dist/
 build/
 
+# Clutch Partners Desktop (Tauri build artifacts)
+clutch-partners-desktop/src-tauri/target/
+clutch-partners-desktop/dist/
+clutch-partners-desktop/build/
+
 # Logs and databases
 *.log
 *.sql

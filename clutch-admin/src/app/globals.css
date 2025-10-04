@@ -89,7 +89,7 @@
     --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
   }
 
-  .dark {
+  [data-theme="dark"] {
     /* Dark theme colors from design.json - exact OKLCH values */
     --background: oklch(0.1450 0 0);
     --foreground: oklch(0.9850 0 0);

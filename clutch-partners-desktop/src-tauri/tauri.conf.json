@@ -1,0 +1,71 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "productName": "Clutch Partners System",
+  "version": "1.0.0",
+  "identifier": "com.clutch.partners",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Clutch Partners System",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "alwaysOnTop": false,
+        "skipTaskbar": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "resources": [],
+    "externalBin": [],
+    "copyright": "© 2024 Clutch. All rights reserved.",
+    "category": "Business",
+    "shortDescription": "POS and Inventory Management System",
+    "longDescription": "Production-ready POS and Inventory Management System for auto parts shops"
+  },
+  "plugins": {
+    "shell": {
+      "open": true
+    },
+    "fs": {
+      "scope": ["$APPDATA", "$APPDATA/**", "$APPCONFIG", "$APPCONFIG/**"]
+    },
+    "dialog": {
+      "all": true,
+      "ask": true,
+      "confirm": true,
+      "message": true,
+      "open": true,
+      "save": true
+    },
+    "notification": {
+      "all": true
+    },
+    "store": {
+      "all": true
+    },
+    "http": {
+      "all": true,
+      "request": true
+    }
+  }
+}

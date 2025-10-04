@@ -789,6 +789,8 @@ router.post('/employee-login', loginRateLimit, async (req, res) => {
   try {
     const { email, password } = req.body;
     
+    console.log('🔐 Employee login attempt:', { email: email?.substring(0, 3) + '***', passwordLength: password?.length });
+    
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -814,7 +816,18 @@ router.post('/employee-login', loginRateLimit, async (req, res) => {
       }
       
       // Verify password
-      const isPasswordValid = await bcrypt.compare(password, employee.password || employee.authentication?.password);
+      const storedPassword = employee.password || employee.authentication?.password;
+      if (!storedPassword) {
+        console.error('❌ Employee has no password set:', email);
+        return res.status(401).json({
+          success: false,
+          error: 'INVALID_CREDENTIALS',
+          message: 'Invalid email or password',
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      const isPasswordValid = await bcrypt.compare(password, storedPassword);
       if (!isPasswordValid) {
         return res.status(401).json({
           success: false,
