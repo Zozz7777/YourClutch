@@ -455,4 +455,6 @@ export function EmployeeInvitationForm({ onSuccess, onCancel }: EmployeeInvitati
   );
 }
 
+export default EmployeeInvitationForm;
+
 

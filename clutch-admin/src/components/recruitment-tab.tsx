@@ -672,3 +672,5 @@ export function RecruitmentTab({ applications, jobs, onApplicationsUpdate }: Rec
     </div>
   );
 }
+
+export default RecruitmentTab;

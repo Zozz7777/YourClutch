@@ -903,3 +903,5 @@ export function JobPostingOverlay({ isOpen, onClose, onSuccess, editingJob }: Jo
     </div>
   );
 }
+
+export default JobPostingOverlay;
