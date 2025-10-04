@@ -333,9 +333,9 @@ app.use(`${apiPrefix}/admin-ceo`, adminCeoRoutes);
 app.use(`${apiPrefix}/emergency-auth`, emergencyAuthRoutes);
 
 // New missing routes - only include defined routes
-// app.use(`${apiPrefix}/payments`, paymentsRoutes); // Not defined
-// app.use(`${apiPrefix}/communication`, communicationRoutes); // Not defined
-// app.use(`${apiPrefix}/performance`, performanceRoutes); // Not defined
+app.use(`${apiPrefix}/payments`, paymentsRoutes);
+app.use(`${apiPrefix}/communication`, communicationRoutes);
+app.use(`${apiPrefix}/performance`, performanceRoutes);
 // app.use(`${apiPrefix}/dashboard`, dashboardRoutes); // Not defined
 // app.use(`${apiPrefix}/notifications`, notificationsRoutes); // Not defined
 // app.use(`${apiPrefix}/employees`, employeesRoutes); // Not defined
@@ -343,7 +343,7 @@ app.use(`${apiPrefix}/emergency-auth`, emergencyAuthRoutes);
 // app.use(`${apiPrefix}/export`, exportRoutes); // Not defined
 
 // Mount new missing route files with correct v1 prefix
-// app.use(`${apiPrefix}/fleet`, fleetRoutes); // Not defined
+app.use(`${apiPrefix}/fleet`, fleetRoutes);
 // app.use(`${apiPrefix}/crm`, crmRoutes); // Not defined
 // app.use(`${apiPrefix}/sales`, salesRoutes); // Not defined
 // app.use(`${apiPrefix}/finance`, financeRoutes); // Not defined
