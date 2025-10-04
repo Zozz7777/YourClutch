@@ -308,7 +308,7 @@ const applyOptimizedMiddleware = (app) => {
   });
   
   // Handle preflight requests
-  app.options('*', optimizedCORS);
+  app.options('/*', optimizedCORS);
   app.use(optimizedCORS);
   
   // Body parsing with limits
