@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Salary Debug Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        button { padding: 10px 20px; margin: 10px 0; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; white-space: pre-wrap; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HR Salary Debug Tool</h1>
+        <p>This tool will help debug the HR salary calculation issue.</p>
+        
+        <button onclick="debugSalary()">Debug Salary Data</button>
+        <button onclick="fixSalary()">Fix Salary Data</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://clutch-main-nk7x.onrender.com';
+        
+        async function debugSalary() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="result">Loading...</div>';
+            
+            try {
+                // Get token from localStorage (you need to be logged in to admin panel)
+                const token = localStorage.getItem('clutch-admin-token');
+                
+                if (!token) {
+                    resultDiv.innerHTML = '<div class="result error">No authentication token found. Please log in to the admin panel first.</div>';
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/api/v1/hr/debug-salary`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h3>Debug Results:</h3>
+                            <strong>Total Employees:</strong> ${data.data.totalEmployees}<br>
+                            <strong>Has Wrong Salary:</strong> ${data.data.hasWrongSalary}<br>
+                            <strong>Employees with Wrong Salary:</strong> ${data.data.wrongSalaryEmployees.length}<br><br>
+                            <strong>All Employees:</strong><br>
+                            ${JSON.stringify(data.data.employees, null, 2)}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">Error: ${data.message || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function fixSalary() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="result">Fixing salary data...</div>';
+            
+            try {
+                const token = localStorage.getItem('clutch-admin-token');
+                
+                if (!token) {
+                    resultDiv.innerHTML = '<div class="result error">No authentication token found. Please log in to the admin panel first.</div>';
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/api/v1/hr/fix-salary`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h3>Fix Results:</h3>
+                            <strong>Total Fixed:</strong> ${data.data.totalFixed}<br>
+                            <strong>Fixed Employees:</strong><br>
+                            ${JSON.stringify(data.data.fixedEmployees, null, 2)}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">Error: ${data.message || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -867,15 +867,8 @@ router.get('/stats', authenticateToken, checkRole(['head_administrator', 'hr_man
     console.log('HR Stats Debug - All employees with salaries:', allEmployees);
     console.log('HR Stats Debug - Salary aggregation result:', salaryAggregation);
     
-    let averageSalary = salaryAggregation.length > 0 ? salaryAggregation[0].avgSalary : 0;
+    const averageSalary = salaryAggregation.length > 0 ? salaryAggregation[0].avgSalary : 0;
     console.log('HR Stats Debug - Calculated average salary:', averageSalary);
-    
-    // Fix: If average salary is 500000, it's likely wrong (should be 50000)
-    // This is a temporary fix for the salary calculation issue
-    if (averageSalary === 500000) {
-      console.log('🔧 Fixing wrong average salary: 500000 -> 50000');
-      averageSalary = 50000;
-    }
     
     // Calculate open positions from applications that are still in progress
     const openPositions = await applicationsCollection.countDocuments({ 
