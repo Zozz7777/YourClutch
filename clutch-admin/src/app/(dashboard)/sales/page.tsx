@@ -54,6 +54,16 @@ interface Lead {
   contractSigned: boolean;
   contractApproved: boolean;
   partnerId?: string;
+  // Contract type and related fields
+  contractType: 'person' | 'company';
+  // Person contract fields
+  personName?: string;
+  nationalId?: string;
+  personAddress?: string;
+  // Company contract fields
+  companyRegistrationId?: string;
+  companyTaxId?: string;
+  companyOwnerName?: string;
 }
 
 export default function SalesPage() {
@@ -76,7 +86,16 @@ export default function SalesPage() {
     address: "",
     city: "",
     partnerType: "",
-    notes: ""
+    notes: "",
+    contractType: "person" as 'person' | 'company',
+    // Person contract fields
+    personName: "",
+    nationalId: "",
+    personAddress: "",
+    // Company contract fields
+    companyRegistrationId: "",
+    companyTaxId: "",
+    companyOwnerName: ""
   });
 
   // Load leads on component mount
@@ -400,6 +419,111 @@ export default function SalesPage() {
                   rows={3}
                 />
               </div>
+              
+              {/* Contract Type Toggle */}
+              <div className="border-t pt-4">
+                <Label className="text-base font-medium">{t('sales.contractType') || 'Contract Type'}</Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t('sales.contractTypeDesc') || 'Choose how the contract will be structured'}
+                </p>
+                <div className="flex space-x-4">
+                  <Button
+                    type="button"
+                    variant={formData.contractType === 'person' ? 'default' : 'outline'}
+                    onClick={() => setFormData({ ...formData, contractType: 'person' })}
+                    className="flex-1"
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    {t('sales.contractAsPerson') || 'Contract as Person'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.contractType === 'company' ? 'default' : 'outline'}
+                    onClick={() => setFormData({ ...formData, contractType: 'company' })}
+                    className="flex-1"
+                  >
+                    <Building2 className="h-4 w-4 mr-2" />
+                    {t('sales.contractAsCompany') || 'Contract as Company'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Contract-specific fields */}
+              {formData.contractType === 'person' && (
+                <div className="space-y-4 border-t pt-4">
+                  <h4 className="font-medium text-sm text-muted-foreground">
+                    {t('sales.personContractInfo') || 'Person Contract Information (Optional - Required for contract generation)'}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="personName">{t('sales.personName') || 'Full Name'}</Label>
+                      <Input
+                        id="personName"
+                        value={formData.personName}
+                        onChange={(e) => setFormData({ ...formData, personName: e.target.value })}
+                        placeholder={t('sales.enterPersonName') || 'Enter full name'}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="nationalId">{t('sales.nationalId') || 'National ID'}</Label>
+                      <Input
+                        id="nationalId"
+                        value={formData.nationalId}
+                        onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
+                        placeholder={t('sales.enterNationalId') || 'Enter national ID'}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="personAddress">{t('sales.personAddress') || 'Address'}</Label>
+                    <Textarea
+                      id="personAddress"
+                      value={formData.personAddress}
+                      onChange={(e) => setFormData({ ...formData, personAddress: e.target.value })}
+                      placeholder={t('sales.enterPersonAddress') || 'Enter full address'}
+                      rows={2}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {formData.contractType === 'company' && (
+                <div className="space-y-4 border-t pt-4">
+                  <h4 className="font-medium text-sm text-muted-foreground">
+                    {t('sales.companyContractInfo') || 'Company Contract Information (Optional - Required for contract generation)'}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="companyRegistrationId">{t('sales.companyRegistrationId') || 'Company Registration ID'}</Label>
+                      <Input
+                        id="companyRegistrationId"
+                        value={formData.companyRegistrationId}
+                        onChange={(e) => setFormData({ ...formData, companyRegistrationId: e.target.value })}
+                        placeholder={t('sales.enterCompanyRegistrationId') || 'Enter registration ID'}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="companyTaxId">{t('sales.companyTaxId') || 'Company Tax ID'}</Label>
+                      <Input
+                        id="companyTaxId"
+                        value={formData.companyTaxId}
+                        onChange={(e) => setFormData({ ...formData, companyTaxId: e.target.value })}
+                        placeholder={t('sales.enterCompanyTaxId') || 'Enter tax ID'}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="companyOwnerName">{t('sales.companyOwnerName') || 'Company Owner Name'}</Label>
+                    <Input
+                      id="companyOwnerName"
+                      value={formData.companyOwnerName}
+                      onChange={(e) => setFormData({ ...formData, companyOwnerName: e.target.value })}
+                      placeholder={t('sales.enterCompanyOwnerName') || 'Enter owner name'}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                   {t('common.cancel') || 'Cancel'}
