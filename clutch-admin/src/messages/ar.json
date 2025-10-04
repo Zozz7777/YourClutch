@@ -4188,7 +4188,25 @@
       "approved": "موافق عليه",
       "rejected": "مرفوض",
       "completed": "مكتمل"
-    }
+    },
+    "contractType": "نوع العقد",
+    "contractTypeDesc": "اختر كيفية هيكلة العقد",
+    "contractAsPerson": "عقد كشخص",
+    "contractAsCompany": "عقد كشركة",
+    "personContractInfo": "معلومات عقد الشخص (اختياري - مطلوب لإنشاء العقد)",
+    "companyContractInfo": "معلومات عقد الشركة (اختياري - مطلوب لإنشاء العقد)",
+    "personName": "الاسم الكامل",
+    "nationalId": "الرقم القومي",
+    "personAddress": "العنوان",
+    "companyRegistrationId": "رقم تسجيل الشركة",
+    "companyTaxId": "الرقم الضريبي للشركة",
+    "companyOwnerName": "اسم مالك الشركة",
+    "enterPersonName": "أدخل الاسم الكامل",
+    "enterNationalId": "أدخل الرقم القومي",
+    "enterPersonAddress": "أدخل العنوان الكامل",
+    "enterCompanyRegistrationId": "أدخل رقم التسجيل",
+    "enterCompanyTaxId": "أدخل الرقم الضريبي",
+    "enterCompanyOwnerName": "أدخل اسم المالك"
   },
   "pricing": {
     "plans": "خطط التسعير",

@@ -136,6 +136,26 @@ export default function SalesPage() {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      companyName: "",
+      contactPerson: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      partnerType: "",
+      notes: "",
+      contractType: "person",
+      personName: "",
+      nationalId: "",
+      personAddress: "",
+      companyRegistrationId: "",
+      companyTaxId: "",
+      companyOwnerName: ""
+    });
+  };
+
   const handleCreateLead = async () => {
     try {
       setIsLoading(true);

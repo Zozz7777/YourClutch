@@ -93,7 +93,16 @@ router.post('/leads', authenticateToken, async (req, res) => {
       city,
       partnerType,
       notes,
-      status = LEAD_STATUS.NEW
+      status = LEAD_STATUS.NEW,
+      contractType = 'person',
+      // Person contract fields
+      personName,
+      nationalId,
+      personAddress,
+      // Company contract fields
+      companyRegistrationId,
+      companyTaxId,
+      companyOwnerName
     } = req.body;
 
     // Validate required fields
@@ -136,6 +145,16 @@ router.post('/leads', authenticateToken, async (req, res) => {
       contractGenerated: false,
       contractSigned: false,
       contractApproved: false,
+      // Contract type and related fields
+      contractType: contractType || 'person',
+      // Person contract fields
+      personName: personName || '',
+      nationalId: nationalId || '',
+      personAddress: personAddress || '',
+      // Company contract fields
+      companyRegistrationId: companyRegistrationId || '',
+      companyTaxId: companyTaxId || '',
+      companyOwnerName: companyOwnerName || '',
       partnerId: null
     };
 

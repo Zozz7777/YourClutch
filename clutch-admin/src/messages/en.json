@@ -817,7 +817,25 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "completed": "Completed"
-    }
+    },
+    "contractType": "Contract Type",
+    "contractTypeDesc": "Choose how the contract will be structured",
+    "contractAsPerson": "Contract as Person",
+    "contractAsCompany": "Contract as Company",
+    "personContractInfo": "Person Contract Information (Optional - Required for contract generation)",
+    "companyContractInfo": "Company Contract Information (Optional - Required for contract generation)",
+    "personName": "Full Name",
+    "nationalId": "National ID",
+    "personAddress": "Address",
+    "companyRegistrationId": "Company Registration ID",
+    "companyTaxId": "Company Tax ID",
+    "companyOwnerName": "Company Owner Name",
+    "enterPersonName": "Enter full name",
+    "enterNationalId": "Enter national ID",
+    "enterPersonAddress": "Enter full address",
+    "enterCompanyRegistrationId": "Enter registration ID",
+    "enterCompanyTaxId": "Enter tax ID",
+    "enterCompanyOwnerName": "Enter owner name"
   },
   "pendingEmails": {
     "title": "Pending Emails",
