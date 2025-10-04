@@ -30,6 +30,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       const titleMap: Record<string, string> = {
         'Dashboard': 'navigation.dashboard',
         'Sales': 'navigation.sales',
+        'Partners': 'navigation.partners',
         'HR': 'navigation.hr'
       };
       

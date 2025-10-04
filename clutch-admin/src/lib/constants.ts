@@ -476,8 +476,14 @@ export const NAVIGATION_ITEMS = [
   {
     title: "Sales",
     href: "/sales",
-    icon: "ShoppingCart",
+    icon: "Handshake",
     permissions: [PERMISSIONS.VIEW_SALES],
+  },
+  {
+    title: "Partners",
+    href: "/partners",
+    icon: "Users",
+    permissions: [PERMISSIONS.VIEW_PARTNERS],
   },
   {
     title: "HR",

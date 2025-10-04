@@ -23,6 +23,7 @@ import {
   Code,
   Package,
   Activity,
+  Handshake,
 } from "lucide-react";
 
 export const iconMap = {
@@ -50,6 +51,7 @@ export const iconMap = {
   Code,
   Package,
   Activity,
+  Handshake,
 } as const;
 
 export type IconName = keyof typeof iconMap;
