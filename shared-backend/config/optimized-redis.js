@@ -228,7 +228,7 @@ class OptimizedRedisCache {
    */
   async set(type, identifier, value, ttl = null, suffix = '') {
     try {
-      if (!this.isConnected) {
+      if (!this.isConnected || !this.client) {
         this.stats.sets++;
         return false;
       }
@@ -237,7 +237,8 @@ class OptimizedRedisCache {
       const cacheValue = JSON.stringify(value);
       const cacheTTL = ttl || this.defaultTTL[type] || 3600;
 
-      await this.client.setex(key, cacheTTL, cacheValue);
+      // Redis v5 API - use set with EX option
+      await this.client.set(key, cacheValue, 'EX', cacheTTL);
       this.stats.sets++;
       
       this.logger.debug(`Cache SET: ${key} (TTL: ${cacheTTL}s)`);
