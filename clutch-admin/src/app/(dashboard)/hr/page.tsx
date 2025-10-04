@@ -398,8 +398,10 @@ export default function HRPage() {
         
         if (employeesResponse.ok) {
           const employeesData = await employeesResponse.json();
+          console.log('HR Employees API Response:', employeesData);
           // Handle different response structures
           const employeesList = employeesData.data?.employees || employeesData.data || employeesData;
+          console.log('HR Employees List:', employeesList);
           
           // Ensure all employees have required fields with fallbacks
           const safeEmployees = Array.isArray(employeesList) ? employeesList.map(emp => ({
@@ -550,6 +552,7 @@ export default function HRPage() {
           // Debug logging for salary calculation
           console.log('HR Salary Debug:', {
             employeeCount: employees.length,
+            employees: employees,
             salaries: employees.map(e => ({ name: `${e.firstName} ${e.lastName}`, salary: e.salary, salaryType: typeof e.salary })),
             totalSalary: employees.reduce((sum, e) => sum + (Number(e.salary) || 0), 0),
             averageSalary: averageSalary

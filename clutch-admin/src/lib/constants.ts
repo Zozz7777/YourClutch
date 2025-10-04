@@ -476,7 +476,7 @@ export const NAVIGATION_ITEMS = [
   {
     title: "Sales",
     href: "/sales",
-    icon: "TrendingUp",
+    icon: "ShoppingCart",
     permissions: [PERMISSIONS.VIEW_SALES],
   },
   {
