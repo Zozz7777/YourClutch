@@ -99,7 +99,7 @@
     --primary-foreground: oklch(0.2050 0 0);
     --secondary: oklch(0.2690 0 0);
     --muted: oklch(0.2690 0 0);
-    --muted-foreground: oklch(0.5560 0 0);
+    --muted-foreground: oklch(0.7500 0 0); /* Fixed: Better contrast for dark theme */
     --destructive: oklch(0.7040 0.1910 22.2160);
     --destructive-foreground: oklch(0.9850 0 0);
     --border: oklch(0.2750 0 0);
