@@ -1396,7 +1396,7 @@ export default function HRPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search jobs..."
+                  placeholder={t('hr.searchJobs') || 'Search jobs...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 border-border bg-input text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent rounded-[0.625rem] transition-all duration-150"
@@ -1410,14 +1410,14 @@ export default function HRPage() {
                 className="px-3 py-2 border border-border bg-input text-foreground rounded-[0.625rem] text-sm focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-150"
                 style={{ fontFamily: 'Roboto, ui-sans-serif, sans-serif, system-ui' }}
               >
-                <option value="all">All Status</option>
-                <option value="draft">Draft</option>
-                <option value="pending_manager_approval">Pending Manager Approval</option>
-                <option value="pending_hr_admin_approval">Pending HR Admin Approval</option>
-                <option value="published">Published</option>
-                <option value="closed">Closed</option>
-                <option value="filled">Filled</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all">{t('hr.allStatus') || 'All Status'}</option>
+                <option value="draft">{t('hr.draft') || 'Draft'}</option>
+                <option value="pending_manager_approval">{t('hr.pendingManagerApproval') || 'Pending Manager Approval'}</option>
+                <option value="pending_hr_admin_approval">{t('hr.pendingHrAdminApproval') || 'Pending HR Admin Approval'}</option>
+                <option value="published">{t('hr.published') || 'Published'}</option>
+                <option value="closed">{t('hr.closed') || 'Closed'}</option>
+                <option value="filled">{t('hr.filled') || 'Filled'}</option>
+                <option value="cancelled">{t('hr.cancelled') || 'Cancelled'}</option>
               </select>
             </div>
 

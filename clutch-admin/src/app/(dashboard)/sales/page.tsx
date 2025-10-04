@@ -321,7 +321,7 @@ export default function SalesPage() {
                     id="companyName"
                     value={formData.companyName}
                     onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    placeholder="Enter company name"
+                    placeholder={t('sales.enterCompanyName') || 'Enter company name'}
                   />
                 </div>
                 <div>
@@ -330,7 +330,7 @@ export default function SalesPage() {
                     id="contactPerson"
                     value={formData.contactPerson}
                     onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                    placeholder="Enter contact person name"
+                    placeholder={t('sales.enterContactPerson') || 'Enter contact person name'}
                   />
                 </div>
               </div>
@@ -342,7 +342,7 @@ export default function SalesPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="Enter email address"
+                    placeholder={t('sales.enterEmailAddress') || 'Enter email address'}
                   />
                 </div>
                 <div>
@@ -351,7 +351,7 @@ export default function SalesPage() {
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Enter phone number"
+                    placeholder={t('sales.enterPhoneNumber') || 'Enter phone number'}
                   />
                 </div>
               </div>
@@ -362,7 +362,7 @@ export default function SalesPage() {
                     id="address"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="Enter address"
+                    placeholder={t('sales.enterAddress') || 'Enter address'}
                   />
                 </div>
                 <div>
@@ -371,7 +371,7 @@ export default function SalesPage() {
                     id="city"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    placeholder="Enter city"
+                    placeholder={t('sales.enterCity') || 'Enter city'}
                   />
                 </div>
               </div>
@@ -379,14 +379,14 @@ export default function SalesPage() {
                 <Label htmlFor="partnerType">{t('sales.partnerType') || 'Partner Type'}</Label>
                 <Select value={formData.partnerType} onValueChange={(value) => setFormData({ ...formData, partnerType: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select partner type" />
+                    <SelectValue placeholder={t('sales.selectPartnerType') || 'Select partner type'} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={PartnerType.PARTS_SHOP}>Parts Shop</SelectItem>
-                    <SelectItem value={PartnerType.SERVICE_CENTER}>Service Center</SelectItem>
-                    <SelectItem value={PartnerType.REPAIR_CENTER}>Repair Center</SelectItem>
-                    <SelectItem value={PartnerType.ACCESSORIES_SHOP}>Accessories Shop</SelectItem>
-                    <SelectItem value={PartnerType.IMPORTER_MANUFACTURER}>Importer/Manufacturer</SelectItem>
+                    <SelectItem value={PartnerType.PARTS_SHOP}>{t('sales.partnerTypeOptions.parts_shop') || 'Parts Shop'}</SelectItem>
+                    <SelectItem value={PartnerType.SERVICE_CENTER}>{t('sales.partnerTypeOptions.service_center') || 'Service Center'}</SelectItem>
+                    <SelectItem value={PartnerType.REPAIR_CENTER}>{t('sales.partnerTypeOptions.repair_center') || 'Repair Center'}</SelectItem>
+                    <SelectItem value={PartnerType.ACCESSORIES_SHOP}>{t('sales.partnerTypeOptions.accessories_shop') || 'Accessories Shop'}</SelectItem>
+                    <SelectItem value={PartnerType.IMPORTER_MANUFACTURER}>{t('sales.partnerTypeOptions.importer_manufacturer') || 'Importer/Manufacturer'}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -396,7 +396,7 @@ export default function SalesPage() {
                   id="notes"
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Enter any additional notes"
+                  placeholder={t('sales.enterNotes') || 'Enter any additional notes'}
                   rows={3}
                 />
               </div>

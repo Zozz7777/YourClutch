@@ -741,8 +741,16 @@
     "inactive": "Inactive",
     "onLeave": "On Leave",
     "terminated": "Terminated",
-    "noEmployeesFound": "No employees found matching your criteria"
-  },
+        "noEmployeesFound": "No employees found matching your criteria",
+        "searchJobs": "Search jobs...",
+        "draft": "Draft",
+        "pendingManagerApproval": "Pending Manager Approval",
+        "pendingHrAdminApproval": "Pending HR Admin Approval",
+        "published": "Published",
+        "closed": "Closed",
+        "filled": "Filled",
+        "cancelled": "Cancelled"
+      },
   "sales": {
     "title": "Sales Management",
     "description": "Manage leads, contracts, and sales performance",
@@ -790,7 +798,25 @@
     "selectPartnerType": "Select partner type",
     "enterNotes": "Enter any additional notes",
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "partnerTypeOptions": {
+      "parts_shop": "Parts Shop",
+      "service_center": "Service Center", 
+      "repair_center": "Repair Center",
+      "accessories_shop": "Accessories Shop",
+      "importer_manufacturer": "Importer/Manufacturer"
+    },
+    "statusOptions": {
+      "new": "New",
+      "contacted": "Contacted",
+      "qualified": "Qualified",
+      "proposal_sent": "Proposal Sent",
+      "contract_generated": "Contract Generated",
+      "contract_signed": "Contract Signed",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "completed": "Completed"
+    }
   },
   "pendingEmails": {
     "title": "Pending Emails",

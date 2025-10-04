@@ -1257,7 +1257,15 @@
     "inactive": "غير نشط",
     "onLeave": "في إجازة",
     "terminated": "مفصول",
-    "noEmployeesFound": "لم يتم العثور على موظفين يطابقون معاييرك"
+    "noEmployeesFound": "لم يتم العثور على موظفين يطابقون معاييرك",
+    "searchJobs": "البحث في الوظائف...",
+    "draft": "مسودة",
+    "pendingManagerApproval": "في انتظار موافقة المدير",
+    "pendingHrAdminApproval": "في انتظار موافقة مدير الموارد البشرية",
+    "published": "منشور",
+    "closed": "مغلق",
+    "filled": "مكتمل",
+    "cancelled": "ملغي"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -4161,7 +4169,25 @@
     "selectPartnerType": "اختر نوع الشريك",
     "enterNotes": "أدخل أي ملاحظات إضافية",
     "cancel": "إلغاء",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "partnerTypeOptions": {
+      "parts_shop": "متجر قطع غيار",
+      "service_center": "مركز خدمة", 
+      "repair_center": "مركز إصلاح",
+      "accessories_shop": "متجر إكسسوارات",
+      "importer_manufacturer": "مستورد/مصنع"
+    },
+    "statusOptions": {
+      "new": "جديد",
+      "contacted": "تم التواصل",
+      "qualified": "مؤهل",
+      "proposal_sent": "تم إرسال العرض",
+      "contract_generated": "تم إنشاء العقد",
+      "contract_signed": "تم توقيع العقد",
+      "approved": "موافق عليه",
+      "rejected": "مرفوض",
+      "completed": "مكتمل"
+    }
   },
   "pricing": {
     "plans": "خطط التسعير",
