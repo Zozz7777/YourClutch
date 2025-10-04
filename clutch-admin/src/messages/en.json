@@ -698,6 +698,7 @@
     "toggle": "Toggle theme"
   },
   "jobTitles": {
+    "super_admin": "Super Administrator",
     "head_administrator": "Chief Executive Officer",
     "admin": "Administrator",
     "manager": "Manager",
@@ -1546,3 +1547,4 @@
     "serviceMetrics": "Service Metrics",
     "meanTimeToRecovery": "Mean Time to Recovery"
   }
+}

@@ -1214,6 +1214,7 @@
     "toggle": "تبديل المظهر"
   },
   "jobTitles": {
+    "super_admin": "مدير النظام الأعلى",
     "head_administrator": "الرئيس التنفيذي",
     "admin": "مدير النظام",
     "manager": "مدير",
