@@ -955,7 +955,10 @@ fun MainAppScreen() {
     
     val tabs = listOf(
         "Home" to Icons.Filled.Home,
+        "Dashboard" to Icons.Filled.Analytics,
         "Payments" to Icons.Filled.Payment,
+        "Notifications" to Icons.Filled.Notifications,
+        "Support" to Icons.Filled.Help,
         "Settings" to Icons.Filled.Settings
     )
     
@@ -980,8 +983,11 @@ fun MainAppScreen() {
         ) {
             when (selectedTab) {
                 0 -> HomeScreen()
-                1 -> PaymentsScreen()
-                2 -> StoreSettingsScreen()
+                1 -> BusinessDashboardScreen()
+                2 -> PaymentsScreen()
+                3 -> NotificationsScreen()
+                4 -> SupportScreen()
+                5 -> StoreSettingsScreen()
             }
         }
     }
