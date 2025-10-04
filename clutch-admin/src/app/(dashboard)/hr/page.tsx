@@ -533,6 +533,23 @@ export default function HRPage() {
           const statsData = await statsResponse.json();
           // Handle both data.stats and direct data structures
           const statsResult = statsData.data?.stats || statsData.data || statsData;
+          
+          // Debug logging for salary calculation from API
+          console.log('HR Stats API Response:', statsResult);
+          console.log('HR Salary Debug (from API):', {
+            employeeCount: employees.length,
+            employees: employees,
+            salaries: employees.map(e => ({ 
+              name: `${e.firstName} ${e.lastName}`, 
+              salary: e.salary, 
+              salaryType: typeof e.salary,
+              salaryValue: e.salary,
+              salaryNumber: Number(e.salary)
+            })),
+            apiStats: statsResult,
+            apiAverageSalary: statsResult.averageSalary
+          });
+          
           setStats(statsResult);
         } else {
           // Calculate stats from loaded data
