@@ -698,7 +698,7 @@ export default function LegalPage() {
 
       {/* Upload Template Dialog */}
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t('contractTemplates.uploadNewTemplate')}</DialogTitle>
             <DialogDescription>
@@ -927,7 +927,7 @@ export default function LegalPage() {
 
       {/* Template Detail Dialog */}
       <Dialog open={isTemplateDetailOpen} onOpenChange={setIsTemplateDetailOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t('contractTemplates.templateDetails')}</DialogTitle>
             <DialogDescription>

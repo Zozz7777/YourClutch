@@ -726,6 +726,110 @@ router.get('/applications', authenticateToken, checkRole(['head_administrator', 
 
 // ==================== HR STATISTICS ====================
 
+// GET /api/v1/hr/debug-salary - Debug salary data
+router.get('/debug-salary', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+  try {
+    const employeesCollection = await getCollection('employees');
+    
+    // Get all employees with salary data
+    const employees = await employeesCollection.find({}, { 
+      projection: { 
+        _id: 1, 
+        firstName: 1, 
+        lastName: 1, 
+        salary: 1,
+        'employment.salary': 1 
+      } 
+    }).toArray();
+    
+    // Check for wrong salary values
+    const wrongSalaryEmployees = employees.filter(emp => 
+      emp.salary === 500000 || emp.employment?.salary === 500000
+    );
+    
+    res.json({
+      success: true,
+      data: {
+        employees: employees,
+        wrongSalaryEmployees: wrongSalaryEmployees,
+        totalEmployees: employees.length,
+        hasWrongSalary: wrongSalaryEmployees.length > 0
+      },
+      message: 'Salary debug data retrieved successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Debug salary error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'DEBUG_SALARY_FAILED',
+      message: 'Failed to debug salary data',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// POST /api/v1/hr/fix-salary - Fix salary data
+router.post('/fix-salary', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+  try {
+    const employeesCollection = await getCollection('employees');
+    
+    // Find employees with wrong salary (500000)
+    const wrongSalaryEmployees = await employeesCollection.find({
+      $or: [
+        { salary: 500000 },
+        { 'employment.salary': 500000 }
+      ]
+    }).toArray();
+    
+    if (wrongSalaryEmployees.length === 0) {
+      return res.json({
+        success: true,
+        message: 'No salary data issues found',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Fix the salary data
+    const fixResults = [];
+    for (const emp of wrongSalaryEmployees) {
+      const updateResult = await employeesCollection.updateOne(
+        { _id: emp._id },
+        { 
+          $set: { 
+            salary: 50000,
+            'employment.salary': 50000 
+          } 
+        }
+      );
+      
+      fixResults.push({
+        employeeId: emp._id,
+        name: `${emp.firstName} ${emp.lastName}`,
+        fixed: updateResult.modifiedCount > 0
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: {
+        fixedEmployees: fixResults,
+        totalFixed: fixResults.filter(r => r.fixed).length
+      },
+      message: 'Salary data fixed successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Fix salary error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'FIX_SALARY_FAILED',
+      message: 'Failed to fix salary data',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // GET /api/v1/hr/stats - Get HR statistics
 router.get('/stats', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
   try {
