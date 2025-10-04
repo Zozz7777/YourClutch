@@ -558,14 +558,7 @@ const corsOptions = {
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// OPTIONS handler - Express v5 compatible
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, x-session-token, X-API-Version, X-Correlation-ID, Accept, Origin');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.status(200).end();
-});
+// OPTIONS handler - Express v5 compatible (handled by CORS middleware)
 
 // Enhanced error handling middleware with production logging
 app.use(errorLogger);
@@ -577,7 +570,7 @@ app.get('/Logored.png', (req, res) => {
 });
 
 // 404 handler - Express v5 compatible
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     error: 'ENDPOINT_NOT_FOUND',
