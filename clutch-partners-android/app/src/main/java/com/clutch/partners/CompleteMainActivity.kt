@@ -997,12 +997,13 @@ fun SignUpForm(onAuthenticated: () -> Unit) {
                         modifier = Modifier.size(20.dp)
                     )
                 } else {
-                Text(
-                    text = if (isRTL) "إنشاء حساب" else "Sign Up",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                    Text(
+                        text = if (isRTL) "إنشاء حساب" else "Sign Up",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
         }
             
