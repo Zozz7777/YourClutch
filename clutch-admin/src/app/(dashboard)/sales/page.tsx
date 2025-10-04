@@ -281,51 +281,6 @@ export default function SalesPage() {
     }
   };
 
-  const handleUpdateLeadStatus = async (leadId: string, newStatus: LeadStatus) => {
-    try {
-      setIsLoading(true);
-      const response = await apiService.request(`/api/v1/sales/leads/${leadId}/status`, {
-        method: "PUT",
-        body: JSON.stringify({ status: newStatus })
-      });
-
-      if (response.success) {
-        await loadLeads();
-      }
-    } catch (error) {
-      console.error("Error updating lead status:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGenerateContract = async (leadId: string) => {
-    try {
-      setIsLoading(true);
-      const response = await apiService.request(`/api/v1/sales/leads/${leadId}/contract`, {
-        method: "POST"
-      });
-
-      if (response.success) {
-        // Download the contract
-        const blob = new Blob([response.data.contract], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `contract-${leadId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
-        await loadLeads();
-      }
-    } catch (error) {
-      console.error("Error generating contract:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleUploadContract = async (leadId: string, file: File) => {
     try {
