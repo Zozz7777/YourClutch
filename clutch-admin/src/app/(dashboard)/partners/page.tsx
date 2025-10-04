@@ -109,7 +109,7 @@ export default function PartnersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [minRating, setMinRating] = useState<string>("");
+  const [minRating, setMinRating] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -139,7 +139,7 @@ export default function PartnersPage() {
       filtered = filtered.filter(partner => partner.status === statusFilter);
     }
 
-    if (minRating) {
+    if (minRating && minRating !== "all") {
       const minRatingNum = parseFloat(minRating);
       if (!isNaN(minRatingNum)) {
         filtered = filtered.filter(partner => partner.rating.average >= minRatingNum);
@@ -395,7 +395,7 @@ export default function PartnersPage() {
                   <SelectValue placeholder={t('partners.minRating')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t('partners.minRating')}</SelectItem>
+                  <SelectItem value="all">{t('partners.minRating')}</SelectItem>
                   <SelectItem value="1">1+ Stars</SelectItem>
                   <SelectItem value="2">2+ Stars</SelectItem>
                   <SelectItem value="3">3+ Stars</SelectItem>
