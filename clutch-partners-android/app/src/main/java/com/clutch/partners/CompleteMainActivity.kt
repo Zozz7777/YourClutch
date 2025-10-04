@@ -845,15 +845,8 @@ fun SignInForm(onAuthenticated: () -> Unit) {
 fun SignUpForm(onAuthenticated: () -> Unit) {
     var partnerId by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var businessName by remember { mutableStateOf("") }
-    var ownerName by remember { mutableStateOf("") }
-    var street by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-    var state by remember { mutableStateOf("") }
-    var zipCode by remember { mutableStateOf("") }
     val context = LocalContext.current
     val isRTL = LanguageManager.isRTL(context)
     val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
@@ -865,6 +858,15 @@ fun SignUpForm(onAuthenticated: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Info text
+            Text(
+                text = if (isRTL) "إنشاء حساب للشريك الموجود" else "Create account for existing partner",
+                fontSize = 16.sp,
+                color = LightMutedForeground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            
             OutlinedTextField(
                 value = partnerId,
                 onValueChange = { partnerId = it },
@@ -962,24 +964,22 @@ fun SignUpForm(onAuthenticated: () -> Unit) {
             
             Button(
                 onClick = { 
-                    if (partnerId.isNotEmpty() && email.isNotEmpty() && phone.isNotEmpty() && 
-                        password.isNotEmpty() && businessName.isNotEmpty() && ownerName.isNotEmpty() &&
-                        street.isNotEmpty() && city.isNotEmpty() && state.isNotEmpty() && zipCode.isNotEmpty()) {
-                        // Create BusinessAddress from form data
+                    if (partnerId.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
+                        // Create minimal BusinessAddress for the API call
                         val businessAddress = com.clutch.partners.data.api.BusinessAddress(
-                            street = street,
-                            city = city,
-                            state = state,
-                            zipCode = zipCode
+                            street = "",
+                            city = "",
+                            state = "",
+                            zipCode = ""
                         )
                         authViewModel.signUp(
                             partnerId, 
                             email, 
-                            phone,
+                            "", // phone - will be filled from partner record
                             password,
-                            businessName,
-                            ownerName,
-                            "repair_center", // Default partner type
+                            "", // businessName - will be filled from partner record
+                            "", // ownerName - will be filled from partner record
+                            "", // partnerType - will be filled from partner record
                             businessAddress
                         )
                     }
