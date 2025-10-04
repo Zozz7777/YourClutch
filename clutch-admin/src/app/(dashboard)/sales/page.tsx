@@ -90,9 +90,9 @@ export default function SalesPage() {
 
     if (searchTerm) {
       filtered = filtered.filter(lead =>
-        lead.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (lead.companyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (lead.contactPerson || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (lead.email || '').toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
