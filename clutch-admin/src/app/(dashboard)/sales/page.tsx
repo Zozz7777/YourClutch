@@ -282,26 +282,6 @@ export default function SalesPage() {
   };
 
 
-  const handleUploadContract = async (leadId: string, file: File) => {
-    try {
-      setIsLoading(true);
-      const formData = new FormData();
-      formData.append('contract', file);
-
-      const response = await apiService.request(`/api/v1/sales/leads/${leadId}/contract/upload`, {
-        method: "POST",
-        body: formData
-      });
-
-      if (response.success) {
-        await loadLeads();
-      }
-    } catch (error) {
-      console.error("Error uploading contract:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
 
   const getStatusColor = (status: LeadStatus) => {

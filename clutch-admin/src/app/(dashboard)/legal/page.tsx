@@ -999,4 +999,3 @@ export default function LegalPage() {
   );
 }
 
-export default LegalPage;

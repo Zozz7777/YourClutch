@@ -452,7 +452,7 @@ app.use('/api/v1/contract-templates', require('./routes/contract-templates'));
 app.use('/api/v1/contracts', require('./routes/contracts'));
 
 // Notifications routes
-app.use('/api/v1/notifications', require('./routes/notifications'));
+app.use('/api/v1/notifications', require('./routes/notifications').router);
 
 // Updates routes
 app.use('/api/v1/updates', require('./routes/updates'));
