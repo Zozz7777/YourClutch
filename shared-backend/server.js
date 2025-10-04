@@ -415,8 +415,8 @@ app.use('/api/v1/fleet', fleetEnhancedRoutes);
 app.use('/api/v1/finance', financeEnhancedRoutes);
 app.use('/api/v1/system-health', systemHealthEnhancedRoutes);
 
-// Partners routes
-app.use('/api/v1/partners', partnersRoutes);
+// Partners routes - Auth routes first (more specific)
+app.use('/api/v1/partners', partnerAuthRoutes);
 app.use('/api/v1/partners/notifications', partnerNotificationsRoutes);
 app.use('/api/v1/partners/rbac', partnerRbacRoutes);
 app.use('/api/v1/partners/kyc', partnerKycRoutes);
@@ -427,7 +427,8 @@ app.use('/api/v1/partners/data-export', partnerDataExportRoutes);
 app.use('/api/v1/partners/advanced-reports', partnerAdvancedReportsRoutes);
 app.use('/api/v1/partners/purchase-orders', partnerPurchaseOrdersRoutes);
 app.use('/api/v1/partners/staff', partnerStaffManagementRoutes);
-app.use('/api/v1/partners', partnerAuthRoutes);
+// General partners routes last (less specific)
+app.use('/api/v1/partners', partnersRoutes);
 app.use('/api/v1/partners', partnerInventoryRoutes);
 app.use('/api/v1/partners', partnerSyncRoutes);
 app.use('/api/v1/partners', require('./routes/partner-mobile'));
