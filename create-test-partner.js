@@ -8,9 +8,8 @@ async function createTestPartner() {
     await client.connect();
     console.log('✅ Connected to MongoDB');
     
-    const db = client.db(process.env.MONGODB_DB || 'clutch');
+    const db = client.db(process.env.DB_NAME || 'clutch');
     const partnersCollection = db.collection('partners');
-    const usersCollection = db.collection('users');
     
     // Test partner data
     const testPartner = {
@@ -131,6 +130,7 @@ async function createTestPartner() {
     }
     
     // Also create a user account for the partner
+    const usersCollection = db.collection('users');
     const testUser = {
       email: 'ahmed@testautoparts.com',
       password: '$2b$10$rQZ8K9mN2pL3sT4uV5wX6yA7bC8dE9fG0hI1jK2lM3nO4pQ5rS6tU7vW8xY9zA', // password: "testpass123"

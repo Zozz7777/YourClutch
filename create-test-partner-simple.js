@@ -1,16 +1,14 @@
-const { MongoClient } = require('mongodb');
-require('dotenv').config();
+const { getCollection } = require('./shared-backend/config/database');
 
 async function createTestPartner() {
-  const client = new MongoClient(process.env.MONGODB_URI);
-  
   try {
-    await client.connect();
-    console.log('✅ Connected to MongoDB');
+    console.log('🔌 Connecting to database...');
     
-    const db = client.db(process.env.MONGODB_DB || 'clutch');
-    const partnersCollection = db.collection('partners');
-    const usersCollection = db.collection('users');
+    // Get collections
+    const partnersCollection = await getCollection('partners');
+    const usersCollection = await getCollection('users');
+    
+    console.log('✅ Connected to database');
     
     // Test partner data
     const testPartner = {
@@ -197,9 +195,6 @@ async function createTestPartner() {
     
   } catch (error) {
     console.error('❌ Error creating test partner:', error);
-  } finally {
-    await client.close();
-    console.log('🔌 Disconnected from MongoDB');
   }
 }
 
