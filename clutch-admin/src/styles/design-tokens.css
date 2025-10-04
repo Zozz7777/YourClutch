@@ -81,10 +81,10 @@
   --color-primary-foreground: oklch(0.2050 0 0);
   --color-secondary: oklch(0.2690 0 0);
   --color-muted: oklch(0.2690 0 0);
-  --color-muted-foreground: oklch(0.7500 0 0); /* Fixed: Better contrast for dark theme */
+  --color-muted-foreground: oklch(0.8500 0 0); /* Much better contrast for dark theme */
   --color-destructive: oklch(0.7040 0.1910 22.2160);
   --color-border: oklch(0.2750 0 0);
-  --color-input: oklch(0.3250 0 0);
+  --color-input: oklch(0.3750 0 0); /* Slightly lighter for better contrast */
   --color-ring: oklch(0.5560 0 0);
   --color-sidebar: oklch(0.2050 0 0);
   --color-sidebar-primary: oklch(0.5770 0.2450 27.3250);
