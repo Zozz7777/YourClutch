@@ -959,6 +959,9 @@ fun MainAppScreen() {
         "Payments" to Icons.Filled.Payment,
         "Notifications" to Icons.Filled.Notifications,
         "Support" to Icons.Filled.Help,
+        "Audit" to Icons.Filled.Security,
+        "Warranty" to Icons.Filled.Gavel,
+        "Export" to Icons.Filled.Download,
         "Settings" to Icons.Filled.Settings
     )
     
@@ -987,7 +990,10 @@ fun MainAppScreen() {
                 2 -> PaymentsScreen()
                 3 -> NotificationsScreen()
                 4 -> SupportScreen()
-                5 -> StoreSettingsScreen()
+                5 -> AuditLogScreen()
+                6 -> WarrantyDisputesScreen()
+                7 -> DataExportScreen()
+                8 -> StoreSettingsScreen()
             }
         }
     }
