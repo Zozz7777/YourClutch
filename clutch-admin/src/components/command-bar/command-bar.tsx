@@ -747,7 +747,7 @@ export default function CommandBar({ isOpen, onClose }: CommandBarProps) {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl max-h-[80vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           <Command className="rounded-[0.625rem] border shadow-2xs">
             <div className="flex items-center border-b px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
@@ -804,7 +804,7 @@ export default function CommandBar({ isOpen, onClose }: CommandBarProps) {
       {/* Confirmation Dialog */}
       {selectedAction && (
         <Dialog open={!!selectedAction} onOpenChange={() => setSelectedAction(null)}>
-          <DialogContent>
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 {selectedAction.icon}
