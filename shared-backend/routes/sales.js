@@ -223,6 +223,80 @@ router.put('/leads/:id/status', authenticateToken, async (req, res) => {
       { returnDocument: 'after' }
     );
 
+    // Convert lead to partner when approved
+    if (status === LEAD_STATUS.APPROVED) {
+      try {
+        const partnersCollection = await getCollection('partners');
+        
+        // Check if partner already exists
+        const existingPartner = await partnersCollection.findOne({ 
+          $or: [
+            { partnerId: lead.id },
+            { 'primaryContact.email': lead.email }
+          ]
+        });
+        
+        if (!existingPartner) {
+          // Create new partner
+          const partnerId = `PARTNER-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          const now = new Date().toISOString();
+          
+          const newPartner = {
+            partnerId,
+            name: lead.companyName,
+            type: lead.partnerType,
+            status: 'active',
+            primaryContact: {
+              name: lead.contactPerson,
+              email: lead.email,
+              phone: lead.phone
+            },
+            addresses: [{
+              line1: lead.address,
+              city: lead.city,
+              country: 'Egypt' // Default, can be made configurable
+            }],
+            apps: {
+              mobile: {
+                active: true,
+                lastLoginAt: null
+              },
+              api: {
+                keyLastRotatedAt: null
+              }
+            },
+            rating: {
+              average: 0,
+              count: 0,
+              lastUpdatedAt: now
+            },
+            notes: [],
+            audit: [{
+              action: 'created_from_lead',
+              leadId: lead.id,
+              performedBy: req.user.userId,
+              performedAt: now
+            }],
+            createdAt: now,
+            updatedAt: now
+          };
+          
+          await partnersCollection.insertOne(newPartner);
+          
+          // Update lead with partnerId
+          await leadsCollection.updateOne(
+            { id },
+            { $set: { partnerId } }
+          );
+          
+          console.log(`✅ Partner created from lead ${id}: ${partnerId}`);
+        }
+      } catch (partnerError) {
+        console.error('❌ Error creating partner from lead:', partnerError);
+        // Don't fail the lead update, just log the error
+      }
+    }
+
     // Send notification to sales person about status change
     await sendNotification(lead.createdBy, 'LEAD_STATUS_UPDATED', {
       leadId: id,

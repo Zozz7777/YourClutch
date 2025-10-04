@@ -213,13 +213,13 @@ function App() {
                 <p className="text-sm text-muted-foreground">{t.app.subtitle}</p>
               </div>
               <div className="flex items-center space-x-2">
-                {connectionStatus === 'checking' && <Loader2 className="w-4 h-4 animate-spin text-info" />}
-                {connectionStatus === 'connected' && <CheckCircle className="w-4 h-4 text-success" />}
+                {connectionStatus === 'checking' && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
+                {connectionStatus === 'connected' && <CheckCircle className="w-4 h-4 text-primary" />}
                 {connectionStatus === 'disconnected' && <XCircle className="w-4 h-4 text-destructive" />}
                 <span className={`text-sm font-medium ${
-                  connectionStatus === 'connected' ? 'text-success' : 
+                  connectionStatus === 'connected' ? 'text-primary' : 
                   connectionStatus === 'disconnected' ? 'text-destructive' : 
-                  'text-info'
+                  'text-muted-foreground'
                 }`}>
                   {connectionStatus === 'checking' ? t.common.checking :
                    connectionStatus === 'connected' ? t.common.online : t.common.offline}
@@ -236,13 +236,13 @@ function App() {
               </button>
               <button
                 onClick={testConnection}
-                className="px-3 py-1 text-sm bg-info text-primary-foreground rounded-md hover:bg-info/90 transition-colors"
+                className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
                 {t.common.testConnection}
               </button>
               <button
                 onClick={checkForUpdates}
-                className="px-3 py-1 text-sm bg-success text-primary-foreground rounded-md hover:bg-success/90 transition-colors"
+                className="px-3 py-1 text-sm bg-secondary text-primary-foreground rounded-md hover:bg-secondary/90 transition-colors"
               >
                 {t.common.checkUpdates}
               </button>
@@ -363,7 +363,7 @@ function App() {
                 <button
                   onClick={login}
                   disabled={loading}
-                  className="w-full py-2 px-4 bg-success text-primary-foreground rounded-md hover:bg-success/90 disabled:opacity-50 transition-colors"
+                  className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
                 >
                   {loading ? t.common.loading : t.auth.login}
                 </button>
@@ -417,7 +417,7 @@ function App() {
               <button
                 onClick={processSale}
                 disabled={loading}
-                className="mt-4 px-4 py-2 bg-success text-primary-foreground rounded-md hover:bg-success/90 disabled:opacity-50 transition-colors"
+                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
                 {loading ? t.pos.processing : t.pos.process}
               </button>
@@ -588,8 +588,8 @@ function App() {
 
         {/* Status Message */}
         {message && (
-          <div className="mt-4 p-4 bg-info/10 border border-info/20 rounded-md">
-            <p className="text-info">{message}</p>
+          <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-md">
+            <p className="text-primary">{message}</p>
           </div>
         )}
       </div>

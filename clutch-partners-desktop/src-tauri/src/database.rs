@@ -47,7 +47,7 @@ impl Database {
             });
         }
         
-        // Remove any existing empty file
+        // Remove any existing empty or invalid file
         if database_path.exists() {
             if let Ok(metadata) = std::fs::metadata(&database_path) {
                 if metadata.len() == 0 {
@@ -56,6 +56,7 @@ impl Database {
             }
         }
         
+        // Use an absolute path to avoid working directory issues
         let database_url = format!("sqlite:{}", database_path.display());
         log::info!("Connecting to database: {}", database_url);
         
@@ -68,7 +69,25 @@ impl Database {
                 log::error!("❌ Database connection failed: {}", e);
                 log::error!("Database URL: {}", database_url);
                 log::error!("Current directory: {:?}", std::env::current_dir());
-                panic!("Failed to connect to database: {}", e);
+                log::error!("Database path exists: {}", database_path.exists());
+                log::error!("Database path: {}", database_path.display());
+                
+                // Try to create the database file manually
+                if let Err(create_err) = std::fs::write(&database_path, "") {
+                    log::error!("Failed to create database file: {}", create_err);
+                }
+                
+                // Try connecting again
+                match SqlitePool::connect(&database_url).await {
+                    Ok(pool) => {
+                        log::info!("✅ Database connected successfully on retry");
+                        pool
+                    }
+                    Err(retry_err) => {
+                        log::error!("❌ Database connection failed on retry: {}", retry_err);
+                        panic!("Failed to connect to database: {}", retry_err);
+                    }
+                }
             }
         };
         

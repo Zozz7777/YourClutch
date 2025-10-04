@@ -371,6 +371,98 @@ router.post('/change-password', authenticateToken, async (req, res) => {
   }
 });
 
+// ==================== EMPLOYEE PASSWORD MANAGEMENT ====================
+
+// POST /api/v1/employees/:id/set-password - Set password for existing employee
+router.post('/:id/set-password', authenticateToken, checkRole(['head_administrator', 'hr']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_PASSWORD',
+        message: 'Password is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        error: 'WEAK_PASSWORD',
+        message: 'Password must be at least 8 characters long',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    const usersCollection = await getCollection('users');
+    
+    // Handle both string and ObjectId formats
+    let query = {};
+    try {
+      query._id = new ObjectId(id);
+    } catch (error) {
+      query._id = id;
+    }
+    
+    // Check if employee exists
+    const existingEmployee = await usersCollection.findOne({ 
+      ...query, 
+      isEmployee: true 
+    });
+    
+    if (!existingEmployee) {
+      return res.status(404).json({
+        success: false,
+        error: 'EMPLOYEE_NOT_FOUND',
+        message: 'Employee not found',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+    
+    // Update employee with password
+    const result = await usersCollection.updateOne(
+      { ...query, isEmployee: true },
+      { 
+        $set: { 
+          password: hashedPassword,
+          updatedAt: new Date(),
+          updatedBy: req.user.userId
+        } 
+      }
+    );
+    
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'PASSWORD_UPDATE_FAILED',
+        message: 'Failed to set password',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Password set successfully',
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Set employee password error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'SET_PASSWORD_FAILED',
+      message: 'Failed to set employee password',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // ==================== EMPLOYEE MANAGEMENT ====================
 
 // GET /api/v1/employees - Get all employees (admin/hr only)

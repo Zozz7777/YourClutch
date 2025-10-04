@@ -441,6 +441,13 @@ app.use('/api/v1/loyalty', require('./routes/loyalty'));
 
 // Sales routes
 app.use('/api/v1/sales', require('./routes/sales'));
+
+// Partners routes
+app.use('/api/v1/partners', require('./routes/partners'));
+
+// Updates routes
+app.use('/api/v1/updates', require('./routes/updates'));
+
 app.use('/api/v1', clutchAppRoutes);
 app.use('/api/v1/admin/onboarding', onboardingRoutes);
 app.use('/api/v1/admin/roles', rolesRoutes);
