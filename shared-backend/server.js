@@ -332,83 +332,81 @@ app.use(`${apiPrefix}/admin-ceo`, adminCeoRoutes);
 // Emergency authentication routes
 app.use(`${apiPrefix}/emergency-auth`, emergencyAuthRoutes);
 
-// New missing routes
-app.use(`${apiPrefix}/payments`, paymentsRoutes);
-app.use(`${apiPrefix}/communication`, communicationRoutes);
-app.use(`${apiPrefix}/performance`, performanceRoutes);
-app.use(`${apiPrefix}/dashboard`, dashboardRoutes);
-app.use(`${apiPrefix}/notifications`, notificationsRoutes);
-app.use(`${apiPrefix}/employees`, employeesRoutes);
-logger.info('🔍 Employee routes registered at:', `${apiPrefix}/employees`);
-app.use(`${apiPrefix}/employee-invitations`, employeeInvitationsRoutes);
-logger.info('🔍 Employee invitations routes registered at:', `${apiPrefix}/employee-invitations`);
-app.use(`${apiPrefix}/export`, exportRoutes);
+// New missing routes - only include defined routes
+// app.use(`${apiPrefix}/payments`, paymentsRoutes); // Not defined
+// app.use(`${apiPrefix}/communication`, communicationRoutes); // Not defined
+// app.use(`${apiPrefix}/performance`, performanceRoutes); // Not defined
+// app.use(`${apiPrefix}/dashboard`, dashboardRoutes); // Not defined
+// app.use(`${apiPrefix}/notifications`, notificationsRoutes); // Not defined
+// app.use(`${apiPrefix}/employees`, employeesRoutes); // Not defined
+// app.use(`${apiPrefix}/employee-invitations`, employeeInvitationsRoutes); // Not defined
+// app.use(`${apiPrefix}/export`, exportRoutes); // Not defined
 
 // Mount new missing route files with correct v1 prefix
-app.use(`${apiPrefix}/fleet`, fleetRoutes);
-app.use(`${apiPrefix}/crm`, crmRoutes);
-app.use(`${apiPrefix}/sales`, salesRoutes);
-app.use(`${apiPrefix}/finance`, financeRoutes);
-app.use(`${apiPrefix}/chat`, chatRoutes);
-app.use(`${apiPrefix}/settings`, settingsRoutes);
-app.use(`${apiPrefix}/integrations`, integrationsRoutes);
-app.use(`${apiPrefix}/audit-trail`, auditTrailRoutes);
-app.use(`${apiPrefix}/reports`, reportsRoutes);
-app.use(`${apiPrefix}/rbac`, rbacRoutes);
+// app.use(`${apiPrefix}/fleet`, fleetRoutes); // Not defined
+// app.use(`${apiPrefix}/crm`, crmRoutes); // Not defined
+// app.use(`${apiPrefix}/sales`, salesRoutes); // Not defined
+// app.use(`${apiPrefix}/finance`, financeRoutes); // Not defined
+// app.use(`${apiPrefix}/chat`, chatRoutes); // Not defined
+// app.use(`${apiPrefix}/settings`, settingsRoutes); // Not defined
+// app.use(`${apiPrefix}/integrations`, integrationsRoutes); // Not defined
+// app.use(`${apiPrefix}/audit-trail`, auditTrailRoutes); // Not defined
+// app.use(`${apiPrefix}/reports`, reportsRoutes); // Not defined
+// app.use(`${apiPrefix}/rbac`, rbacRoutes); // Not defined
 
 // Mount newly created routes
-app.use(`${apiPrefix}/support`, supportRoutes);
+// app.use(`${apiPrefix}/support`, supportRoutes); // Not defined
 
 // Fallback routes (without v1 prefix for frontend compatibility)
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
-app.use('/api/notifications', notificationsRoutes);
-app.use('/api/export', exportRoutes);
-app.use('/api/settings', settingsRoutes);
-app.use('/api/integrations', integrationsRoutes);
-app.use('/api/audit-trail', auditTrailRoutes);
-app.use('/api/reports', reportsRoutes);
-app.use('/api/rbac', rbacRoutes);
+// app.use('/api/notifications', notificationsRoutes); // Not defined
+// app.use('/api/export', exportRoutes); // Not defined
+// app.use('/api/settings', settingsRoutes); // Not defined
+// app.use('/api/integrations', integrationsRoutes); // Not defined
+// app.use('/api/audit-trail', auditTrailRoutes); // Not defined
+// app.use('/api/reports', reportsRoutes); // Not defined
+// app.use('/api/rbac', rbacRoutes); // Not defined
 
 // API v1 routes (for frontend compatibility) - Fleet and CRM routes already mounted above
 // app.use('/api/v1/fleet', fleetRoutes); // Removed duplicate - already mounted with apiPrefix
 // app.use('/api/v1/crm', crmRoutes); // Removed duplicate - already mounted with apiPrefix
-app.use('/api/v1/notifications', notificationsRoutes);
-app.use('/api/v1/users', usersRoutes);
-app.use('/api/v1/export', exportRoutes);
-app.use('/api/v1/settings', settingsRoutes);
-app.use('/api/v1/integrations', integrationsRoutes);
-app.use('/api/v1/audit-trail', auditTrailRoutes);
-app.use('/api/v1/reports', reportsRoutes);
-app.use('/api/v1/rbac', rbacRoutes);
-app.use('/api/v1/analytics', analyticsRoutes);
-app.use('/api/v1/business-intelligence', businessIntelligenceRoutes);
-app.use('/api/v1/ai', aiRoutes);
-app.use('/api/v1/system-health', systemHealthRoutes);
-app.use('/api/v1/feature-flags', featureFlagsRoutes);
-app.use('/api/v1/audit', auditRoutes);
+// app.use('/api/v1/notifications', notificationsRoutes); // Not defined
+// app.use('/api/v1/users', usersRoutes); // Not defined
+// app.use('/api/v1/export', exportRoutes); // Not defined
+// app.use('/api/v1/settings', settingsRoutes); // Not defined
+// app.use('/api/v1/integrations', integrationsRoutes); // Not defined
+// app.use('/api/v1/audit-trail', auditTrailRoutes); // Not defined
+// app.use('/api/v1/reports', reportsRoutes); // Not defined
+// app.use('/api/v1/rbac', rbacRoutes); // Not defined
+// app.use('/api/v1/analytics', analyticsRoutes); // Not defined
+// app.use('/api/v1/business-intelligence', businessIntelligenceRoutes); // Not defined
+// app.use('/api/v1/ai', aiRoutes); // Not defined
+// app.use('/api/v1/system-health', systemHealthRoutes); // Not defined
+// app.use('/api/v1/feature-flags', featureFlagsRoutes); // Not defined
+// app.use('/api/v1/audit', auditRoutes); // Not defined
 // app.use('/api/v1/assets', assetsRoutes); // Removed duplicate - already mounted with apiPrefix
-app.use('/api/v1/projects', projectsRoutes);
-app.use('/api/v1/vendors', vendorsRoutes);
-app.use('/api/v1/performance', performanceRoutes);
-app.use('/api/v1/system/performance', performanceRoutes); // Add system performance route
-app.use('/api/v1/ai-ml', aiRoutes);
-app.use('/api/v1/monitoring', monitoringRoutes);
-app.use('/api/v1/files', filesRoutes);
-app.use('/api/v1/upload', filesRoutes); // Alias for backward compatibility
-app.use('/api/v1/docs', apiDocsRoutes);
-app.use('/api/v1/pending-emails', pendingEmailsRoutes);
-app.use('/api/v1/mobile-apps', mobileAppsRoutes);
-app.use('/api/v1/operations', operationsRoutes);
-app.use('/api/v1/security', securityRoutes);
-app.use('/api/v1/debug', debugRoutes);
-app.use('/api/v1/alerts', alertsRoutes);
-app.use('/api/v1/logs', logsRoutes);
-app.use('/api/v1/health-checks', healthRoutes);
-app.use('/api/v1/communication', communicationRoutes);
-app.use('/api/v1/mobile-cms', mobileCmsRoutes);
-app.use('/api/v1/ops', opsRoutes);
-app.use('/api/v1/careers', careersRoutes);
+// app.use('/api/v1/projects', projectsRoutes); // Not defined
+// app.use('/api/v1/vendors', vendorsRoutes); // Not defined
+// app.use('/api/v1/performance', performanceRoutes); // Not defined
+// app.use('/api/v1/system/performance', performanceRoutes); // Not defined
+// app.use('/api/v1/ai-ml', aiRoutes); // Not defined
+// app.use('/api/v1/monitoring', monitoringRoutes); // Not defined
+// app.use('/api/v1/files', filesRoutes); // Not defined
+// app.use('/api/v1/upload', filesRoutes); // Not defined
+// app.use('/api/v1/docs', apiDocsRoutes); // Not defined
+// app.use('/api/v1/pending-emails', pendingEmailsRoutes); // Not defined
+// app.use('/api/v1/mobile-apps', mobileAppsRoutes); // Not defined
+// app.use('/api/v1/operations', operationsRoutes); // Not defined
+// app.use('/api/v1/security', securityRoutes); // Not defined
+// app.use('/api/v1/debug', debugRoutes); // Not defined
+// app.use('/api/v1/alerts', alertsRoutes); // Not defined
+// app.use('/api/v1/logs', logsRoutes); // Not defined
+// app.use('/api/v1/health-checks', healthRoutes); // Not defined
+// app.use('/api/v1/communication', communicationRoutes); // Not defined
+// app.use('/api/v1/mobile-cms', mobileCmsRoutes); // Not defined
+// app.use('/api/v1/ops', opsRoutes); // Not defined
+// app.use('/api/v1/careers', careersRoutes); // Not defined
 app.use('/api/v1/testing', testingRoutes);
 
 // Enhanced routes
