@@ -546,6 +546,14 @@ export default function HRPage() {
           const averageSalary = employees.length > 0 
             ? employees.reduce((sum, e) => sum + (Number(e.salary) || 0), 0) / employees.length 
             : 0;
+          
+          // Debug logging for salary calculation
+          console.log('HR Salary Debug:', {
+            employeeCount: employees.length,
+            salaries: employees.map(e => ({ name: `${e.firstName} ${e.lastName}`, salary: e.salary, salaryType: typeof e.salary })),
+            totalSalary: employees.reduce((sum, e) => sum + (Number(e.salary) || 0), 0),
+            averageSalary: averageSalary
+          });
 
           setStats({
             totalEmployees,
@@ -1055,6 +1063,7 @@ export default function HRPage() {
                 Array.isArray(employees) && employees.length > 0 ? 
                   (() => {
                     const avg = employees.reduce((sum, e) => sum + (Number(e.salary) || 0), 0) / employees.length;
+                    console.log('Display calculation:', { avg, employees: employees.length, salaries: employees.map(e => e.salary) });
                     return isNaN(avg) ? 0 : Math.round(avg).toLocaleString();
                   })() : 0} EGP
             </div>
