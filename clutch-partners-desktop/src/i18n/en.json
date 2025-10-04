@@ -1,0 +1,86 @@
+{
+  "app": {
+    "title": "Clutch Partners System",
+    "subtitle": "POS and Inventory Management System"
+  },
+  "auth": {
+    "title": "Authentication",
+    "partnerId": "Partner ID",
+    "email": "Email",
+    "password": "Password",
+    "login": "Login",
+    "validate": "Validate",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
+    "validationSuccess": "Partner ID validated successfully",
+    "validationFailed": "Partner ID validation failed"
+  },
+  "navigation": {
+    "pos": "POS",
+    "inventory": "Inventory",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "pos": {
+    "title": "Point of Sale",
+    "processSale": "Process Sale",
+    "productId": "Product ID",
+    "quantity": "Quantity",
+    "customerName": "Customer Name",
+    "process": "Process Sale",
+    "processing": "Processing..."
+  },
+  "inventory": {
+    "title": "Inventory",
+    "addProduct": "Add Product",
+    "products": "Products",
+    "sku": "SKU",
+    "name": "Name",
+    "price": "Price",
+    "stock": "Stock",
+    "category": "Category",
+    "barcode": "Barcode",
+    "add": "Add",
+    "adding": "Adding..."
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "Reports and analytics will be displayed here"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Settings and configuration options will be displayed here",
+    "language": "Language",
+    "arabic": "Arabic",
+    "english": "English"
+  },
+  "common": {
+    "testConnection": "Test Connection",
+    "checkUpdates": "Check Updates",
+    "online": "🟢 Online",
+    "offline": "🔴 Offline",
+    "checking": "Checking...",
+    "success": "Success",
+    "error": "Error",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh"
+  },
+  "status": {
+    "connected": "Connected to server",
+    "disconnected": "Disconnected from server",
+    "syncing": "Syncing...",
+    "synced": "Synced",
+    "error": "Connection error"
+  }
+}

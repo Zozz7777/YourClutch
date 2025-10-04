@@ -961,7 +961,7 @@ export default function HRPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading HR data...</p>
+          <p className="text-muted-foreground">{t('hr.loadingHrData')}</p>
         </div>
       </div>
     );
@@ -972,22 +972,22 @@ export default function HRPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-medium tracking-tight">HR Management</h1>
+          <h1 className="text-3xl font-medium tracking-tight">{t('hr.title')}</h1>
           <p className="text-muted-foreground font-sans">
-            Manage your team members, track employee performance, and handle HR operations efficiently.
+            {t('hr.description')}
           </p>
         </div>
         <div className="flex space-x-2">
           <Button onClick={() => setShowInvitationForm(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Invite Employee
+            {t('hr.inviteEmployee')}
           </Button>
           <Button variant="outline" onClick={() => {
             setEditingJob(null);
             setShowJobPostingOverlay(true);
           }}>
             <Plus className="mr-2 h-4 w-4" />
-            Post Job
+{t('hr.postJob')}
           </Button>
         </div>
       </div>
@@ -996,7 +996,7 @@ export default function HRPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('hr.totalEmployees')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -1004,7 +1004,7 @@ export default function HRPage() {
               {stats ? stats.totalEmployees : Array.isArray(employees) ? employees.length : 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              {stats ? stats.activeEmployees : Array.isArray(employees) ? employees.filter(e => e.status === "active").length : 0} Active
+              {stats ? stats.activeEmployees : Array.isArray(employees) ? employees.filter(e => e.status === "active").length : 0} {t('hr.active')}
             </p>
           </CardContent>
         </Card>
@@ -1059,7 +1059,7 @@ export default function HRPage() {
                   })() : 0} EGP
             </div>
             <p className="text-xs text-muted-foreground">
-              Annual average
+{t('hr.annualAverage')}
             </p>
           </CardContent>
         </Card>
@@ -1073,7 +1073,7 @@ export default function HRPage() {
           onClick={() => setActiveTab("employees")}
         >
           <Users className="mr-2 h-4 w-4" />
-          Employees
+          {t('hr.employees')}
         </Button>
         <Button
           variant={activeTab === "invitations" ? "default" : "ghost"}
@@ -1081,7 +1081,7 @@ export default function HRPage() {
           onClick={() => setActiveTab("invitations")}
         >
           <Mail className="mr-2 h-4 w-4" />
-          Invitations ({Array.isArray(invitations) ? invitations.filter(i => i.status === 'pending').length : 0})
+{t('hr.invitations')} ({Array.isArray(invitations) ? invitations.filter(i => i.status === 'pending').length : 0})
         </Button>
         <Button
           variant={activeTab === "recruitment" ? "default" : "ghost"}
@@ -1089,7 +1089,7 @@ export default function HRPage() {
           onClick={() => setActiveTab("recruitment")}
         >
           <UserPlus className="mr-2 h-4 w-4" />
-          Recruitment
+{t('hr.recruitment')}
         </Button>
         <Button
           variant={activeTab === "careers" ? "default" : "ghost"}
@@ -1097,7 +1097,7 @@ export default function HRPage() {
           onClick={() => setActiveTab("careers")}
         >
           <Briefcase className="mr-2 h-4 w-4" />
-          Careers ({jobs.length})
+{t('hr.careers')} ({jobs.length})
         </Button>
       </div>
 
@@ -1107,7 +1107,7 @@ export default function HRPage() {
           <CardHeader>
             <CardTitle>{t('hr.employeeManagement')}</CardTitle>
             <CardDescription>
-              Manage employee information and records
+              {t('hr.manageEmployeeInfo')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -1115,7 +1115,7 @@ export default function HRPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search employees..."
+                  placeholder={t('hr.searchEmployees')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -1127,11 +1127,11 @@ export default function HRPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-3 py-2 border border-input bg-background rounded-md text-sm"
               >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="on_leave">On Leave</option>
-                <option value="terminated">Terminated</option>
+                <option value="all">{t('hr.allStatus')}</option>
+                <option value="active">{t('hr.active')}</option>
+                <option value="inactive">{t('hr.inactive')}</option>
+                <option value="on_leave">{t('hr.onLeave')}</option>
+                <option value="terminated">{t('hr.terminated')}</option>
               </select>
             </div>
 
@@ -1231,7 +1231,7 @@ export default function HRPage() {
             {filteredEmployees.length === 0 && (
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No employees found matching your criteria</p>
+                <p className="text-muted-foreground">{t('hr.noEmployeesFound')}</p>
               </div>
             )}
           </CardContent>

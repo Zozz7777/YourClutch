@@ -1,17 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Roboto+Serif:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* RTL Support */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+  
+  [dir="ltr"] {
+    direction: ltr;
+  }
+
+  /* Arabic font support */
+  [lang="ar"] {
+    font-family: 'Roboto', 'Cairo', 'Tajawal', ui-sans-serif, sans-serif;
+  }
+}
+
+@layer components {
+  /* Design system components following design.json */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 transition-all duration-fast;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-primary-foreground hover:bg-secondary/90 focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 transition-all duration-fast;
+  }
+  
+  .btn-success {
+    @apply bg-success text-primary-foreground hover:bg-success/90 focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 transition-all duration-fast;
+  }
+  
+  .btn-warning {
+    @apply bg-warning text-primary-foreground hover:bg-warning/90 focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 transition-all duration-fast;
+  }
+  
+  .btn-destructive {
+    @apply bg-destructive text-primary-foreground hover:bg-destructive/90 focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 transition-all duration-fast;
+  }
+  
+  .input {
+    @apply bg-input border-border text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-ring transition-all duration-fast;
+  }
+  
+  .card {
+    @apply bg-card text-card-foreground border border-border shadow-sm;
+  }
+  
+  .sidebar {
+    @apply bg-sidebar text-foreground;
+  }
+  
+  .sidebar-primary {
+    @apply bg-sidebar-primary text-primary-foreground;
+  }
+}
+
+@layer utilities {
+  /* Custom utilities for design system */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .shadow-design-sm {
+    box-shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
+  }
+  
+  .shadow-design-md {
+    box-shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);
+  }
+  
+  .shadow-design-2xs {
+    box-shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  }
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: 'Roboto Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

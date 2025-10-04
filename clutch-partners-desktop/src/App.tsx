@@ -9,8 +9,12 @@ import {
   WifiOff,
   CheckCircle,
   XCircle,
-  Loader2
+  Loader2,
+  Globe,
+  Menu,
+  X
 } from 'lucide-react'
+import { i18n, type Language } from './i18n'
 
 interface Product {
   id: number
@@ -39,6 +43,8 @@ function App() {
   const [sales, setSales] = useState<Sale[]>([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [language, setLanguage] = useState<Language>('ar')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Form states
   const [partnerId, setPartnerId] = useState('')
@@ -59,8 +65,9 @@ function App() {
   })
 
   useEffect(() => {
+    i18n.setLanguage(language)
     testConnection()
-  }, [])
+  }, [language])
 
   const testConnection = async () => {
     try {
@@ -78,16 +85,16 @@ function App() {
 
   const validatePartnerId = async () => {
     if (!partnerId.trim()) {
-      setMessage('Please enter a Partner ID')
+      setMessage(i18n.t().auth.validationFailed)
       return
     }
 
     try {
       setLoading(true)
       const result = await invoke<string>('validate_partner_id', { partnerId })
-      setMessage(result)
+      setMessage(i18n.t().auth.validationSuccess)
     } catch (error) {
-      setMessage(`Validation failed: ${error}`)
+      setMessage(`${i18n.t().auth.validationFailed}: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -95,18 +102,18 @@ function App() {
 
   const login = async () => {
     if (!email.trim() || !password.trim()) {
-      setMessage('Please enter email and password')
+      setMessage(i18n.t().auth.loginFailed)
       return
     }
 
     try {
       setLoading(true)
       const result = await invoke<string>('login', { email, password })
-      setMessage(result)
+      setMessage(i18n.t().auth.loginSuccess)
       setCurrentTab('main')
       loadProducts()
     } catch (error) {
-      setMessage(`Login failed: ${error}`)
+      setMessage(`${i18n.t().auth.loginFailed}: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -182,78 +189,115 @@ function App() {
     }
   }
 
+  const toggleLanguage = () => {
+    const newLanguage = language === 'ar' ? 'en' : 'ar'
+    setLanguage(newLanguage)
+  }
+
+  const t = i18n.t()
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-background ${i18n.isRTL() ? 'rtl' : 'ltr'}`}>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-card shadow-sm border-b border-border">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">🚀 Clutch Partners System</h1>
+              <img 
+                src="/logo-black.png" 
+                alt="Clutch Partners" 
+                className="h-8 w-auto"
+              />
+              <div>
+                <h1 className="text-2xl font-bold text-foreground font-sans">{t.app.title}</h1>
+                <p className="text-sm text-muted-foreground">{t.app.subtitle}</p>
+              </div>
               <div className="flex items-center space-x-2">
-                {connectionStatus === 'checking' && <Loader2 className="w-4 h-4 animate-spin text-blue-500" />}
-                {connectionStatus === 'connected' && <CheckCircle className="w-4 h-4 text-green-500" />}
-                {connectionStatus === 'disconnected' && <XCircle className="w-4 h-4 text-red-500" />}
+                {connectionStatus === 'checking' && <Loader2 className="w-4 h-4 animate-spin text-info" />}
+                {connectionStatus === 'connected' && <CheckCircle className="w-4 h-4 text-success" />}
+                {connectionStatus === 'disconnected' && <XCircle className="w-4 h-4 text-destructive" />}
                 <span className={`text-sm font-medium ${
-                  connectionStatus === 'connected' ? 'text-green-600' : 
-                  connectionStatus === 'disconnected' ? 'text-red-600' : 
-                  'text-blue-600'
+                  connectionStatus === 'connected' ? 'text-success' : 
+                  connectionStatus === 'disconnected' ? 'text-destructive' : 
+                  'text-info'
                 }`}>
-                  {connectionStatus === 'checking' ? 'Checking...' :
-                   connectionStatus === 'connected' ? '🟢 Online' : '🔴 Offline'}
+                  {connectionStatus === 'checking' ? t.common.checking :
+                   connectionStatus === 'connected' ? t.common.online : t.common.offline}
                 </span>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <button
-                onClick={testConnection}
-                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={toggleLanguage}
+                className="flex items-center space-x-2 px-3 py-1 text-sm bg-muted text-foreground rounded-md hover:bg-muted/80 transition-colors"
               >
-                Test Connection
+                <Globe className="w-4 h-4" />
+                <span>{language === 'ar' ? 'العربية' : 'English'}</span>
+              </button>
+              <button
+                onClick={testConnection}
+                className="px-3 py-1 text-sm bg-info text-primary-foreground rounded-md hover:bg-info/90 transition-colors"
+              >
+                {t.common.testConnection}
               </button>
               <button
                 onClick={checkForUpdates}
-                className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+                className="px-3 py-1 text-sm bg-success text-primary-foreground rounded-md hover:bg-success/90 transition-colors"
               >
-                Check Updates
+                {t.common.checkUpdates}
               </button>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Mobile Menu Button */}
+      {currentTab === 'main' && (
+        <div className="lg:hidden bg-card border-b border-border">
+          <div className="px-4 py-2">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="flex items-center space-x-2 text-foreground"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <span>{t.navigation.pos}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
       {currentTab === 'main' && (
-        <div className="bg-white shadow-sm">
+        <div className={`bg-card shadow-sm ${sidebarOpen ? 'block' : 'hidden lg:block'}`}>
           <div className="px-6 py-3">
-            <nav className="flex space-x-8">
+            <nav className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-8">
               <button
-                onClick={() => setCurrentTab('pos')}
-                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                onClick={() => { setCurrentTab('pos'); setSidebarOpen(false) }}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               >
                 <ShoppingCart className="w-4 h-4" />
-                <span>POS</span>
+                <span>{t.navigation.pos}</span>
               </button>
               <button
-                onClick={() => setCurrentTab('inventory')}
-                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                onClick={() => { setCurrentTab('inventory'); setSidebarOpen(false) }}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               >
                 <Package className="w-4 h-4" />
-                <span>Inventory</span>
+                <span>{t.navigation.inventory}</span>
               </button>
               <button
-                onClick={() => setCurrentTab('reports')}
-                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                onClick={() => { setCurrentTab('reports'); setSidebarOpen(false) }}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               >
                 <BarChart3 className="w-4 h-4" />
-                <span>Reports</span>
+                <span>{t.navigation.reports}</span>
               </button>
               <button
-                onClick={() => setCurrentTab('settings')}
-                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                onClick={() => { setCurrentTab('settings'); setSidebarOpen(false) }}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               >
                 <Settings className="w-4 h-4" />
-                <span>Settings</span>
+                <span>{t.navigation.settings}</span>
               </button>
             </nav>
           </div>
@@ -264,64 +308,64 @@ function App() {
       <div className="p-6">
         {currentTab === 'auth' && (
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-6">🔐 Authentication</h2>
+            <div className="bg-card rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold mb-6 text-foreground">{t.auth.title}</h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Partner ID
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.auth.partnerId}
                   </label>
                   <div className="flex space-x-2">
                     <input
                       type="text"
                       value={partnerId}
                       onChange={(e) => setPartnerId(e.target.value)}
-                      placeholder="Enter your Partner ID"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={t.auth.partnerId}
+                      className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                     />
                     <button
                       onClick={validatePartnerId}
                       disabled={loading}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
                     >
-                      Validate
+                      {t.auth.validate}
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.auth.email}
                   </label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={t.auth.email}
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.auth.password}
                   </label>
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={t.auth.password}
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
 
                 <button
                   onClick={login}
                   disabled={loading}
-                  className="w-full py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+                  className="w-full py-2 px-4 bg-success text-primary-foreground rounded-md hover:bg-success/90 disabled:opacity-50 transition-colors"
                 >
-                  {loading ? 'Logging in...' : 'Login'}
+                  {loading ? t.common.loading : t.auth.login}
                 </button>
               </div>
             </div>
@@ -330,52 +374,52 @@ function App() {
 
         {currentTab === 'pos' && (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">💰 Process Sale</h2>
+            <div className="bg-card rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold mb-4 text-foreground">{t.pos.title}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Product ID
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.pos.productId}
                   </label>
                   <input
                     type="text"
                     value={saleForm.productId}
                     onChange={(e) => setSaleForm({...saleForm, productId: e.target.value})}
-                    placeholder="Enter product ID"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={t.pos.productId}
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quantity
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.pos.quantity}
                   </label>
                   <input
                     type="number"
                     value={saleForm.quantity}
                     onChange={(e) => setSaleForm({...saleForm, quantity: parseInt(e.target.value) || 1})}
                     min="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Customer Name
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.pos.customerName}
                   </label>
                   <input
                     type="text"
                     value={saleForm.customerName}
                     onChange={(e) => setSaleForm({...saleForm, customerName: e.target.value})}
-                    placeholder="Customer name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={t.pos.customerName}
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
               </div>
               <button
                 onClick={processSale}
                 disabled={loading}
-                className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+                className="mt-4 px-4 py-2 bg-success text-primary-foreground rounded-md hover:bg-success/90 disabled:opacity-50 transition-colors"
               >
-                {loading ? 'Processing...' : 'Process Sale'}
+                {loading ? t.pos.processing : t.pos.process}
               </button>
             </div>
           </div>
@@ -383,36 +427,36 @@ function App() {
 
         {currentTab === 'inventory' && (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">📦 Add Product</h2>
+            <div className="bg-card rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold mb-4 text-foreground">{t.inventory.addProduct}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    SKU
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.inventory.sku}
                   </label>
                   <input
                     type="text"
                     value={productForm.sku}
                     onChange={(e) => setProductForm({...productForm, sku: e.target.value})}
-                    placeholder="Product SKU"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={t.inventory.sku}
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Name
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.inventory.name}
                   </label>
                   <input
                     type="text"
                     value={productForm.name}
                     onChange={(e) => setProductForm({...productForm, name: e.target.value})}
-                    placeholder="Product name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={t.inventory.name}
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.inventory.price}
                   </label>
                   <input
                     type="number"
@@ -420,76 +464,76 @@ function App() {
                     value={productForm.price}
                     onChange={(e) => setProductForm({...productForm, price: parseFloat(e.target.value) || 0})}
                     placeholder="0.00"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.inventory.stock}
                   </label>
                   <input
                     type="number"
                     value={productForm.stock}
                     onChange={(e) => setProductForm({...productForm, stock: parseInt(e.target.value) || 0})}
                     placeholder="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.inventory.category}
                   </label>
                   <input
                     type="text"
                     value={productForm.category}
                     onChange={(e) => setProductForm({...productForm, category: e.target.value})}
-                    placeholder="Product category"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={t.inventory.category}
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Barcode
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.inventory.barcode}
                   </label>
                   <input
                     type="text"
                     value={productForm.barcode}
                     onChange={(e) => setProductForm({...productForm, barcode: e.target.value})}
-                    placeholder="Product barcode"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={t.inventory.barcode}
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-input text-foreground"
                   />
                 </div>
               </div>
               <button
                 onClick={addProduct}
                 disabled={loading}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
-                {loading ? 'Adding...' : 'Add Product'}
+                {loading ? t.inventory.adding : t.inventory.add}
               </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">📦 Products</h2>
+            <div className="bg-card rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold mb-4 text-foreground">{t.inventory.products}</h2>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-border">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t.inventory.sku}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t.inventory.name}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t.inventory.price}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t.inventory.stock}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{t.inventory.category}</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-card divide-y divide-border">
                     {products.map((product) => (
                       <tr key={product.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.sku}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${product.price.toFixed(2)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.stock}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.category}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">{product.sku}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{product.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">${product.price.toFixed(2)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{product.stock}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{product.category}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -500,23 +544,52 @@ function App() {
         )}
 
         {currentTab === 'reports' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">📊 Reports</h2>
-            <p className="text-gray-600">Reports and analytics will be displayed here.</p>
+          <div className="bg-card rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">{t.reports.title}</h2>
+            <p className="text-muted-foreground">{t.reports.description}</p>
           </div>
         )}
 
         {currentTab === 'settings' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">⚙️ Settings</h2>
-            <p className="text-gray-600">Settings and configuration options will be displayed here.</p>
+          <div className="bg-card rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">{t.settings.title}</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t.settings.language}
+                </label>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setLanguage('ar')}
+                    className={`px-3 py-2 rounded-md transition-colors ${
+                      language === 'ar' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    {t.settings.arabic}
+                  </button>
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`px-3 py-2 rounded-md transition-colors ${
+                      language === 'en' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    {t.settings.english}
+                  </button>
+                </div>
+              </div>
+              <p className="text-muted-foreground">{t.settings.description}</p>
+            </div>
           </div>
         )}
 
         {/* Status Message */}
         {message && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-blue-800">{message}</p>
+          <div className="mt-4 p-4 bg-info/10 border border-info/20 rounded-md">
+            <p className="text-info">{message}</p>
           </div>
         )}
       </div>

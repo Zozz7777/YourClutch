@@ -1243,7 +1243,21 @@
     "deleteInvitation": "حذف الدعوة",
     "deleteInvitationConfirm": "هل أنت متأكد من حذف هذه الدعوة؟",
     "invitationDeleted": "تم حذف الدعوة بنجاح",
-    "loadingHrData": "جاري تحميل بيانات الموارد البشرية..."
+    "loadingHrData": "جاري تحميل بيانات الموارد البشرية...",
+    "inviteEmployee": "دعوة موظف",
+    "postJob": "نشر وظيفة",
+    "annualAverage": "متوسط سنوي",
+    "employees": "الموظفون",
+    "invitations": "الدعوات",
+    "recruitment": "التوظيف",
+    "careers": "الوظائف",
+    "manageEmployeeInfo": "إدارة معلومات الموظفين والسجلات",
+    "searchEmployees": "البحث عن الموظفين...",
+    "allStatus": "جميع الحالات",
+    "inactive": "غير نشط",
+    "onLeave": "في إجازة",
+    "terminated": "مفصول",
+    "noEmployeesFound": "لم يتم العثور على موظفين يطابقون معاييرك"
   },
   "auth": {
     "login": "تسجيل الدخول",
