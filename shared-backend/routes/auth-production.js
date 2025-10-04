@@ -803,8 +803,8 @@ router.post('/employee-login', loginRateLimit, async (req, res) => {
     // Fetch employee from database
     let employee;
     try {
-      const usersCollection = await getCollection('users');
-      employee = await usersCollection.findOne({ email: email.toLowerCase(), isEmployee: true });
+      const employeesCollection = await getCollection('employees');
+      employee = await employeesCollection.findOne({ email: email.toLowerCase() });
       
       if (!employee) {
         return res.status(401).json({
@@ -838,8 +838,8 @@ router.post('/employee-login', loginRateLimit, async (req, res) => {
       }
       
       // Update last login
-      await usersCollection.updateOne(
-        { email: email.toLowerCase(), isEmployee: true },
+      await employeesCollection.updateOne(
+        { email: email.toLowerCase() },
         { $set: { lastLogin: new Date().toISOString() } }
       );
     } catch (error) {
