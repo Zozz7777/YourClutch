@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const { logger } = require('../config/logger');
 const { authenticateToken, requireRole } = require('../middleware/auth');
-const { checkRole, checkPermission } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 
 // Simple authentication middleware (non-blocking)
 const simpleAuth = (req, res, next) => {
