@@ -295,6 +295,18 @@ app.use(`${apiPrefix}/performance`, performanceRoutes);
 app.use(`${apiPrefix}/mobile-cms`, mobileCmsRoutes);
 app.use(`${apiPrefix}/ops`, opsRoutes);
 app.use(`${apiPrefix}/dashboard`, dashboardRoutes);
+
+// New comprehensive financial management routes
+app.use('/api/v1/integrations', require('./routes/integrations'));
+app.use('/api/v1/financial', require('./routes/financial'));
+app.use('/api/v1/shipping', require('./routes/shipping'));
+app.use('/api/v1/revenue-management', require('./routes/revenue-management'));
+app.use('/api/v1/payroll', require('./routes/payroll'));
+app.use('/api/v1/company-expenses', require('./routes/company-expenses'));
+app.use('/api/v1/ap', require('./routes/accounts-payable'));
+app.use('/api/v1/ar', require('./routes/accounts-receivable'));
+app.use('/api/v1/banking', require('./routes/banking'));
+
 // app.use('/api/notifications', notificationsRoutes); // Not defined
 // app.use('/api/export', exportRoutes); // Not defined
 // app.use('/api/settings', settingsRoutes); // Not defined
