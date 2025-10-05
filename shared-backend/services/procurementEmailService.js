@@ -1,10 +1,10 @@
 const nodemailer = require('nodemailer');
 const EmailTemplate = require('../models/EmailTemplate');
-const logger = require('../utils/logger');
+const { logger } = require('../config/logger');
 
 class ProcurementEmailService {
   constructor() {
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: process.env.SMTP_PORT || 587,
       secure: false,

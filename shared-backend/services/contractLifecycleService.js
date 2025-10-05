@@ -1,7 +1,7 @@
 const ProcurementContract = require('../models/ProcurementContract');
 const PartnerContract = require('../models/PartnerContract');
 const Legal = require('../models/Legal');
-const logger = require('../utils/logger');
+const { logger } = require('../config/logger');
 
 class ContractLifecycleService {
   constructor() {

@@ -1,6 +1,6 @@
 const SupplierRiskAssessment = require('../models/SupplierRiskAssessment');
 const ProcurementSupplier = require('../models/ProcurementSupplier');
-const logger = require('../utils/logger');
+const { logger } = require('../config/logger');
 
 class SupplierRiskAssessmentService {
   constructor() {
