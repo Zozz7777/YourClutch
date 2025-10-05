@@ -76,11 +76,21 @@ class PerformanceTuner {
 
   // Analyze performance metrics and apply tuning
   async analyzeAndTune(metrics) {
-    console.log('🔧 Analyzing performance metrics for tuning...');
+    // Only log if we're actually doing something significant
+    const os = require('os');
+    const systemMemory = os.totalmem();
+    const freeMemory = os.freemem();
+    const systemMemoryUsage = (systemMemory - freeMemory) / systemMemory;
+    
+    // Only proceed with tuning if system memory is actually high
+    if (systemMemoryUsage > 0.8) {
+      console.log('🔧 Analyzing performance metrics for tuning...');
+    }
     
     // Store performance history
     this.performanceHistory.push({
       ...metrics,
+      systemMemoryUsage,
       timestamp: new Date()
     });
 

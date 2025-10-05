@@ -1,418 +1,403 @@
-const Employee = require('../models/Employee');
-const Role = require('../models/Role');
-const Permission = require('../models/Permission');
+const logger = require('../config/logger');
+
+// Define roles and their permissions
+const ROLES = {
+  SUPER_ADMIN: 'super_admin',
+  ADMIN: 'admin',
+  PARTNER_OWNER: 'partner_owner',
+  PARTNER_MANAGER: 'partner_manager',
+  PARTNER_EMPLOYEE: 'partner_employee',
+  CUSTOMER: 'customer'
+};
+
+const PERMISSIONS = {
+  // User Management
+  CREATE_USER: 'create_user',
+  READ_USER: 'read_user',
+  UPDATE_USER: 'update_user',
+  DELETE_USER: 'delete_user',
+  
+  // Partner Management
+  CREATE_PARTNER: 'create_partner',
+  READ_PARTNER: 'read_partner',
+  UPDATE_PARTNER: 'update_partner',
+  DELETE_PARTNER: 'delete_partner',
+  
+  // Order Management
+  CREATE_ORDER: 'create_order',
+  READ_ORDER: 'read_order',
+  UPDATE_ORDER: 'update_order',
+  DELETE_ORDER: 'delete_order',
+  
+  // Payment Management
+  CREATE_PAYMENT: 'create_payment',
+  READ_PAYMENT: 'read_payment',
+  UPDATE_PAYMENT: 'update_payment',
+  DELETE_PAYMENT: 'delete_payment',
+  
+  // Inventory Management
+  CREATE_INVENTORY: 'create_inventory',
+  READ_INVENTORY: 'read_inventory',
+  UPDATE_INVENTORY: 'update_inventory',
+  DELETE_INVENTORY: 'delete_inventory',
+  
+  // Analytics & Reports
+  READ_ANALYTICS: 'read_analytics',
+  READ_REPORTS: 'read_reports',
+  EXPORT_DATA: 'export_data',
+  
+  // Audit & Compliance
+  READ_AUDIT_LOGS: 'read_audit_logs',
+  CREATE_AUDIT_LOG: 'create_audit_log',
+  
+  // Support & Tickets
+  CREATE_TICKET: 'create_ticket',
+  READ_TICKET: 'read_ticket',
+  UPDATE_TICKET: 'update_ticket',
+  DELETE_TICKET: 'delete_ticket',
+  
+  // Warranty & Disputes
+  CREATE_WARRANTY_CLAIM: 'create_warranty_claim',
+  READ_WARRANTY_CLAIM: 'read_warranty_claim',
+  UPDATE_WARRANTY_CLAIM: 'update_warranty_claim',
+  CREATE_DISPUTE: 'create_dispute',
+  READ_DISPUTE: 'read_dispute',
+  UPDATE_DISPUTE: 'update_dispute',
+  
+  // Notifications
+  SEND_NOTIFICATION: 'send_notification',
+  READ_NOTIFICATION: 'read_notification',
+  UPDATE_NOTIFICATION: 'update_notification',
+  
+  // Settings
+  READ_SETTINGS: 'read_settings',
+  UPDATE_SETTINGS: 'update_settings'
+};
+
+// Role-Permission mapping
+const ROLE_PERMISSIONS = {
+  [ROLES.SUPER_ADMIN]: Object.values(PERMISSIONS),
+  
+  [ROLES.ADMIN]: [
+    PERMISSIONS.CREATE_USER,
+    PERMISSIONS.READ_USER,
+    PERMISSIONS.UPDATE_USER,
+    PERMISSIONS.CREATE_PARTNER,
+    PERMISSIONS.READ_PARTNER,
+    PERMISSIONS.UPDATE_PARTNER,
+    PERMISSIONS.READ_ORDER,
+    PERMISSIONS.UPDATE_ORDER,
+    PERMISSIONS.READ_PAYMENT,
+    PERMISSIONS.READ_INVENTORY,
+    PERMISSIONS.READ_ANALYTICS,
+    PERMISSIONS.READ_REPORTS,
+    PERMISSIONS.EXPORT_DATA,
+    PERMISSIONS.READ_AUDIT_LOGS,
+    PERMISSIONS.READ_TICKET,
+    PERMISSIONS.UPDATE_TICKET,
+    PERMISSIONS.READ_WARRANTY_CLAIM,
+    PERMISSIONS.UPDATE_WARRANTY_CLAIM,
+    PERMISSIONS.READ_DISPUTE,
+    PERMISSIONS.UPDATE_DISPUTE,
+    PERMISSIONS.SEND_NOTIFICATION,
+    PERMISSIONS.READ_NOTIFICATION,
+    PERMISSIONS.READ_SETTINGS,
+    PERMISSIONS.UPDATE_SETTINGS
+  ],
+  
+  [ROLES.PARTNER_OWNER]: [
+    PERMISSIONS.READ_USER,
+    PERMISSIONS.UPDATE_USER,
+    PERMISSIONS.READ_PARTNER,
+    PERMISSIONS.UPDATE_PARTNER,
+    PERMISSIONS.CREATE_ORDER,
+    PERMISSIONS.READ_ORDER,
+    PERMISSIONS.UPDATE_ORDER,
+    PERMISSIONS.CREATE_PAYMENT,
+    PERMISSIONS.READ_PAYMENT,
+    PERMISSIONS.CREATE_INVENTORY,
+    PERMISSIONS.READ_INVENTORY,
+    PERMISSIONS.UPDATE_INVENTORY,
+    PERMISSIONS.DELETE_INVENTORY,
+    PERMISSIONS.READ_ANALYTICS,
+    PERMISSIONS.READ_REPORTS,
+    PERMISSIONS.EXPORT_DATA,
+    PERMISSIONS.READ_AUDIT_LOGS,
+    PERMISSIONS.CREATE_TICKET,
+    PERMISSIONS.READ_TICKET,
+    PERMISSIONS.UPDATE_TICKET,
+    PERMISSIONS.CREATE_WARRANTY_CLAIM,
+    PERMISSIONS.READ_WARRANTY_CLAIM,
+    PERMISSIONS.UPDATE_WARRANTY_CLAIM,
+    PERMISSIONS.CREATE_DISPUTE,
+    PERMISSIONS.READ_DISPUTE,
+    PERMISSIONS.UPDATE_DISPUTE,
+    PERMISSIONS.READ_NOTIFICATION,
+    PERMISSIONS.UPDATE_NOTIFICATION,
+    PERMISSIONS.READ_SETTINGS,
+    PERMISSIONS.UPDATE_SETTINGS
+  ],
+  
+  [ROLES.PARTNER_MANAGER]: [
+    PERMISSIONS.READ_USER,
+    PERMISSIONS.READ_PARTNER,
+    PERMISSIONS.CREATE_ORDER,
+    PERMISSIONS.READ_ORDER,
+    PERMISSIONS.UPDATE_ORDER,
+    PERMISSIONS.READ_PAYMENT,
+    PERMISSIONS.CREATE_INVENTORY,
+    PERMISSIONS.READ_INVENTORY,
+    PERMISSIONS.UPDATE_INVENTORY,
+    PERMISSIONS.READ_ANALYTICS,
+    PERMISSIONS.READ_REPORTS,
+    PERMISSIONS.READ_AUDIT_LOGS,
+    PERMISSIONS.CREATE_TICKET,
+    PERMISSIONS.READ_TICKET,
+    PERMISSIONS.UPDATE_TICKET,
+    PERMISSIONS.CREATE_WARRANTY_CLAIM,
+    PERMISSIONS.READ_WARRANTY_CLAIM,
+    PERMISSIONS.CREATE_DISPUTE,
+    PERMISSIONS.READ_DISPUTE,
+    PERMISSIONS.READ_NOTIFICATION,
+    PERMISSIONS.UPDATE_NOTIFICATION,
+    PERMISSIONS.READ_SETTINGS
+  ],
+  
+  [ROLES.PARTNER_EMPLOYEE]: [
+    PERMISSIONS.READ_ORDER,
+    PERMISSIONS.UPDATE_ORDER,
+    PERMISSIONS.READ_PAYMENT,
+    PERMISSIONS.READ_INVENTORY,
+    PERMISSIONS.UPDATE_INVENTORY,
+    PERMISSIONS.READ_ANALYTICS,
+    PERMISSIONS.CREATE_TICKET,
+    PERMISSIONS.READ_TICKET,
+    PERMISSIONS.READ_WARRANTY_CLAIM,
+    PERMISSIONS.READ_DISPUTE,
+    PERMISSIONS.READ_NOTIFICATION,
+    PERMISSIONS.UPDATE_NOTIFICATION
+  ],
+  
+  [ROLES.CUSTOMER]: [
+    PERMISSIONS.CREATE_ORDER,
+    PERMISSIONS.READ_ORDER,
+    PERMISSIONS.READ_PAYMENT,
+    PERMISSIONS.CREATE_TICKET,
+    PERMISSIONS.READ_TICKET,
+    PERMISSIONS.CREATE_WARRANTY_CLAIM,
+    PERMISSIONS.READ_WARRANTY_CLAIM,
+    PERMISSIONS.CREATE_DISPUTE,
+    PERMISSIONS.READ_DISPUTE,
+    PERMISSIONS.READ_NOTIFICATION
+  ]
+};
 
 /**
  * Check if user has specific permission
- * @param {string} permissionName - The permission to check
- * @returns {Function} Express middleware function
  */
-const checkPermission = (permissionName) => {
-  return async (req, res, next) => {
-    try {
-      if (!req.user || (!req.user.id && !req.user.userId)) {
-        return res.status(401).json({ 
-          error: 'Authentication required',
-          code: 'AUTH_REQUIRED'
-        });
-      }
-
-      // Get employee from database - handle both id and userId
-      const userId = req.user.id || req.user.userId;
-      const employee = await Employee.findById(userId);
-      if (!employee) {
-        return res.status(401).json({ 
-          error: 'Employee not found',
-          code: 'EMPLOYEE_NOT_FOUND'
-        });
-      }
-
-      // Check if employee is active
-      if (!employee.isActive) {
-        return res.status(403).json({ 
-          error: 'Account is deactivated',
-          code: 'ACCOUNT_DEACTIVATED'
-        });
-      }
-
-      // Check permission
-      const hasPermission = await employee.hasPermission(permissionName);
-      
-      if (hasPermission) {
-        // Add employee info to request for use in route handlers
-        req.employee = employee;
-        next();
-      } else {
-        return res.status(403).json({ 
-          error: 'Insufficient permissions',
-          code: 'INSUFFICIENT_PERMISSIONS',
-          required: permissionName,
-          message: `You need the '${permissionName}' permission to access this resource`
-        });
-      }
-    } catch (error) {
-      console.error('Permission check error:', error);
-      return res.status(500).json({ 
-        error: 'Permission validation failed',
-        code: 'PERMISSION_CHECK_ERROR'
-      });
-    }
-  };
-};
+function hasPermission(userRole, permission) {
+  const rolePermissions = ROLE_PERMISSIONS[userRole] || [];
+  return rolePermissions.includes(permission);
+}
 
 /**
  * Check if user has any of the specified permissions
- * @param {string[]} permissions - Array of permissions to check
- * @returns {Function} Express middleware function
  */
-const checkAnyPermission = (permissions) => {
-  return async (req, res, next) => {
-    try {
-      if (!req.user || (!req.user.id && !req.user.userId)) {
-        return res.status(401).json({ 
-          error: 'Authentication required',
-          code: 'AUTH_REQUIRED'
-        });
-      }
-
-      // Get employee from database - handle both id and userId
-      const userId = req.user.id || req.user.userId;
-      const employee = await Employee.findById(userId);
-      if (!employee) {
-        return res.status(401).json({ 
-          error: 'Employee not found',
-          code: 'EMPLOYEE_NOT_FOUND'
-        });
-      }
-
-      if (!employee.isActive) {
-        return res.status(403).json({ 
-          error: 'Account is deactivated',
-          code: 'ACCOUNT_DEACTIVATED'
-        });
-      }
-
-      // Check if user has any of the required permissions
-      for (const permission of permissions) {
-        const hasPermission = await employee.hasPermission(permission);
-        if (hasPermission) {
-          req.employee = employee;
-          return next();
-        }
-      }
-
-      return res.status(403).json({ 
-        error: 'Insufficient permissions',
-        code: 'INSUFFICIENT_PERMISSIONS',
-        required: permissions,
-        message: `You need one of these permissions: ${permissions.join(', ')}`
-      });
-    } catch (error) {
-      console.error('Permission check error:', error);
-      return res.status(500).json({ 
-        error: 'Permission validation failed',
-        code: 'PERMISSION_CHECK_ERROR'
-      });
-    }
-  };
-};
+function hasAnyPermission(userRole, permissions) {
+  return permissions.some(permission => hasPermission(userRole, permission));
+}
 
 /**
  * Check if user has all of the specified permissions
- * @param {string[]} permissions - Array of permissions to check
- * @returns {Function} Express middleware function
  */
-const checkAllPermissions = (permissions) => {
-  return async (req, res, next) => {
-    try {
-      if (!req.user || (!req.user.id && !req.user.userId)) {
-        return res.status(401).json({ 
-          error: 'Authentication required',
-          code: 'AUTH_REQUIRED'
-        });
-      }
-
-      // Get employee from database - handle both id and userId
-      const userId = req.user.id || req.user.userId;
-      const employee = await Employee.findById(userId);
-      if (!employee) {
-        return res.status(401).json({ 
-          error: 'Employee not found',
-          code: 'EMPLOYEE_NOT_FOUND'
-        });
-      }
-
-      if (!employee.isActive) {
-        return res.status(403).json({ 
-          error: 'Account is deactivated',
-          code: 'ACCOUNT_DEACTIVATED'
-        });
-      }
-
-      // Check if user has all required permissions
-      for (const permission of permissions) {
-        const hasPermission = await employee.hasPermission(permission);
-        if (!hasPermission) {
-          return res.status(403).json({ 
-            error: 'Insufficient permissions',
-            code: 'INSUFFICIENT_PERMISSIONS',
-            required: permissions,
-            missing: permission,
-            message: `You need all of these permissions: ${permissions.join(', ')}`
-          });
-        }
-      }
-
-      req.employee = employee;
-      next();
-    } catch (error) {
-      console.error('Permission check error:', error);
-      return res.status(500).json({ 
-        error: 'Permission validation failed',
-        code: 'PERMISSION_CHECK_ERROR'
-      });
-    }
-  };
-};
+function hasAllPermissions(userRole, permissions) {
+  return permissions.every(permission => hasPermission(userRole, permission));
+}
 
 /**
- * Check if user has specific role
- * @param {string|string[]} roles - Role name(s) to check
- * @returns {Function} Express middleware function
+ * RBAC middleware factory
  */
-const checkRole = (roles) => {
-  return async (req, res, next) => {
+function requirePermission(permission) {
+  return (req, res, next) => {
     try {
-      if (!req.user || (!req.user.id && !req.user.userId)) {
-        return res.status(401).json({ 
-          error: 'Authentication required',
-          code: 'AUTH_REQUIRED'
-        });
-      }
-
-      console.log('🔍 RBAC checkRole - User:', req.user.userId || req.user.id);
-      console.log('🔍 RBAC checkRole - Current role:', req.user.role);
-      console.log('🔍 RBAC checkRole - Required roles:', roles);
-
-      // Handle fallback users (CEO, admin) who don't exist in Employee database
-      if (req.user.userId === 'fallback_ziad_ceo' || req.user.userId === 'admin-001') {
-        // For fallback users, check role directly from JWT token
-        const allowedRoles = Array.isArray(roles) ? roles : [roles];
-        if (allowedRoles.includes(req.user.role)) {
-          return next();
-        } else {
-          return res.status(403).json({ 
-            error: 'Insufficient role permissions',
-            code: 'INSUFFICIENT_ROLE',
-            required: allowedRoles,
-            current: req.user.role,
-            message: `You need one of these roles: ${allowedRoles.join(', ')}`
-          });
-        }
-      }
-
-      // Get employee from database - handle both id and userId
-      const userId = req.user.id || req.user.userId;
-      const employee = await Employee.findById(userId);
-      if (!employee) {
-        return res.status(401).json({ 
-          error: 'Employee not found',
-          code: 'EMPLOYEE_NOT_FOUND'
-        });
-      }
-
-      if (!employee.isActive) {
-        return res.status(403).json({ 
-          error: 'Account is deactivated',
-          code: 'ACCOUNT_DEACTIVATED'
-        });
-      }
-
-      const allowedRoles = Array.isArray(roles) ? roles : [roles];
+      const userRole = req.user?.role || ROLES.CUSTOMER;
       
-      // Check primary role (backward compatibility)
-      if (employee.role && allowedRoles.includes(employee.role)) {
-        req.employee = employee;
-        return next();
-      }
-
-      // Check multiple roles
-      const userRoles = await Role.find({ 
-        _id: { $in: employee.roles }, 
-        isActive: true 
-      });
-
-      const userRoleNames = userRoles.map(role => role.name);
-      const hasAllowedRole = allowedRoles.some(role => userRoleNames.includes(role));
-
-      if (hasAllowedRole) {
-        req.employee = employee;
-        next();
-      } else {
-        return res.status(403).json({ 
-          error: 'Insufficient role privileges',
-          code: 'INSUFFICIENT_ROLE',
-          required: allowedRoles,
-          current: employee.role,
-          userRoles: userRoleNames,
-          message: `You need one of these roles: ${allowedRoles.join(', ')}`
+      if (!hasPermission(userRole, permission)) {
+        logger.warn('Access denied:', { 
+          userId: req.user?.id, 
+          role: userRole, 
+          permission, 
+          endpoint: req.path 
         });
-      }
-    } catch (error) {
-      console.error('Role check error:', error);
-      return res.status(500).json({ 
-        error: 'Role validation failed',
-        code: 'ROLE_CHECK_ERROR'
-      });
-    }
-  };
-};
-
-/**
- * Check if user has permission from specific group
- * @param {string} groupName - Permission group to check
- * @returns {Function} Express middleware function
- */
-const checkGroupPermission = (groupName) => {
-  return async (req, res, next) => {
-    try {
-      if (!req.user || (!req.user.id && !req.user.userId)) {
-        return res.status(401).json({ 
-          error: 'Authentication required',
-          code: 'AUTH_REQUIRED'
+        
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Insufficient permissions.',
+          requiredPermission: permission,
+          userRole: userRole
         });
-      }
-
-      // Get employee from database - handle both id and userId
-      const userId = req.user.id || req.user.userId;
-      const employee = await Employee.findById(userId);
-      if (!employee) {
-        return res.status(401).json({ 
-          error: 'Employee not found',
-          code: 'EMPLOYEE_NOT_FOUND'
-        });
-      }
-
-      if (!employee.isActive) {
-        return res.status(403).json({ 
-          error: 'Account is deactivated',
-          code: 'ACCOUNT_DEACTIVATED'
-        });
-      }
-
-      // Get all permissions for the user
-      const userPermissions = await employee.getAllPermissions();
-      
-      // Check if user has any permission from the specified group
-      const hasGroupPermission = userPermissions.some(permission => 
-        permission.groupName === groupName
-      );
-
-      if (hasGroupPermission) {
-        req.employee = employee;
-        next();
-      } else {
-        return res.status(403).json({ 
-          error: 'Insufficient group permissions',
-          code: 'INSUFFICIENT_GROUP_PERMISSIONS',
-          required: groupName,
-          message: `You need permissions from the '${groupName}' group`
-        });
-      }
-    } catch (error) {
-      console.error('Group permission check error:', error);
-      return res.status(500).json({ 
-        error: 'Group permission validation failed',
-        code: 'GROUP_PERMISSION_CHECK_ERROR'
-      });
-    }
-  };
-};
-
-/**
- * Optional permission check - doesn't fail if no permission, but adds employee info
- * @param {string} permissionName - The permission to check
- * @returns {Function} Express middleware function
- */
-const optionalPermission = (permissionName) => {
-  return async (req, res, next) => {
-    try {
-      if (!req.user || !req.user.id) {
-        return next(); // Continue without employee info
-      }
-
-      const employee = await Employee.findById(req.user.id);
-      if (employee && employee.isActive) {
-        const hasPermission = await employee.hasPermission(permissionName);
-        if (hasPermission) {
-          req.employee = employee;
-        }
       }
       
       next();
     } catch (error) {
-      console.error('Optional permission check error:', error);
-      next(); // Continue even if check fails
+      logger.error('RBAC middleware error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Authorization error'
+      });
     }
   };
-};
+}
 
 /**
- * Get user permissions for frontend
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
+ * RBAC middleware for multiple permissions (any)
  */
-const getUserPermissions = async (req, res) => {
+function requireAnyPermission(permissions) {
+  return (req, res, next) => {
+    try {
+      const userRole = req.user?.role || ROLES.CUSTOMER;
+      
+      if (!hasAnyPermission(userRole, permissions)) {
+        logger.warn('Access denied:', { 
+          userId: req.user?.id, 
+          role: userRole, 
+          permissions, 
+          endpoint: req.path 
+        });
+        
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Insufficient permissions.',
+          requiredPermissions: permissions,
+          userRole: userRole
+        });
+      }
+      
+      next();
+    } catch (error) {
+      logger.error('RBAC middleware error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Authorization error'
+      });
+    }
+  };
+}
+
+/**
+ * RBAC middleware for multiple permissions (all)
+ */
+function requireAllPermissions(permissions) {
+  return (req, res, next) => {
+    try {
+      const userRole = req.user?.role || ROLES.CUSTOMER;
+      
+      if (!hasAllPermissions(userRole, permissions)) {
+        logger.warn('Access denied:', { 
+          userId: req.user?.id, 
+          role: userRole, 
+          permissions, 
+          endpoint: req.path 
+        });
+        
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Insufficient permissions.',
+          requiredPermissions: permissions,
+          userRole: userRole
+        });
+      }
+      
+      next();
+    } catch (error) {
+      logger.error('RBAC middleware error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Authorization error'
+      });
+    }
+  };
+}
+
+/**
+ * Check if user can access partner data
+ */
+function canAccessPartnerData(req, res, next) {
   try {
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ 
-        error: 'Authentication required',
-        code: 'AUTH_REQUIRED'
-      });
-    }
-
-    const employee = await Employee.findById(req.user.id);
-    if (!employee) {
-      return res.status(401).json({ 
-        error: 'Employee not found',
-        code: 'EMPLOYEE_NOT_FOUND'
-      });
-    }
-
-    const permissions = await employee.getAllPermissions();
+    const userRole = req.user?.role;
+    const requestedPartnerId = req.params.partnerId || req.body.partnerId;
+    const userPartnerId = req.user?.partnerId;
     
-    // Group permissions by group name
-    const groupedPermissions = permissions.reduce((groups, permission) => {
-      if (!groups[permission.groupName]) {
-        groups[permission.groupName] = [];
-      }
-      groups[permission.groupName].push({
-        name: permission.name,
-        description: permission.description
+    // Super admin and admin can access all partner data
+    if (userRole === ROLES.SUPER_ADMIN || userRole === ROLES.ADMIN) {
+      return next();
+    }
+    
+    // Partner users can only access their own data
+    if (userPartnerId && requestedPartnerId && userPartnerId !== requestedPartnerId) {
+      logger.warn('Partner data access denied:', { 
+        userId: req.user?.id, 
+        userPartnerId, 
+        requestedPartnerId 
       });
-      return groups;
-    }, {});
-
-    res.json({
-      success: true,
-      permissions: groupedPermissions,
-      totalPermissions: permissions.length
-    });
+      
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Cannot access other partner data.'
+      });
+    }
+    
+    next();
   } catch (error) {
-    console.error('Get user permissions error:', error);
-    res.status(500).json({ 
-      error: 'Failed to get user permissions',
-      code: 'GET_PERMISSIONS_ERROR'
+    logger.error('Partner data access check error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Authorization error'
     });
   }
-};
+}
+
+/**
+ * Audit log for RBAC actions
+ */
+function auditRBACAction(req, action, resource, success) {
+  try {
+    const { getCollection } = require('../config/database');
+    const auditLogsCollection = getCollection('audit_logs');
+    
+    const auditLog = {
+      userId: req.user?.id,
+      partnerId: req.user?.partnerId,
+      action: `RBAC_${action}`,
+      description: `${action} access to ${resource}`,
+      category: 'SECURITY',
+      severity: success ? 'INFO' : 'WARNING',
+      metadata: {
+        userRole: req.user?.role,
+        resource: resource,
+        success: success,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      },
+      createdAt: new Date()
+    };
+    
+    auditLogsCollection.insertOne(auditLog);
+  } catch (error) {
+    logger.error('RBAC audit log error:', error);
+  }
+}
 
 module.exports = {
-  checkPermission,
-  checkAnyPermission,
-  checkAllPermissions,
-  checkRole,
-  checkGroupPermission,
-  optionalPermission,
-  getUserPermissions
+  ROLES,
+  PERMISSIONS,
+  ROLE_PERMISSIONS,
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+  requirePermission,
+  requireAnyPermission,
+  requireAllPermissions,
+  canAccessPartnerData,
+  auditRBACAction
 };

@@ -18,6 +18,26 @@ router.get('/test', (req, res) => {
   });
 });
 
+// Simple validate-id test endpoint
+router.post('/validate-id-test', (req, res) => {
+  try {
+    const { partnerId } = req.body;
+    res.json({
+      success: true,
+      message: 'Test validation successful',
+      partnerId: partnerId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.name,
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Validation middleware
 const validatePartnerId = [
   body('partnerId').notEmpty().withMessage('Partner ID is required')
@@ -137,6 +157,7 @@ router.post('/validate-id', validatePartnerId, async (req, res) => {
       });
     }
 
+    // If partner exists in PartnerUser collection, check status
     if (partner.status !== 'active') {
       return res.status(403).json({
         success: false,

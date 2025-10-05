@@ -1,652 +1,285 @@
-const { messaging, firestore } = require('../config/firebase-admin');
-const { v4: uuidv4 } = require('uuid');
+const admin = require('firebase-admin');
+const sgMail = require('@sendgrid/mail');
+const twilio = require('twilio');
 
-/**
- * Push Notification Service
- * Handles FCM messaging, topic subscriptions, and notification management
- */
+// Initialize Firebase Admin
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+    })
+  });
+}
+
+// Initialize SendGrid
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// Initialize Twilio
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
+
 class NotificationService {
-  constructor() {
-    this.db = firestore;
-  }
-
   /**
-   * Send push notification to a specific device
-   * @param {string} token - FCM token
-   * @param {Object} notification - Notification payload
-   * @param {Object} data - Additional data payload
-   * @returns {Object} Send result
+   * Send push notification via FCM
    */
-  async sendToDevice(token, notification, data = {}) {
+  static async sendPushNotification(deviceToken, notification) {
     try {
       const message = {
-        token,
+        token: deviceToken,
         notification: {
           title: notification.title,
-          body: notification.body,
-          imageUrl: notification.imageUrl,
-          ...notification
+          body: notification.body
         },
-        data: {
-          ...data,
-          timestamp: Date.now().toString(),
-          messageId: uuidv4()
-        },
+        data: notification.data || {},
         android: {
-          priority: 'high',
           notification: {
-            sound: 'default',
-            channelId: 'clutch-notifications',
-            priority: 'high',
-            defaultSound: true,
-            defaultVibrateTimings: true
+            icon: 'ic_notification',
+            color: '#E74C3C',
+            sound: 'default'
           }
         },
         apns: {
           payload: {
             aps: {
               sound: 'default',
-              badge: 1
+              badge: notification.badge || 1
             }
           }
         }
       };
 
-      const response = await messaging.send(message);
-      
-      console.log(`✅ Push notification sent to device: ${response}`);
-      
-      // Save notification record to Firestore
-      await this.saveNotificationRecord({
-        type: 'device',
-        target: token,
-        notification,
-        data,
-        messageId: response,
-        status: 'sent',
-        sentAt: new Date()
-      });
-
-      return {
-        success: true,
-        messageId: response,
-        message: 'Notification sent successfully'
-      };
-
+      const response = await admin.messaging().send(message);
+      console.log('✅ Push notification sent successfully:', response);
+      return { success: true, messageId: response };
     } catch (error) {
       console.error('❌ Push notification error:', error);
-      
-      // Save failed notification record
-      await this.saveNotificationRecord({
-        type: 'device',
-        target: token,
-        notification,
-        data,
-        status: 'failed',
-        error: error.message,
-        failedAt: new Date()
-      });
-
-      return {
-        success: false,
-        error: error.message
-      };
+      throw error;
     }
   }
 
   /**
-   * Send push notification to multiple devices
-   * @param {Array} tokens - Array of FCM tokens
-   * @param {Object} notification - Notification payload
-   * @param {Object} data - Additional data payload
-   * @returns {Object} Send result
+   * Send email notification via SendGrid
    */
-  async sendToMultipleDevices(tokens, notification, data = {}) {
+  static async sendEmailNotification(email, notification) {
     try {
-      if (!Array.isArray(tokens) || tokens.length === 0) {
-        return {
-          success: false,
-          error: 'No valid tokens provided'
-        };
-      }
-
-      // Split tokens into chunks of 500 (FCM limit)
-      const tokenChunks = this.chunkArray(tokens, 500);
-      const results = [];
-
-      for (const chunk of tokenChunks) {
-        const message = {
-          tokens: chunk,
-          notification: {
-            title: notification.title,
-            body: notification.body,
-            imageUrl: notification.imageUrl,
-            ...notification
-          },
-          data: {
-            ...data,
-            timestamp: Date.now().toString(),
-            messageId: uuidv4()
-          },
-          android: {
-            priority: 'high',
-            notification: {
-              sound: 'default',
-              channelId: 'clutch-notifications',
-              priority: 'high',
-              defaultSound: true,
-              defaultVibrateTimings: true
-            }
-          },
-          apns: {
-            payload: {
-              aps: {
-                sound: 'default',
-                badge: 1
-              }
-            }
-          }
-        };
-
-        const response = await messaging.sendMulticast(message);
-        
-        results.push({
-          successCount: response.successCount,
-          failureCount: response.failureCount,
-          responses: response.responses
-        });
-
-        console.log(`✅ Multicast notification sent: ${response.successCount} success, ${response.failureCount} failed`);
-      }
-
-      // Save notification record
-      await this.saveNotificationRecord({
-        type: 'multicast',
-        target: tokens,
-        notification,
-        data,
-        results,
-        status: 'sent',
-        sentAt: new Date()
-      });
-
-      return {
-        success: true,
-        results,
-        totalTokens: tokens.length,
-        message: 'Multicast notification sent successfully'
+      const msg = {
+        to: email,
+        from: {
+          email: process.env.SENDGRID_FROM_EMAIL || 'noreply@clutch.com',
+          name: 'Clutch Partners'
+        },
+        subject: notification.subject || notification.title,
+        html: this.generateEmailTemplate(notification),
+        text: notification.body
       };
 
+      await sgMail.send(msg);
+      console.log('✅ Email notification sent successfully to:', email);
+      return { success: true };
     } catch (error) {
-      console.error('❌ Multicast notification error:', error);
-      
-      await this.saveNotificationRecord({
-        type: 'multicast',
-        target: tokens,
-        notification,
-        data,
-        status: 'failed',
-        error: error.message,
-        failedAt: new Date()
-      });
-
-      return {
-        success: false,
-        error: error.message
-      };
+      console.error('❌ Email notification error:', error);
+      throw error;
     }
   }
 
   /**
-   * Send push notification to a topic
-   * @param {string} topic - Topic name
-   * @param {Object} notification - Notification payload
-   * @param {Object} data - Additional data payload
-   * @returns {Object} Send result
+   * Send SMS notification via Twilio
    */
-  async sendToTopic(topic, notification, data = {}) {
+  static async sendSMSNotification(phoneNumber, notification) {
     try {
-      const message = {
-        topic,
-        notification: {
-          title: notification.title,
-          body: notification.body,
-          imageUrl: notification.imageUrl,
-          ...notification
-        },
-        data: {
-          ...data,
-          timestamp: Date.now().toString(),
-          messageId: uuidv4()
-        },
-        android: {
-          priority: 'high',
-          notification: {
-            sound: 'default',
-            channelId: 'clutch-notifications',
-            priority: 'high',
-            defaultSound: true,
-            defaultVibrateTimings: true
-          }
-        },
-        apns: {
-          payload: {
-            aps: {
-              sound: 'default',
-              badge: 1
-            }
+      const message = await twilioClient.messages.create({
+        body: `${notification.title}\n\n${notification.body}`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: phoneNumber
+      });
+
+      console.log('✅ SMS notification sent successfully:', message.sid);
+      return { success: true, messageSid: message.sid };
+    } catch (error) {
+      console.error('❌ SMS notification error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send multi-channel notification
+   */
+  static async sendMultiChannelNotification(partnerId, notification, channels = ['push', 'email', 'sms']) {
+    try {
+      const { getCollection } = require('../config/database');
+      const partnersCollection = await getCollection('partners');
+      const partner = await partnersCollection.findOne({ partnerId });
+
+      if (!partner) {
+        throw new Error('Partner not found');
+      }
+
+      const results = {};
+
+      // Send push notification
+      if (channels.includes('push') && partner.deviceTokens && partner.deviceTokens.length > 0) {
+        for (const deviceToken of partner.deviceTokens) {
+          try {
+            await this.sendPushNotification(deviceToken, notification);
+            results.push = { success: true };
+          } catch (error) {
+            console.error('Push notification failed for token:', deviceToken, error);
+            results.push = { success: false, error: error.message };
           }
         }
-      };
-
-      const response = await messaging.send(message);
-      
-      console.log(`✅ Topic notification sent: ${topic}`);
-      
-      // Save notification record
-      await this.saveNotificationRecord({
-        type: 'topic',
-        target: topic,
-        notification,
-        data,
-        messageId: response,
-        status: 'sent',
-        sentAt: new Date()
-      });
-
-      return {
-        success: true,
-        messageId: response,
-        topic,
-        message: 'Topic notification sent successfully'
-      };
-
-    } catch (error) {
-      console.error('❌ Topic notification error:', error);
-      
-      await this.saveNotificationRecord({
-        type: 'topic',
-        target: topic,
-        notification,
-        data,
-        status: 'failed',
-        error: error.message,
-        failedAt: new Date()
-      });
-
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  /**
-   * Subscribe device to a topic
-   * @param {string|Array} tokens - FCM token(s)
-   * @param {string} topic - Topic name
-   * @returns {Object} Subscription result
-   */
-  async subscribeToTopic(tokens, topic) {
-    try {
-      const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
-      
-      if (tokenArray.length === 0) {
-        return {
-          success: false,
-          error: 'No valid tokens provided'
-        };
       }
 
-      // Split tokens into chunks of 1000 (FCM limit)
-      const tokenChunks = this.chunkArray(tokenArray, 1000);
-      const results = [];
-
-      for (const chunk of tokenChunks) {
-        const response = await messaging.subscribeToTopic(chunk, topic);
-        results.push(response);
-      }
-
-      console.log(`✅ Subscribed ${tokenArray.length} devices to topic: ${topic}`);
-      
-      // Save subscription record
-      await this.saveSubscriptionRecord({
-        tokens: tokenArray,
-        topic,
-        action: 'subscribe',
-        status: 'success',
-        timestamp: new Date()
-      });
-
-      return {
-        success: true,
-        topic,
-        subscribedTokens: tokenArray.length,
-        results,
-        message: 'Successfully subscribed to topic'
-      };
-
-    } catch (error) {
-      console.error('❌ Topic subscription error:', error);
-      
-      await this.saveSubscriptionRecord({
-        tokens: Array.isArray(tokens) ? tokens : [tokens],
-        topic,
-        action: 'subscribe',
-        status: 'failed',
-        error: error.message,
-        timestamp: new Date()
-      });
-
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  /**
-   * Unsubscribe device from a topic
-   * @param {string|Array} tokens - FCM token(s)
-   * @param {string} topic - Topic name
-   * @returns {Object} Unsubscription result
-   */
-  async unsubscribeFromTopic(tokens, topic) {
-    try {
-      const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
-      
-      if (tokenArray.length === 0) {
-        return {
-          success: false,
-          error: 'No valid tokens provided'
-        };
-      }
-
-      // Split tokens into chunks of 1000 (FCM limit)
-      const tokenChunks = this.chunkArray(tokenArray, 1000);
-      const results = [];
-
-      for (const chunk of tokenChunks) {
-        const response = await messaging.unsubscribeFromTopic(chunk, topic);
-        results.push(response);
-      }
-
-      console.log(`✅ Unsubscribed ${tokenArray.length} devices from topic: ${topic}`);
-      
-      // Save unsubscription record
-      await this.saveSubscriptionRecord({
-        tokens: tokenArray,
-        topic,
-        action: 'unsubscribe',
-        status: 'success',
-        timestamp: new Date()
-      });
-
-      return {
-        success: true,
-        topic,
-        unsubscribedTokens: tokenArray.length,
-        results,
-        message: 'Successfully unsubscribed from topic'
-      };
-
-    } catch (error) {
-      console.error('❌ Topic unsubscription error:', error);
-      
-      await this.saveSubscriptionRecord({
-        tokens: Array.isArray(tokens) ? tokens : [tokens],
-        topic,
-        action: 'unsubscribe',
-        status: 'failed',
-        error: error.message,
-        timestamp: new Date()
-      });
-
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  /**
-   * Send conditional notification
-   * @param {Object} condition - FCM condition
-   * @param {Object} notification - Notification payload
-   * @param {Object} data - Additional data payload
-   * @returns {Object} Send result
-   */
-  async sendConditional(condition, notification, data = {}) {
-    try {
-      const message = {
-        condition,
-        notification: {
-          title: notification.title,
-          body: notification.body,
-          imageUrl: notification.imageUrl,
-          ...notification
-        },
-        data: {
-          ...data,
-          timestamp: Date.now().toString(),
-          messageId: uuidv4()
-        },
-        android: {
-          priority: 'high',
-          notification: {
-            sound: 'default',
-            channelId: 'clutch-notifications',
-            priority: 'high',
-            defaultSound: true,
-            defaultVibrateTimings: true
-          }
-        },
-        apns: {
-          payload: {
-            aps: {
-              sound: 'default',
-              badge: 1
-            }
-          }
+      // Send email notification
+      if (channels.includes('email') && partner.primaryContact?.email) {
+        try {
+          await this.sendEmailNotification(partner.primaryContact.email, notification);
+          results.email = { success: true };
+        } catch (error) {
+          console.error('Email notification failed:', error);
+          results.email = { success: false, error: error.message };
         }
+      }
+
+      // Send SMS notification
+      if (channels.includes('sms') && partner.primaryContact?.phone) {
+        try {
+          await this.sendSMSNotification(partner.primaryContact.phone, notification);
+          results.sms = { success: true };
+        } catch (error) {
+          console.error('SMS notification failed:', error);
+          results.sms = { success: false, error: error.message };
+        }
+      }
+
+      // Save notification to database
+      await this.saveNotificationToDatabase(partnerId, notification, results);
+
+      return { success: true, results };
+    } catch (error) {
+      console.error('❌ Multi-channel notification error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Save notification to database
+   */
+  static async saveNotificationToDatabase(partnerId, notification, results) {
+    try {
+      const { getCollection } = require('../config/database');
+      const notificationsCollection = await getCollection('notifications');
+
+      const notificationRecord = {
+        partnerId,
+        type: notification.type || 'general',
+        title: notification.title,
+        message: notification.body,
+        data: notification.data || {},
+        channels: Object.keys(results),
+        results,
+        isRead: false,
+        createdAt: new Date(),
+        readAt: null
       };
 
-      const response = await messaging.send(message);
+      await notificationsCollection.insertOne(notificationRecord);
+      console.log('✅ Notification saved to database');
+    } catch (error) {
+      console.error('❌ Save notification error:', error);
+    }
+  }
+
+  /**
+   * Generate email template
+   */
+  static generateEmailTemplate(notification) {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${notification.title}</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #E74C3C; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9f9f9; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .button { display: inline-block; padding: 10px 20px; background-color: #E74C3C; color: white; text-decoration: none; border-radius: 5px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Clutch Partners</h1>
+          </div>
+          <div class="content">
+            <h2>${notification.title}</h2>
+            <p>${notification.body}</p>
+            ${notification.actionUrl ? `<a href="${notification.actionUrl}" class="button">View Details</a>` : ''}
+          </div>
+          <div class="footer">
+            <p>This is an automated message from Clutch Partners. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  /**
+   * Send bulk notifications
+   */
+  static async sendBulkNotifications(partnerIds, notification, channels = ['push', 'email']) {
+    try {
+      const results = [];
       
-      console.log(`✅ Conditional notification sent: ${condition}`);
-      
-      // Save notification record
-      await this.saveNotificationRecord({
-        type: 'conditional',
-        target: condition,
+      for (const partnerId of partnerIds) {
+        try {
+          const result = await this.sendMultiChannelNotification(partnerId, notification, channels);
+          results.push({ partnerId, success: true, result });
+        } catch (error) {
+          results.push({ partnerId, success: false, error: error.message });
+        }
+      }
+
+      return { success: true, results };
+    } catch (error) {
+      console.error('❌ Bulk notifications error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Schedule notification
+   */
+  static async scheduleNotification(partnerId, notification, scheduledTime, channels = ['push', 'email']) {
+    try {
+      const { getCollection } = require('../config/database');
+      const scheduledNotificationsCollection = await getCollection('scheduled_notifications');
+
+      const scheduledNotification = {
+        partnerId,
         notification,
-        data,
-        messageId: response,
-        status: 'sent',
-        sentAt: new Date()
-      });
-
-      return {
-        success: true,
-        messageId: response,
-        condition,
-        message: 'Conditional notification sent successfully'
-      };
-
-    } catch (error) {
-      console.error('❌ Conditional notification error:', error);
-      
-      await this.saveNotificationRecord({
-        type: 'conditional',
-        target: condition,
-        notification,
-        data,
-        status: 'failed',
-        error: error.message,
-        failedAt: new Date()
-      });
-
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  /**
-   * Save notification record to Firestore
-   * @param {Object} record - Notification record
-   */
-  async saveNotificationRecord(record) {
-    try {
-      await this.db.collection('notifications').add({
-        ...record,
+        channels,
+        scheduledTime: new Date(scheduledTime),
+        status: 'scheduled',
         createdAt: new Date()
-      });
+      };
+
+      await scheduledNotificationsCollection.insertOne(scheduledNotification);
+      console.log('✅ Notification scheduled for:', scheduledTime);
+      return { success: true };
     } catch (error) {
-      console.error('❌ Error saving notification record:', error);
-    }
-  }
-
-  /**
-   * Save subscription record to Firestore
-   * @param {Object} record - Subscription record
-   */
-  async saveSubscriptionRecord(record) {
-    try {
-      await this.db.collection('subscriptions').add({
-        ...record,
-        createdAt: new Date()
-      });
-    } catch (error) {
-      console.error('❌ Error saving subscription record:', error);
-    }
-  }
-
-  /**
-   * Get notification history for a user
-   * @param {string} userId - User ID
-   * @param {number} limit - Number of notifications to retrieve
-   * @returns {Object} Notification history
-   */
-  async getNotificationHistory(userId, limit = 50) {
-    try {
-      const snapshot = await this.db
-        .collection('notifications')
-        .where('target', '==', userId)
-        .orderBy('sentAt', 'desc')
-        .limit(limit)
-        .get();
-
-      const notifications = [];
-      snapshot.forEach(doc => {
-        notifications.push({
-          id: doc.id,
-          ...doc.data()
-        });
-      });
-
-      return {
-        success: true,
-        notifications,
-        count: notifications.length
-      };
-
-    } catch (error) {
-      console.error('❌ Error getting notification history:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  /**
-   * Mark notification as read
-   * @param {string} notificationId - Notification ID
-   * @param {string} userId - User ID
-   * @returns {Object} Update result
-   */
-  async markNotificationAsRead(notificationId, userId) {
-    try {
-      await this.db
-        .collection('notifications')
-        .doc(notificationId)
-        .update({
-          readBy: firestore.FieldValue.arrayUnion(userId),
-          readAt: firestore.FieldValue.arrayUnion(new Date())
-        });
-
-      return {
-        success: true,
-        message: 'Notification marked as read'
-      };
-
-    } catch (error) {
-      console.error('❌ Error marking notification as read:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  /**
-   * Helper function to chunk array
-   * @param {Array} array - Array to chunk
-   * @param {number} size - Chunk size
-   * @returns {Array} Chunked array
-   */
-  chunkArray(array, size) {
-    const chunks = [];
-    for (let i = 0; i < array.length; i += size) {
-      chunks.push(array.slice(i, i + size));
-    }
-    return chunks;
-  }
-
-  /**
-   * Get FCM token info
-   * @param {string} token - FCM token
-   * @returns {Object} Token info
-   */
-  async getTokenInfo(token) {
-    try {
-      const response = await messaging.getTokenInfo(token);
-      return {
-        success: true,
-        tokenInfo: response
-      };
-    } catch (error) {
-      console.error('❌ Error getting token info:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  /**
-   * Validate FCM token
-   * @param {string} token - FCM token
-   * @returns {Object} Validation result
-   */
-  async validateToken(token) {
-    try {
-      const tokenInfo = await messaging.getTokenInfo(token);
-      return {
-        success: true,
-        valid: true,
-        tokenInfo
-      };
-    } catch (error) {
-      return {
-        success: true,
-        valid: false,
-        error: error.message
-      };
+      console.error('❌ Schedule notification error:', error);
+      throw error;
     }
   }
 }
 
-module.exports = new NotificationService();
+module.exports = NotificationService;

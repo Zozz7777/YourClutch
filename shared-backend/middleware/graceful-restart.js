@@ -63,18 +63,35 @@ class GracefulRestartManager {
   // Check system health for restart decisions
   checkSystemHealth() {
     const memUsage = process.memoryUsage();
+    const os = require('os');
+    
+    // Use system memory usage instead of Node.js heap usage
+    const systemMemory = os.totalmem();
+    const freeMemory = os.freemem();
+    const usedMemory = systemMemory - freeMemory;
+    const systemMemoryUsage = usedMemory / systemMemory;
+    
+    // Also check Node.js heap usage for reference
     const heapUsageRatio = memUsage.heapUsed / memUsage.heapTotal;
     
-    // With 512MB RAM, we can be more lenient with memory thresholds
     const timeSinceLastRestart = Date.now() - (this.lastRestartTime || 0);
-    const restartCooldown = 10 * 60 * 1000; // 10 minutes cooldown (increased)
+    const restartCooldown = 10 * 60 * 1000; // 10 minutes cooldown
     
-    if (heapUsageRatio > 0.99 && timeSinceLastRestart > restartCooldown) {
-      console.log('⚠️ Critical memory usage detected. Queuing for restart...');
-      this.queueRestart('critical_memory_usage', { heapUsageRatio });
-    } else if (heapUsageRatio > 0.90) {
-      // Log high memory usage without restarting (increased threshold)
-      console.log(`🧹 High memory usage: ${(heapUsageRatio * 100).toFixed(1)}% - monitoring...`);
+    // Only restart based on SYSTEM memory usage, not Node.js heap usage
+    if (systemMemoryUsage > 0.95 && timeSinceLastRestart > restartCooldown) {
+      console.log('⚠️ Critical system memory usage detected. Queuing for restart...');
+      this.queueRestart('critical_system_memory', { 
+        systemMemoryUsage: (systemMemoryUsage * 100).toFixed(1),
+        heapUsageRatio: (heapUsageRatio * 100).toFixed(1)
+      });
+    } else if (systemMemoryUsage > 0.85) {
+      // Only log if SYSTEM memory is actually high
+      console.log(`🧹 High system memory usage: ${(systemMemoryUsage * 100).toFixed(1)}% - monitoring...`);
+    }
+    
+    // Log heap usage for debugging but don't trigger alerts
+    if (heapUsageRatio > 0.90) {
+      console.log(`📊 Node.js heap usage: ${(heapUsageRatio * 100).toFixed(1)}% (system: ${(systemMemoryUsage * 100).toFixed(1)}%)`);
     }
 
     // Check for too many active connections

@@ -811,23 +811,31 @@ async function startServer() {
       trackConnection(socket);
     });
 
-    // Setup performance monitoring and tuning
+    // Enterprise monitoring for 6M+ users with auto-scaling
+    const { enterpriseMonitoring } = require('./monitoring/enterprise-monitoring');
+    const { autoScalingOptimizer } = require('./config/auto-scaling-optimized');
+    
+    // Setup enterprise monitoring (optimized for 6M users)
     setInterval(async () => {
       try {
-        const memUsage = process.memoryUsage();
-        const metrics = {
-          memoryUsage: memUsage.heapUsed / memUsage.heapTotal,
-          avgResponseTime: 0, // Would be calculated from performance monitor
-          errorRate: 0, // Would be calculated from error tracking
-          throughput: 0, // Would be calculated from request tracking
-          dbQueryTime: 0 // Would be calculated from database monitor
-        };
+        const metrics = enterpriseMonitoring.getMetrics();
+        const recommendations = enterpriseMonitoring.getScalingRecommendations();
         
-        await analyzeAndTune(metrics);
+        // Only run tuning if system metrics indicate need
+        if (metrics.healthScore < 80 || recommendations.length > 0) {
+          console.log('🔧 Enterprise optimization triggered for 6M+ users');
+          await analyzeAndTune({
+            memoryUsage: metrics.system.memory,
+            avgResponseTime: metrics.application.responseTime,
+            errorRate: metrics.application.errorRate,
+            throughput: metrics.application.throughput,
+            dbQueryTime: metrics.database.queryTime
+          });
+        }
       } catch (error) {
-        logger.error('Error in performance tuning:', error);
+        logger.error('Enterprise monitoring error:', error);
       }
-    }, 600000); // Run every 10 minutes to reduce memory pressure
+    }, 300000); // Run every 5 minutes for 6M users
 
     // Enhanced graceful shutdown (handled by graceful restart manager)
 
