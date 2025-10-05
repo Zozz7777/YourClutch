@@ -1,0 +1,338 @@
+{
+  "governorates": [
+    {
+      "name": "Cairo",
+      "code": "CAI",
+      "cities": [
+        {
+          "name": "Cairo",
+          "districts": [
+            "Downtown", "Zamalek", "Garden City", "Maadi", "Heliopolis", 
+            "Nasr City", "New Cairo", "Shubra", "Ain Shams", "Matariya",
+            "Shubra El Kheima", "Qalyub", "Banha", "Toukh", "Qaha"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Giza",
+      "code": "GIZ",
+      "cities": [
+        {
+          "name": "Giza",
+          "districts": [
+            "Giza", "Dokki", "Agouza", "Mohandessin", "Imbaba", 
+            "Boulaq", "Warraq", "Kit Kat", "Faisal", "Haram"
+          ]
+        },
+        {
+          "name": "6th of October",
+          "districts": [
+            "6th of October City", "Sheikh Zayed", "New Giza"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Alexandria",
+      "code": "ALX",
+      "cities": [
+        {
+          "name": "Alexandria",
+          "districts": [
+            "Downtown", "Raml Station", "Sidi Gaber", "Smouha", "Gleem",
+            "Stanley", "Montaza", "Sidi Bishr", "Abu Qir", "Borg El Arab"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Qalyubia",
+      "code": "QLY",
+      "cities": [
+        {
+          "name": "Banha",
+          "districts": ["Banha", "Toukh", "Qaha", "Kafr Shukr"]
+        },
+        {
+          "name": "Qalyub",
+          "districts": ["Qalyub", "Shubra El Kheima", "Khanka"]
+        }
+      ]
+    },
+    {
+      "name": "Monufia",
+      "code": "MNF",
+      "cities": [
+        {
+          "name": "Shibin El Kom",
+          "districts": ["Shibin El Kom", "Tala", "Berket El Saba", "Ashmoun"]
+        }
+      ]
+    },
+    {
+      "name": "Gharbia",
+      "code": "GHR",
+      "cities": [
+        {
+          "name": "Tanta",
+          "districts": ["Tanta", "Kafr El Zayat", "Zefta", "Basyoun"]
+        }
+      ]
+    },
+    {
+      "name": "Kafr El Sheikh",
+      "code": "KFS",
+      "cities": [
+        {
+          "name": "Kafr El Sheikh",
+          "districts": ["Kafr El Sheikh", "Desouk", "Fuwa", "Baltim"]
+        }
+      ]
+    },
+    {
+      "name": "Dakahlia",
+      "code": "DKH",
+      "cities": [
+        {
+          "name": "Mansoura",
+          "districts": ["Mansoura", "Talkha", "Mit Ghamr", "Aga"]
+        }
+      ]
+    },
+    {
+      "name": "Damietta",
+      "code": "DMT",
+      "cities": [
+        {
+          "name": "Damietta",
+          "districts": ["Damietta", "Ras El Bar", "Faraskur", "Kafr Saad"]
+        }
+      ]
+    },
+    {
+      "name": "Port Said",
+      "code": "PTS",
+      "cities": [
+        {
+          "name": "Port Said",
+          "districts": ["Port Said", "Port Fouad"]
+        }
+      ]
+    },
+    {
+      "name": "Ismailia",
+      "code": "ISM",
+      "cities": [
+        {
+          "name": "Ismailia",
+          "districts": ["Ismailia", "Fayed", "Qantara", "Abu Suwir"]
+        }
+      ]
+    },
+    {
+      "name": "Suez",
+      "code": "SUZ",
+      "cities": [
+        {
+          "name": "Suez",
+          "districts": ["Suez", "Arbaeen", "Ganayen"]
+        }
+      ]
+    },
+    {
+      "name": "Sharqia",
+      "code": "SHR",
+      "cities": [
+        {
+          "name": "Zagazig",
+          "districts": ["Zagazig", "Abu Hammad", "Faqous", "Minya El Qamh"]
+        }
+      ]
+    },
+    {
+      "name": "North Sinai",
+      "code": "NSN",
+      "cities": [
+        {
+          "name": "Arish",
+          "districts": ["Arish", "Sheikh Zuweid", "Rafah"]
+        }
+      ]
+    },
+    {
+      "name": "South Sinai",
+      "code": "SSN",
+      "cities": [
+        {
+          "name": "Sharm El Sheikh",
+          "districts": ["Sharm El Sheikh", "Dahab", "Nuweiba", "Taba"]
+        }
+      ]
+    },
+    {
+      "name": "Red Sea",
+      "code": "RDS",
+      "cities": [
+        {
+          "name": "Hurghada",
+          "districts": ["Hurghada", "El Gouna", "Safaga", "Marsa Alam"]
+        }
+      ]
+    },
+    {
+      "name": "Luxor",
+      "code": "LXR",
+      "cities": [
+        {
+          "name": "Luxor",
+          "districts": ["Luxor", "Karnak", "Valley of the Kings", "Esna"]
+        }
+      ]
+    },
+    {
+      "name": "Aswan",
+      "code": "ASW",
+      "cities": [
+        {
+          "name": "Aswan",
+          "districts": ["Aswan", "Abu Simbel", "Kom Ombo", "Edfu"]
+        }
+      ]
+    },
+    {
+      "name": "Qena",
+      "code": "QNA",
+      "cities": [
+        {
+          "name": "Qena",
+          "districts": ["Qena", "Nag Hammadi", "Dishna", "Qus"]
+        }
+      ]
+    },
+    {
+      "name": "Sohag",
+      "code": "SHG",
+      "cities": [
+        {
+          "name": "Sohag",
+          "districts": ["Sohag", "Akhmim", "Girga", "Tahta"]
+        }
+      ]
+    },
+    {
+      "name": "Asyut",
+      "code": "ASY",
+      "cities": [
+        {
+          "name": "Asyut",
+          "districts": ["Asyut", "Abnub", "El Badari", "Sohag"]
+        }
+      ]
+    },
+    {
+      "name": "Minya",
+      "code": "MNY",
+      "cities": [
+        {
+          "name": "Minya",
+          "districts": ["Minya", "Beni Mazar", "Mallawi", "Abu Qurqas"]
+        }
+      ]
+    },
+    {
+      "name": "Fayyum",
+      "code": "FAY",
+      "cities": [
+        {
+          "name": "Fayyum",
+          "districts": ["Fayyum", "Tamiya", "Sinnuris", "Ibsheway"]
+        }
+      ]
+    },
+    {
+      "name": "Beni Suef",
+      "code": "BNS",
+      "cities": [
+        {
+          "name": "Beni Suef",
+          "districts": ["Beni Suef", "Biba", "Samasta", "El Wasta"]
+        }
+      ]
+    },
+    {
+      "name": "Matrouh",
+      "code": "MTR",
+      "cities": [
+        {
+          "name": "Mersa Matruh",
+          "districts": ["Mersa Matruh", "El Alamein", "Siwa", "Sallum"]
+        }
+      ]
+    },
+    {
+      "name": "New Valley",
+      "code": "NWV",
+      "cities": [
+        {
+          "name": "Kharga",
+          "districts": ["Kharga", "Dakhla", "Farafra", "Bahariya"]
+        }
+      ]
+    }
+  ],
+  "defaultShippingCosts": {
+    "Cairo": 0,
+    "Giza": 15,
+    "Qalyubia": 25,
+    "Monufia": 30,
+    "Gharbia": 40,
+    "Kafr El Sheikh": 45,
+    "Dakahlia": 50,
+    "Damietta": 55,
+    "Port Said": 60,
+    "Ismailia": 65,
+    "Suez": 70,
+    "Sharqia": 45,
+    "North Sinai": 80,
+    "South Sinai": 100,
+    "Red Sea": 90,
+    "Luxor": 120,
+    "Aswan": 150,
+    "Qena": 110,
+    "Sohag": 100,
+    "Asyut": 90,
+    "Minya": 80,
+    "Fayyum": 50,
+    "Beni Suef": 70,
+    "Matrouh": 120,
+    "New Valley": 200
+  },
+  "estimatedDeliveryDays": {
+    "Cairo": 1,
+    "Giza": 1,
+    "Qalyubia": 1,
+    "Monufia": 2,
+    "Gharbia": 2,
+    "Kafr El Sheikh": 2,
+    "Dakahlia": 2,
+    "Damietta": 2,
+    "Port Said": 2,
+    "Ismailia": 2,
+    "Suez": 2,
+    "Sharqia": 2,
+    "North Sinai": 3,
+    "South Sinai": 4,
+    "Red Sea": 3,
+    "Luxor": 4,
+    "Aswan": 5,
+    "Qena": 4,
+    "Sohag": 3,
+    "Asyut": 3,
+    "Minya": 3,
+    "Fayyum": 2,
+    "Beni Suef": 3,
+    "Matrouh": 4,
+    "New Valley": 5
+  }
+}

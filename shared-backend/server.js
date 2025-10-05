@@ -198,9 +198,7 @@ app.get('/ping', (req, res) => {
 // Mount newly created routes
 // app.use(`${apiPrefix}/support`, supportRoutes); // Not defined
 
-// Fallback routes (without v1 prefix for frontend compatibility)
-app.use('/auth', authRoutes);
-app.use('/admin', adminRoutes);
+// All routes will be loaded dynamically - no mountings needed
 // app.use('/api/notifications', notificationsRoutes); // Not defined
 // app.use('/api/export', exportRoutes); // Not defined
 // app.use('/api/settings', settingsRoutes); // Not defined
@@ -248,69 +246,21 @@ app.use('/admin', adminRoutes);
 // app.use('/api/v1/mobile-cms', mobileCmsRoutes); // Not defined
 // app.use('/api/v1/ops', opsRoutes); // Not defined
 // app.use('/api/v1/careers', careersRoutes); // Not defined
-app.use('/api/v1/testing', testingRoutes);
+// All routes will be loaded dynamically - no mountings needed
 
-// Enhanced routes
-app.use('/api/v1/business-intelligence', businessIntelligenceEnhancedRoutes);
-app.use('/api/v1/fleet', fleetEnhancedRoutes);
-app.use('/api/v1/finance', financeEnhancedRoutes);
-app.use('/api/v1/system-health', systemHealthEnhancedRoutes);
+// All routes will be loaded dynamically - no mountings needed
 
-// Partners routes - Auth routes first (more specific)
-app.use('/api/v1/partners', partnerAuthRoutes);
-app.use('/api/v1/partners/notifications', partnerNotificationsRoutes);
-app.use('/api/v1/partners/rbac', partnerRbacRoutes);
-app.use('/api/v1/partners/kyc', partnerKycRoutes);
-app.use('/api/v1/partners/notifications-enhanced', partnerNotificationsEnhancedRoutes);
-app.use('/api/v1/partners/support', partnerSupportRoutes);
-app.use('/api/v1/partners/warranty-disputes', partnerWarrantyDisputesRoutes);
-app.use('/api/v1/partners/data-export', partnerDataExportRoutes);
-app.use('/api/v1/partners/advanced-reports', partnerAdvancedReportsRoutes);
-app.use('/api/v1/partners/purchase-orders', partnerPurchaseOrdersRoutes);
-app.use('/api/v1/partners/staff', partnerStaffManagementRoutes);
-// General partners routes last (less specific)
-app.use('/api/v1/partners', partnersRoutes);
-app.use('/api/v1/partners', partnerInventoryRoutes);
-app.use('/api/v1/partners', partnerSyncRoutes);
-app.use('/api/v1/partners', require('./routes/partner-mobile'));
-app.use('/api/v1/auth', partnerLoginRoutes);
+// All routes will be loaded dynamically - no mountings needed
 
-// Community and Loyalty routes
-app.use('/api/v1/community', require('./routes/community'));
-app.use('/api/v1/loyalty', require('./routes/loyalty'));
+// All routes will be loaded dynamically - no mountings needed
 
-// Sales routes
-app.use('/api/v1/sales', require('./routes/sales'));
+// All routes will be loaded dynamically - no mountings needed
 
-// Partners routes
-app.use('/api/v1/partners', require('./routes/partners'));
+// All routes will be loaded dynamically - no mountings needed
 
-// Contract templates routes
-app.use('/api/v1/contract-templates', require('./routes/contract-templates'));
+// All routes will be loaded dynamically - no mountings needed
 
-// Contracts routes
-app.use('/api/v1/contracts', require('./routes/contracts'));
-
-// Notifications routes
-app.use('/api/v1/notifications', require('./routes/notifications').router);
-
-// Updates routes
-app.use('/api/v1/updates', require('./routes/updates'));
-
-// Careers routes
-app.use('/api/v1/careers', require('./routes/careers'));
-
-// Employee invitations routes
-app.use('/api/v1/employees', require('./routes/employee-invitations'));
-
-app.use('/api/v1', clutchAppRoutes);
-app.use('/api/v1/admin/onboarding', onboardingRoutes);
-app.use('/api/v1/admin/roles', rolesRoutes);
-app.use('/api/v1', carsRoutes);
-app.use('/api/v1/maintenance', maintenanceRoutes);
-app.use('/api/v1/operations', operationsRoutes);
-app.use('/api/v1/security', securityRoutes);
-app.use('/api/v1/partners/refunds', partnersRefundsRoutes);
+// All routes will be loaded dynamically - no mountings needed
 
 // Note: Authentication is handled by individual routes using authenticateToken middleware
 // No global authentication middleware needed as each route handles its own auth
