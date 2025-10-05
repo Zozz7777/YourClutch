@@ -1,6 +1,7 @@
 ﻿const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('../middleware/unified-auth');
+const { authenticateToken } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/rbac');
 
 router.get('/', authenticateToken, async (req, res) => {
   try {

@@ -5,7 +5,8 @@
 
 const express = require('express');
 const router = express.Router();
-const { authenticateToken, checkRole } = require('../middleware/unified-auth');
+const { authenticateToken } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/rbac');
 const { getCollection } = require('../config/optimized-database');
 
 // POST /api/v1/notifications/send-invitation - Send invitation via alternative methods

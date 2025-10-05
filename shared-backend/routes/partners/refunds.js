@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken, checkRole } = require('../../middleware/unified-auth');
+const { authenticateToken, checkRole } = require('../../middleware/auth');
 const logger = require('../../utils/logger');
 
 // Database connection for real data

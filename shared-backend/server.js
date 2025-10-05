@@ -115,6 +115,23 @@ const partnersRoutes = require('./routes/partners');
 const partnerAuthRoutes = require('./routes/partner-auth');
 const rbacRoutes = require('./routes/rbac');
 
+// New partner routes
+const partnersSuppliersRoutes = require('./routes/partners-suppliers');
+const partnersContractsRoutes = require('./routes/partners-contracts');
+const partnersLoyaltyRoutes = require('./routes/partners-loyalty');
+const partnersRatingsRoutes = require('./routes/partners-ratings');
+const partnersAppointmentsRoutes = require('./routes/partners-appointments');
+const partnersVehiclesRoutes = require('./routes/partners-vehicles');
+const partnersPromotionsRoutes = require('./routes/partners-promotions');
+const partnersTrainingRoutes = require('./routes/partners-training');
+const partnersPerformanceRoutes = require('./routes/partners-performance');
+const partnersCatalogRoutes = require('./routes/partners-catalog');
+const partnersQuotesRoutes = require('./routes/partners-quotes');
+const partnersLocationsRoutes = require('./routes/partners-locations');
+const partnersCommissionRoutes = require('./routes/partners-commission');
+const partnersTaxesRoutes = require('./routes/partners-taxes');
+const partnersFeedbackRoutes = require('./routes/partners-feedback');
+
 // All route imports cleaned up - only existing routes imported above
 
 // Initialize Express app
@@ -253,6 +270,23 @@ app.use(`${apiPrefix}/communication`, communicationRoutes);
 app.use(`${apiPrefix}/partners`, partnersRoutes);
 app.use(`${apiPrefix}/partner-auth`, partnerAuthRoutes);
 app.use(`${apiPrefix}/rbac`, rbacRoutes);
+
+// Mount new partner routes
+app.use(`${apiPrefix}/partners/suppliers`, partnersSuppliersRoutes);
+app.use(`${apiPrefix}/partners/contracts`, partnersContractsRoutes);
+app.use(`${apiPrefix}/partners/loyalty`, partnersLoyaltyRoutes);
+app.use(`${apiPrefix}/partners/ratings`, partnersRatingsRoutes);
+app.use(`${apiPrefix}/partners/appointments`, partnersAppointmentsRoutes);
+app.use(`${apiPrefix}/partners/vehicles`, partnersVehiclesRoutes);
+app.use(`${apiPrefix}/partners/promotions`, partnersPromotionsRoutes);
+app.use(`${apiPrefix}/partners/training`, partnersTrainingRoutes);
+app.use(`${apiPrefix}/partners/performance`, partnersPerformanceRoutes);
+app.use(`${apiPrefix}/partners/catalog`, partnersCatalogRoutes);
+app.use(`${apiPrefix}/partners/quotes`, partnersQuotesRoutes);
+app.use(`${apiPrefix}/partners/locations`, partnersLocationsRoutes);
+app.use(`${apiPrefix}/partners/commission`, partnersCommissionRoutes);
+app.use(`${apiPrefix}/partners/taxes`, partnersTaxesRoutes);
+app.use(`${apiPrefix}/partners/feedback`, partnersFeedbackRoutes);
 
 // Mount additional essential routes
 app.use(`${apiPrefix}/other`, otherRoutes);

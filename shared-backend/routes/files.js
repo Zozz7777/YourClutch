@@ -8,7 +8,8 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
-const { authenticateToken, checkRole, checkPermission } = require('../middleware/unified-auth');
+const { authenticateToken } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/rbac');
 const { getCollection } = require('../config/optimized-database');
 
 // Configure multer for file uploads
