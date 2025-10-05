@@ -1,9 +1,7 @@
 
-// Optimized imports
-const { applyOptimizedMiddleware, getMemoryStats } = require('./middleware/optimized-middleware');
-const { redisCache } = require('./config/optimized-redis');
-const OptimizedAIProviderManager = require('./services/optimizedAIProviderManager');
-const { connectToDatabase: connectOptimizedDatabase } = require('./config/optimized-database');
+// Intelligent feature loading for 512MB memory limit
+const { intelligentLoader } = require('./config/intelligent-loader');
+const { lightweightMiddleware } = require('./middleware/lightweight-middleware');
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -58,57 +56,26 @@ const { connectToDatabase } = require('./config/database-unified');
 const { initializeEnvironment } = require('./config/environment');
 
 // Import routes
-// Import only existing routes
-const authRoutes = require('./routes/auth-production');
-const healthRoutes = require('./routes/health');
-const healthEnhancedRoutes = require('./routes/health-enhanced');
-const adminRoutes = require('./routes/admin');
-const analyticsRoutes = require('./routes/consolidated-analytics');
-const usersRoutes = require('./routes/users');
-const otherRoutes = require('./routes/other');
-const errorsRoutes = require('./routes/errors');
-const clutchAppRoutes = require('./routes/clutch-app');
-const onboardingRoutes = require('./routes/onboarding');
-const rolesRoutes = require('./routes/roles');
-const carsRoutes = require('./routes/cars');
-const maintenanceRoutes = require('./routes/maintenance');
-const knowledgeBaseRoutes = require('./routes/knowledge-base');
-const operationsRoutes = require('./routes/operations');
-const securityRoutes = require('./routes/security');
-const partnersRefundsRoutes = require('./routes/partners/refunds');
-const incidentsRoutes = require('./routes/incidents');
-const alertsRoutes = require('./routes/alerts');
-const logsRoutes = require('./routes/logs');
-const realtimeRoutes = require('./routes/realtime');
-const shopsRoutes = require('./routes/shops');
-const bookingsRoutes = require('./routes/bookings');
-const enterpriseRoutes = require('./routes/enterprise');
-const enterpriseAuthRoutes = require('./routes/enterpriseAuth');
-const aiRoutes = require('./routes/ai');
-
-// Import new missing routes
-const hrRoutes = require('./routes/hr');
-const legalRoutes = require('./routes/legal');
-const projectsRoutes = require('./routes/projects');
-const featureFlagsRoutes = require('./routes/feature-flags');
-const cmsRoutes = require('./routes/cms');
-const marketingRoutes = require('./routes/marketing');
-const assetsRoutes = require('./routes/assets');
-const vendorsRoutes = require('./routes/vendors');
-const auditRoutes = require('./routes/audit');
-const systemHealthRoutes = require('./routes/system-health');
-const systemRoutes = require('./routes/system');
-const systemPerformanceRoutes = require('./routes/system-performance');
-const sessionsRoutes = require('./routes/sessions');
-const revenueRoutes = require('./routes/revenue');
-const testingRoutes = require('./routes/testing');
-const complianceRoutes = require('./routes/compliance');
-const customersRoutes = require('./routes/customers');
-const adminCeoRoutes = require('./routes/admin-ceo');
-const emergencyAuthRoutes = require('./routes/emergency-auth');
-const fleetRoutes = require('./routes/fleet');
-const paymentsRoutes = require('./routes/payments');
-const communicationRoutes = require('./routes/communication');
+// Dynamic route loading - no imports at startup
+const { dynamicRouteLoader } = require('./middleware/dynamic-route-loader');
+// Comment out more routes for lightweight startup
+// const vendorsRoutes = require('./routes/vendors');
+// const auditRoutes = require('./routes/audit');
+// const systemHealthRoutes = require('./routes/system-health');
+// const systemRoutes = require('./routes/system');
+// const systemPerformanceRoutes = require('./routes/system-performance');
+// Comment out more routes for lightweight startup
+// const sessionsRoutes = require('./routes/sessions');
+// const revenueRoutes = require('./routes/revenue');
+// const testingRoutes = require('./routes/testing');
+// const complianceRoutes = require('./routes/compliance');
+// const customersRoutes = require('./routes/customers');
+// Comment out more routes for lightweight startup
+// const adminCeoRoutes = require('./routes/admin-ceo');
+// const emergencyAuthRoutes = require('./routes/emergency-auth');
+// const fleetRoutes = require('./routes/fleet');
+// const paymentsRoutes = require('./routes/payments');
+// const communicationRoutes = require('./routes/communication');
 const mobileCmsRoutes = require('./routes/mobile-cms');
 const opsRoutes = require('./routes/ops');
 const performanceRoutes = require('./routes/performance');
@@ -172,8 +139,8 @@ const app = express();
 // Trust proxy
 app.set('trust proxy', 1);
 
-// Apply optimized middleware stack
-applyOptimizedMiddleware(app);
+// Apply lightweight middleware stack for 512MB limit
+lightweightMiddleware.applyMiddleware(app);
 
 // Add production optimizations
 app.use(productionOptimizations);
@@ -258,7 +225,7 @@ app.get(`${apiPrefix}/analytics/performance`, authenticateToken, async (req, res
 
 // Authentication middleware is imported at the top with other middleware
 
-// CRITICAL: Health endpoints first
+// CRITICAL: Lightweight health endpoints
 app.get('/health/ping', (req, res) => {
   res.status(200).json({
     success: true,
@@ -266,7 +233,7 @@ app.get('/health/ping', (req, res) => {
       status: 'pong',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'development'
+      mode: 'lightweight'
     }
   });
 });
@@ -278,7 +245,7 @@ app.get('/ping', (req, res) => {
       status: 'pong',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'development'
+      mode: 'lightweight'
     }
   });
 });
@@ -286,26 +253,8 @@ app.get('/ping', (req, res) => {
 // Mount routes
 
 
-// Mount only existing routes
-app.use(`${apiPrefix}/auth`, authRoutes);
-app.use('/health', healthRoutes);
-app.use('/health', healthEnhancedRoutes);
-app.use(`${apiPrefix}/admin`, adminRoutes);
-app.use(`${apiPrefix}/analytics`, analyticsRoutes);
-app.use(`${apiPrefix}/users`, usersRoutes);
-app.use('/api', otherRoutes);
-app.use('/errors', errorsRoutes);
-app.use(`${apiPrefix}/knowledge-base`, knowledgeBaseRoutes);
-app.use(`${apiPrefix}/incidents`, incidentsRoutes);
-app.use(`${apiPrefix}/alerts`, alertsRoutes);
-app.use(`${apiPrefix}/logs`, logsRoutes);
-// app.use(`${apiPrefix}/auto-parts`, autoPartsRoutes); // Removed - route deleted
-app.use(`${apiPrefix}/realtime`, realtimeRoutes);
-app.use(`${apiPrefix}/shops`, shopsRoutes);
-app.use(`${apiPrefix}/bookings`, bookingsRoutes);
-app.use(`${apiPrefix}/enterprise`, enterpriseRoutes);
-app.use(`${apiPrefix}/enterprise-auth`, enterpriseAuthRoutes);
-app.use(`${apiPrefix}/ai`, aiRoutes);
+// Dynamic route loading - routes will be loaded in stages
+console.log('📦 Routes will be loaded dynamically to avoid memory crashes');
 
 // Mount new missing routes
 app.use(`${apiPrefix}/hr`, hrRoutes);
@@ -811,31 +760,39 @@ async function startServer() {
       trackConnection(socket);
     });
 
-    // Enterprise monitoring for 6M+ users with auto-scaling
-    const { enterpriseMonitoring } = require('./monitoring/enterprise-monitoring');
-    const { autoScalingOptimizer } = require('./config/auto-scaling-optimized');
+    // Dynamic route loading for 512MB memory limit
+    console.log('🚀 Starting dynamic route loading...');
     
-    // Setup enterprise monitoring (optimized for 6M users)
+    // Start dynamic route loading in background
+    dynamicRouteLoader.loadAllRoutesInStages(app).catch(error => {
+      console.error('❌ Error in dynamic route loading:', error);
+    });
+    
+    // Monitor memory usage
+    intelligentLoader.monitorMemory();
+    
+    // Basic performance monitoring (lightweight)
     setInterval(async () => {
       try {
-        const metrics = enterpriseMonitoring.getMetrics();
-        const recommendations = enterpriseMonitoring.getScalingRecommendations();
+        const memUsage = process.memoryUsage();
+        const systemMemory = require('os').totalmem();
+        const systemMemoryUsage = (systemMemory - require('os').freemem()) / systemMemory;
         
-        // Only run tuning if system metrics indicate need
-        if (metrics.healthScore < 80 || recommendations.length > 0) {
-          console.log('🔧 Enterprise optimization triggered for 6M+ users');
+        // Only run tuning if system memory is actually high and we have enterprise features
+        if (systemMemoryUsage > 0.8 && lightweightStartup.enterpriseFeatures.monitoring) {
+          console.log('🔧 Basic optimization triggered');
           await analyzeAndTune({
-            memoryUsage: metrics.system.memory,
-            avgResponseTime: metrics.application.responseTime,
-            errorRate: metrics.application.errorRate,
-            throughput: metrics.application.throughput,
-            dbQueryTime: metrics.database.queryTime
+            memoryUsage: systemMemoryUsage,
+            avgResponseTime: 0,
+            errorRate: 0,
+            throughput: 0,
+            dbQueryTime: 0
           });
         }
       } catch (error) {
-        logger.error('Enterprise monitoring error:', error);
+        logger.error('Basic monitoring error:', error);
       }
-    }, 300000); // Run every 5 minutes for 6M users
+    }, 600000); // Run every 10 minutes (reduced frequency)
 
     // Enhanced graceful shutdown (handled by graceful restart manager)
 
