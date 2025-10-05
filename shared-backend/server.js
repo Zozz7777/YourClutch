@@ -243,7 +243,7 @@ app.use('/health', healthRoutes);
 app.use(`${apiPrefix}/users`, usersRoutes);
 app.use(`${apiPrefix}/cars`, carsRoutes);
 app.use(`${apiPrefix}/maintenance`, maintenanceRoutes);
-app.use(`${apiPrefix}/notifications`, notificationsRoutes);
+app.use(`${apiPrefix}/notifications`, notificationsRoutes.router);
 app.use(`${apiPrefix}/roles`, rolesRoutes);
 app.use(`${apiPrefix}/admin`, adminRoutes);
 app.use(`${apiPrefix}/analytics`, analyticsRoutes);
