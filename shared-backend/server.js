@@ -258,9 +258,28 @@ app.get('/ping', (req, res) => {
 
 // All routes will be loaded dynamically - no mountings needed
 
-// All routes will be loaded dynamically - no mountings needed
+// Updates routes
+app.use('/api/v1/updates', require('./routes/updates'));
 
-// All routes will be loaded dynamically - no mountings needed
+// Careers routes
+app.use('/api/v1/careers', require('./routes/careers'));
+
+// Employee invitations routes
+app.use('/api/v1/employees', require('./routes/employee-invitations'));
+
+app.use('/api/v1', clutchAppRoutes);
+app.use('/api/v1/admin/onboarding', onboardingRoutes);
+app.use('/api/v1/admin/roles', rolesRoutes);
+app.use('/api/v1', carsRoutes);
+app.use('/api/v1/maintenance', maintenanceRoutes);
+app.use('/api/v1/operations', operationsRoutes);
+app.use('/api/v1/security', securityRoutes);
+app.use('/api/v1/partners/refunds', partnersRefundsRoutes);
+
+// New routes for integrations, financial, and shipping
+app.use('/api/v1/integrations', require('./routes/integrations'));
+app.use('/api/v1/financial', require('./routes/financial'));
+app.use('/api/v1/shipping', require('./routes/shipping'));
 
 // Note: Authentication is handled by individual routes using authenticateToken middleware
 // No global authentication middleware needed as each route handles its own auth

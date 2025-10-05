@@ -239,6 +239,8 @@ export const PERMISSIONS = {
   VIEW_DEVELOPMENT_TOOLS: "view_development_tools",
   MANAGE_DEVELOPMENT_TOOLS: "manage_development_tools",
   VIEW_TECHNICAL_DOCUMENTATION: "view_technical_documentation",
+  VIEW_SHIPPING: "view_shipping",
+  MANAGE_SHIPPING: "manage_shipping",
 
   // Communication & Support
   VIEW_CHAT: "view_chat",
@@ -498,5 +500,23 @@ export const NAVIGATION_ITEMS = [
     href: "/hr",
     icon: "UserCog",
     permissions: [PERMISSIONS.VIEW_HR],
+  },
+  {
+    title: "Integrations",
+    href: "/integrations",
+    icon: "Plug",
+    permissions: [PERMISSIONS.VIEW_INTEGRATIONS],
+  },
+  {
+    title: "Financial",
+    href: "/financial",
+    icon: "DollarSign",
+    permissions: [PERMISSIONS.VIEW_FINANCE],
+  },
+  {
+    title: "Shipping",
+    href: "/shipping",
+    icon: "Truck",
+    permissions: [PERMISSIONS.VIEW_SHIPPING],
   },
 ] as const;

@@ -96,7 +96,16 @@ export default function SalesPage() {
     // Company contract fields
     companyRegistrationId: "",
     companyTaxId: "",
-    companyOwnerName: ""
+    companyOwnerName: "",
+    // Financial contract terms
+    commissionType: "fixed" as 'fixed' | 'tiered' | 'category' | 'hybrid',
+    fixedRate: 5,
+    tieredRates: [] as Array<{ minAmount: number; maxAmount?: number; rate: number }>,
+    categoryRates: [] as Array<{ category: string; rate: number }>,
+    vatApplicable: false,
+    vatRate: 14,
+    clutchMarkupStrategy: "partner_pays" as 'partner_pays' | 'user_pays' | 'split',
+    markupPercentage: 5
   });
 
   // Load leads on component mount
@@ -568,6 +577,103 @@ export default function SalesPage() {
                   </div>
                 </div>
               )}
+
+              {/* Financial Contract Terms */}
+              <div className="border-t pt-4">
+                <h3 className="text-lg font-medium mb-4">Financial Contract Terms</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label>Commission Type</Label>
+                    <Select
+                      value={formData.commissionType}
+                      onValueChange={(value: 'fixed' | 'tiered' | 'category' | 'hybrid') => 
+                        setFormData({ ...formData, commissionType: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fixed">Fixed Rate</SelectItem>
+                        <SelectItem value="tiered">Tiered Rate</SelectItem>
+                        <SelectItem value="category">Category Based</SelectItem>
+                        <SelectItem value="hybrid">Hybrid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {formData.commissionType === 'fixed' && (
+                    <div>
+                      <Label>Commission Rate (%)</Label>
+                      <Input
+                        type="number"
+                        value={formData.fixedRate}
+                        onChange={(e) => setFormData({ ...formData, fixedRate: Number(e.target.value) })}
+                        placeholder="5"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                      />
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={formData.vatApplicable}
+                        onCheckedChange={(checked) => setFormData({ ...formData, vatApplicable: checked })}
+                      />
+                      <Label>VAT Applicable</Label>
+                    </div>
+                    {formData.vatApplicable && (
+                      <div>
+                        <Label>VAT Rate (%)</Label>
+                        <Input
+                          type="number"
+                          value={formData.vatRate}
+                          onChange={(e) => setFormData({ ...formData, vatRate: Number(e.target.value) })}
+                          placeholder="14"
+                          min="0"
+                          max="100"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label>Clutch Markup Strategy</Label>
+                    <Select
+                      value={formData.clutchMarkupStrategy}
+                      onValueChange={(value: 'partner_pays' | 'user_pays' | 'split') => 
+                        setFormData({ ...formData, clutchMarkupStrategy: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="partner_pays">Partner Pays (5% from partner)</SelectItem>
+                        <SelectItem value="user_pays">User Pays (5% from user)</SelectItem>
+                        <SelectItem value="split">Split (2.5% each)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Markup Percentage (%)</Label>
+                    <Input
+                      type="number"
+                      value={formData.markupPercentage}
+                      onChange={(e) => setFormData({ ...formData, markupPercentage: Number(e.target.value) })}
+                      placeholder="5"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                    />
+                  </div>
+                </div>
+              </div>
 
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
