@@ -11,6 +11,7 @@ import com.clutch.partners.ui.screens.main.*
 import com.clutch.partners.ui.screens.advanced.*
 import com.clutch.partners.ui.screens.customer.*
 import com.clutch.partners.ui.screens.growth.*
+import com.clutch.partners.ui.screens.pos.*
 
 @Composable
 fun NavigationHost(

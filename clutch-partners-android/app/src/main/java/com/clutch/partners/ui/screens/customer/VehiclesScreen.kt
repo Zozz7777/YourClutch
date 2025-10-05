@@ -21,7 +21,7 @@ fun VehiclesScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Vehicle Management") },
+                title = { Text("Customer Vehicles") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -50,19 +50,18 @@ fun VehiclesScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Vehicle Database",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Vehicle Management",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Manage customer vehicles and service history",
+                            text = "Track customer vehicles and service history",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -73,18 +72,26 @@ fun VehiclesScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Total Vehicles",
-                            value = "156",
+                            value = "45",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Active",
-                            value = "142",
-                            color = MaterialTheme.colorScheme.tertiary
+                            value = "42",
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -92,7 +99,7 @@ fun VehiclesScreen(navController: NavController) {
             
             item {
                 Text(
-                    "Recent Vehicles",
+                    "Vehicle List",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -106,66 +113,86 @@ fun VehiclesScreen(navController: NavController) {
 }
 
 @Composable
-fun VehicleCard(vehicle: Vehicle) {
+fun VehicleCard(vehicle: CustomerVehicle) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "${vehicle.year} ${vehicle.make} ${vehicle.model}",
+                    text = vehicle.make,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = vehicle.owner,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = vehicle.year,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Model: ${vehicle.model}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = "Owner: ${vehicle.ownerName}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = "VIN: ${vehicle.vin}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-            Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = vehicle.licensePlate,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "${vehicle.mileage} miles",
+                    text = "Services: ${vehicle.serviceCount}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
     }
 }
 
-data class Vehicle(
+data class CustomerVehicle(
     val id: String,
     val make: String,
     val model: String,
-    val year: Int,
+    val year: String,
     val vin: String,
-    val licensePlate: String,
-    val owner: String,
-    val mileage: Int
+    val ownerName: String,
+    val serviceCount: String
 )
 
 val sampleVehicles = listOf(
-    Vehicle("V001", "Honda", "Civic", 2020, "1HGBH41JXMN109186", "ABC-123", "John Smith", 45000),
-    Vehicle("V002", "Toyota", "Camry", 2019, "1FTFW1ET5DFC12345", "XYZ-789", "Sarah Johnson", 52000),
-    Vehicle("V003", "Ford", "F-150", 2021, "1FTFW1ET5DFC54321", "DEF-456", "Mike Davis", 38000),
-    Vehicle("V004", "BMW", "X3", 2018, "WBAFR9C50BC123456", "GHI-789", "Lisa Wilson", 67000)
+    CustomerVehicle("1", "Toyota", "Camry", "2020", "1HGBH41JXMN109186", "John Smith", "3"),
+    CustomerVehicle("2", "Honda", "Civic", "2019", "2HGBH41JXMN109187", "Sarah Johnson", "5"),
+    CustomerVehicle("3", "Ford", "F-150", "2021", "3HGBH41JXMN109188", "Mike Davis", "2"),
+    CustomerVehicle("4", "Chevrolet", "Silverado", "2018", "4HGBH41JXMN109189", "Lisa Wilson", "4"),
+    CustomerVehicle("5", "Nissan", "Altima", "2022", "5HGBH41JXMN109190", "David Brown", "1")
 )

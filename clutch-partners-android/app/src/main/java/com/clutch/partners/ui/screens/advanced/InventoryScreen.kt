@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -50,19 +50,18 @@ fun InventoryScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Inventory Overview",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Inventory Overview",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Manage products, track stock levels, and monitor inventory",
+                            text = "Manage your product inventory efficiently",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -73,14 +72,22 @@ fun InventoryScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Total Products",
                             value = "156",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Low Stock",
                             value = "12",
@@ -95,14 +102,22 @@ fun InventoryScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Out of Stock",
                             value = "3",
                             color = MaterialTheme.colorScheme.error
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Total Value",
                             value = "$45,230",
@@ -131,43 +146,55 @@ fun InventoryScreen(navController: NavController) {
 fun ProductCard(product: Product) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = product.name,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = product.category,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "Stock: ${product.stock}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (product.stock < 10) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = "$${product.price}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = product.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = product.sku,
+                    text = "Stock: ${product.stock}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = product.category,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -177,15 +204,16 @@ fun ProductCard(product: Product) {
 data class Product(
     val id: String,
     val name: String,
+    val description: String,
     val category: String,
     val price: Double,
-    val stock: Int,
-    val sku: String
+    val stock: Int
 )
 
 val sampleProducts = listOf(
-    Product("P001", "Brake Pads", "Brakes", 45.99, 25, "BP-001"),
-    Product("P002", "Oil Filter", "Filters", 12.50, 8, "OF-002"),
-    Product("P003", "Air Filter", "Filters", 18.75, 0, "AF-003"),
-    Product("P004", "Spark Plugs", "Ignition", 8.99, 5, "SP-004")
+    Product("1", "iPhone 15 Pro", "Latest iPhone model", "Electronics", 999.99, 25),
+    Product("2", "Samsung Galaxy S24", "Premium Android phone", "Electronics", 899.99, 18),
+    Product("3", "MacBook Pro M3", "Professional laptop", "Computers", 1999.99, 8),
+    Product("4", "AirPods Pro", "Wireless earbuds", "Accessories", 249.99, 45),
+    Product("5", "iPad Air", "Tablet computer", "Electronics", 599.99, 12)
 )

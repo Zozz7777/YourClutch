@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -50,19 +50,18 @@ fun SuppliersScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Supplier Management",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Supplier Management",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Manage suppliers and track performance",
+                            text = "Manage your supplier relationships",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -73,40 +72,56 @@ fun SuppliersScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "Active Suppliers",
-                            value = "24",
+                            title = "Total Suppliers",
+                            value = "15",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        StatCard(
+                            title = "Active",
+                            value = "12",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            }
+            
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Top Rated",
                             value = "8",
                             color = MaterialTheme.colorScheme.tertiary
                         )
                     }
-                }
-            }
-            
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "New This Month",
                             value = "3",
                             color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    Expanded {
-                        StatCard(
-                            title = "Total Orders",
-                            value = "156",
-                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 }
@@ -127,48 +142,59 @@ fun SuppliersScreen(navController: NavController) {
     }
 }
 
-
 @Composable
 fun SupplierCard(supplier: Supplier) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = supplier.name,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = supplier.category,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = supplier.contact,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "★ ${supplier.rating}",
+                    text = "Rating: ${supplier.rating}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Contact: ${supplier.contact}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "${supplier.orders} orders",
+                    text = "Status: ${supplier.status}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Category: ${supplier.category}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -178,15 +204,16 @@ fun SupplierCard(supplier: Supplier) {
 data class Supplier(
     val id: String,
     val name: String,
-    val category: String,
     val contact: String,
-    val rating: Double,
-    val orders: Int
+    val rating: String,
+    val status: String,
+    val category: String
 )
 
 val sampleSuppliers = listOf(
-    Supplier("S001", "Auto Parts Supply", "General Parts", "contact@autoparts.com", 4.8, 45),
-    Supplier("S002", "Brake Components Inc", "Brake Systems", "sales@brakecomp.com", 4.6, 32),
-    Supplier("S003", "Filter Solutions", "Filters", "info@filtersol.com", 4.9, 28),
-    Supplier("S004", "Engine Parts Co", "Engine Components", "orders@engineparts.com", 4.5, 51)
+    Supplier("1", "Tech Solutions Inc", "contact@techsolutions.com", "4.8", "Active", "Electronics"),
+    Supplier("2", "Mobile Parts Co", "info@mobileparts.com", "4.6", "Active", "Parts"),
+    Supplier("3", "Device Central", "sales@devicecentral.com", "4.9", "Active", "Electronics"),
+    Supplier("4", "Repair Tools Ltd", "orders@repairtools.com", "4.4", "Active", "Tools"),
+    Supplier("5", "Gadget World", "support@gadgetworld.com", "4.7", "Inactive", "Electronics")
 )

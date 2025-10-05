@@ -33,7 +33,7 @@ fun PromotionsScreen(navController: NavController) {
             FloatingActionButton(
                 onClick = { /* TODO: Create new promotion */ }
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Create Promotion")
+                Icon(Icons.Default.Add, contentDescription = "New Promotion")
             }
         }
     ) { paddingValues ->
@@ -50,19 +50,18 @@ fun PromotionsScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Promotion Management",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Promotion Management",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Create and manage customer promotions",
+                            text = "Create and manage customer promotions",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -73,18 +72,26 @@ fun PromotionsScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "Active",
+                            title = "Active Promotions",
                             value = "5",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "Total Uses",
-                            value = "156",
-                            color = MaterialTheme.colorScheme.tertiary
+                            title = "Total Redeemed",
+                            value = "89",
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -92,7 +99,7 @@ fun PromotionsScreen(navController: NavController) {
             
             item {
                 Text(
-                    "Active Promotions",
+                    "Current Promotions",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -109,43 +116,55 @@ fun PromotionsScreen(navController: NavController) {
 fun PromotionCard(promotion: Promotion) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = promotion.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = promotion.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "Code: ${promotion.code}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = promotion.discount,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = promotion.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "Uses: ${promotion.uses}",
+                    text = "Valid until: ${promotion.endDate}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Redeemed: ${promotion.redeemedCount}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -156,14 +175,15 @@ data class Promotion(
     val id: String,
     val title: String,
     val description: String,
-    val code: String,
     val discount: String,
-    val uses: Int
+    val endDate: String,
+    val redeemedCount: String
 )
 
 val samplePromotions = listOf(
-    Promotion("P001", "Oil Change Special", "20% off oil change service", "OIL20", "20% OFF", 45),
-    Promotion("P002", "Brake Service Deal", "Free brake inspection", "BRAKE", "FREE", 23),
-    Promotion("P003", "New Customer", "10% off first service", "WELCOME", "10% OFF", 67),
-    Promotion("P004", "Winter Prep", "Winter tire package discount", "WINTER", "15% OFF", 21)
+    Promotion("1", "Screen Repair Discount", "20% off on all screen repairs", "20% OFF", "2024-02-15", "23"),
+    Promotion("2", "Battery Replacement", "Free battery replacement for iPhone 12", "FREE", "2024-02-20", "15"),
+    Promotion("3", "New Customer Special", "50% off first repair service", "50% OFF", "2024-02-28", "31"),
+    Promotion("4", "Bulk Repair Discount", "10% off when repairing 3+ devices", "10% OFF", "2024-03-01", "8"),
+    Promotion("5", "Weekend Special", "15% off all weekend repairs", "15% OFF", "2024-02-25", "12")
 )

@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,19 +43,18 @@ fun FeedbackScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Customer Feedback",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Customer Feedback",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "View and respond to customer feedback",
+                            text = "Monitor customer satisfaction and feedback",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -65,18 +65,26 @@ fun FeedbackScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Average Rating",
-                            value = "4.8",
+                            value = "4.7",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Total Reviews",
                             value = "156",
-                            color = MaterialTheme.colorScheme.tertiary
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -98,15 +106,15 @@ fun FeedbackScreen(navController: NavController) {
 }
 
 @Composable
-fun FeedbackCard(feedback: Feedback) {
+fun FeedbackCard(feedback: CustomerFeedback) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -116,7 +124,7 @@ fun FeedbackCard(feedback: Feedback) {
                 Text(
                     text = feedback.customerName,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "★ ${feedback.rating}",
@@ -125,33 +133,38 @@ fun FeedbackCard(feedback: Feedback) {
                     color = MaterialTheme.colorScheme.primary
                 )
             }
+            
             Spacer(modifier = Modifier.height(8.dp))
+            
             Text(
                 text = feedback.comment,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            
             Spacer(modifier = Modifier.height(8.dp))
+            
             Text(
                 text = feedback.date,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
 }
 
-data class Feedback(
+data class CustomerFeedback(
     val id: String,
     val customerName: String,
-    val rating: Double,
+    val rating: String,
     val comment: String,
     val date: String
 )
 
 val sampleFeedback = listOf(
-    Feedback("F001", "John Smith", 5.0, "Excellent service! Very professional and quick.", "Dec 15, 2024"),
-    Feedback("F002", "Sarah Johnson", 4.5, "Good service, but had to wait a bit longer than expected.", "Dec 14, 2024"),
-    Feedback("F003", "Mike Davis", 5.0, "Amazing work! My car runs like new.", "Dec 13, 2024"),
-    Feedback("F004", "Lisa Wilson", 4.0, "Decent service, fair pricing.", "Dec 12, 2024")
+    CustomerFeedback("1", "John Smith", "5.0", "Excellent service! My phone was repaired quickly and professionally.", "2024-01-15"),
+    CustomerFeedback("2", "Sarah Johnson", "4.5", "Good service, but had to wait a bit longer than expected.", "2024-01-14"),
+    CustomerFeedback("3", "Mike Davis", "5.0", "Outstanding work! Highly recommend this repair center.", "2024-01-13"),
+    CustomerFeedback("4", "Lisa Wilson", "4.0", "Satisfied with the repair, staff was friendly and helpful.", "2024-01-12"),
+    CustomerFeedback("5", "David Brown", "4.8", "Great experience overall, will definitely come back.", "2024-01-11")
 )

@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +21,7 @@ fun TrainingScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Training & Certification") },
+                title = { Text("Training Center") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -42,19 +43,18 @@ fun TrainingScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Training Center",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Training Center",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Access training courses and certifications",
+                            text = "Access training materials and courses",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -65,18 +65,26 @@ fun TrainingScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "Completed",
-                            value = "8",
+                            title = "Available Courses",
+                            value = "15",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "In Progress",
-                            value = "3",
-                            color = MaterialTheme.colorScheme.tertiary
+                            title = "Completed",
+                            value = "8",
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -84,7 +92,7 @@ fun TrainingScreen(navController: NavController) {
             
             item {
                 Text(
-                    "Available Courses",
+                    "Training Courses",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -98,69 +106,76 @@ fun TrainingScreen(navController: NavController) {
 }
 
 @Composable
-fun CourseCard(course: Course) {
+fun CourseCard(course: TrainingCourse) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = course.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = course.category,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "${course.duration} hours",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = course.status,
+                    text = course.duration,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = when (course.status) {
-                        "Completed" -> MaterialTheme.colorScheme.primary
-                        "In Progress" -> MaterialTheme.colorScheme.tertiary
-                        "Not Started" -> MaterialTheme.colorScheme.onSurfaceVariant
-                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = course.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "${course.progress}%",
+                    text = "Status: ${course.status}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Progress: ${course.progress}%",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
     }
 }
 
-data class Course(
+data class TrainingCourse(
     val id: String,
     val title: String,
-    val category: String,
-    val duration: Int,
+    val description: String,
+    val duration: String,
     val status: String,
     val progress: Int
 )
 
 val sampleCourses = listOf(
-    Course("C001", "Automotive Safety", "Safety", 4, "Completed", 100),
-    Course("C002", "Customer Service", "Service", 6, "In Progress", 65),
-    Course("C003", "Brake Systems", "Technical", 8, "Not Started", 0),
-    Course("C004", "Engine Diagnostics", "Technical", 10, "In Progress", 30)
+    TrainingCourse("1", "iPhone Repair Basics", "Learn fundamental iPhone repair techniques", "2 hours", "Completed", 100),
+    TrainingCourse("2", "Android Troubleshooting", "Advanced Android device troubleshooting", "3 hours", "In Progress", 65),
+    TrainingCourse("3", "Customer Service Excellence", "Improve customer interaction skills", "1.5 hours", "Not Started", 0),
+    TrainingCourse("4", "Sales Techniques", "Effective sales strategies for repair services", "2.5 hours", "Completed", 100)
 )

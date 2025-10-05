@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -50,19 +50,18 @@ fun StaffScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Staff Management",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Staff Overview",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Manage staff members and their roles",
+                            text = "Manage your team and permissions",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -73,18 +72,26 @@ fun StaffScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Total Staff",
                             value = "12",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Active",
                             value = "10",
-                            color = MaterialTheme.colorScheme.tertiary
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -95,18 +102,26 @@ fun StaffScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Managers",
                             value = "3",
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "Staff",
+                            title = "Technicians",
                             value = "7",
-                            color = MaterialTheme.colorScheme.tertiary
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -114,7 +129,7 @@ fun StaffScreen(navController: NavController) {
             
             item {
                 Text(
-                    "Staff List",
+                    "Staff Members",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -128,68 +143,77 @@ fun StaffScreen(navController: NavController) {
 }
 
 @Composable
-fun StaffCard(staff: Staff) {
+fun StaffCard(staff: StaffMember) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = staff.name,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = staff.role,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = staff.email,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = staff.status,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = when (staff.status) {
-                        "Active" -> MaterialTheme.colorScheme.primary
-                        "Inactive" -> MaterialTheme.colorScheme.error
-                        "On Leave" -> MaterialTheme.colorScheme.tertiary
-                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Email: ${staff.email}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "ID: ${staff.id}",
+                    text = "Status: ${staff.status}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Joined: ${staff.joinDate}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
     }
 }
 
-data class Staff(
+data class StaffMember(
     val id: String,
     val name: String,
-    val role: String,
     val email: String,
-    val status: String
+    val role: String,
+    val status: String,
+    val joinDate: String
 )
 
 val sampleStaff = listOf(
-    Staff("S001", "John Smith", "Manager", "john@clutch.com", "Active"),
-    Staff("S002", "Sarah Johnson", "Technician", "sarah@clutch.com", "Active"),
-    Staff("S003", "Mike Davis", "Cashier", "mike@clutch.com", "Active"),
-    Staff("S004", "Lisa Wilson", "Manager", "lisa@clutch.com", "On Leave")
+    StaffMember("1", "John Smith", "john@company.com", "Manager", "Active", "2023-01-15"),
+    StaffMember("2", "Sarah Johnson", "sarah@company.com", "Technician", "Active", "2023-03-20"),
+    StaffMember("3", "Mike Davis", "mike@company.com", "Technician", "Active", "2023-05-10"),
+    StaffMember("4", "Lisa Wilson", "lisa@company.com", "Manager", "Active", "2023-02-28"),
+    StaffMember("5", "David Brown", "david@company.com", "Technician", "Inactive", "2023-04-15")
 )

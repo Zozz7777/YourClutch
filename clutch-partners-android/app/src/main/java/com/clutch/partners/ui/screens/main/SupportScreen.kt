@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -210,7 +211,7 @@ fun TicketCard(
                     modifier = Modifier.weight(1f)
                 )
                 
-                StatusChip(status = ticket.status)
+                SupportStatusChip(status = ticket.status)
             }
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -228,7 +229,7 @@ fun TicketCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Center
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Ticket #${ticket.id}",
@@ -269,7 +270,7 @@ fun FAQCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Center
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = faq.question,
@@ -290,7 +291,7 @@ fun FAQCard(
 }
 
 @Composable
-fun StatusChip(status: String) {
+fun SupportStatusChip(status: String) {
     val (backgroundColor, textColor) = when (status) {
         "Open" -> Color(0xFF4CAF50) to Color.White
         "In Progress" -> Color(0xFF2196F3) to Color.White

@@ -11,6 +11,11 @@ const ProcurementRequest = require('../models/ProcurementRequest');
 const DepartmentBudget = require('../models/DepartmentBudget');
 const ProjectBudget = require('../models/ProjectBudget');
 
+// Import sub-routes
+const supplierRiskAssessmentRoutes = require('./supplier-risk-assessment');
+const contractLifecycleRoutes = require('./contract-lifecycle');
+const procurementEmailRoutes = require('./procurement-email');
+
 // Rate limiting for procurement operations
 const procurementRateLimit = require('express-rate-limit')({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -483,5 +488,10 @@ async function checkBudgetAvailability(request) {
     };
   }
 }
+
+// Mount sub-routes
+router.use('/risk-assessments', supplierRiskAssessmentRoutes);
+router.use('/contract-lifecycle', contractLifecycleRoutes);
+router.use('/email', procurementEmailRoutes);
 
 module.exports = router;

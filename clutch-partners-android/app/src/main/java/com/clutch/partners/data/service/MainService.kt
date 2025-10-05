@@ -84,19 +84,20 @@ class MainService @Inject constructor() {
             listOf(
                 Product(
                     id = "1",
+                    sku = "BP001",
                     name = "Brake Pads",
                     description = "High quality brake pads",
                     category = "Brakes",
-                    brand = "Brembo",
-                    sku = "BP001",
                     price = 45.0,
                     cost = 25.0,
-                    stockQuantity = 50,
-                    minStockLevel = 10,
-                    images = listOf(),
+                    stock = 50,
+                    minStock = 10,
+                    maxStock = 100,
+                    barcode = "1234567890123",
+                    imageUrl = null,
                     isActive = true,
-                    createdAt = java.util.Date(),
-                    updatedAt = java.util.Date()
+                    createdAt = System.currentTimeMillis(),
+                    updatedAt = System.currentTimeMillis()
                 )
             )
         )

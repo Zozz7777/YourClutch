@@ -14,6 +14,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.clutch.partners.ClutchPartnersTheme
 import com.clutch.partners.navigation.Screen
 import com.clutch.partners.viewmodel.MainViewModel
+import com.clutch.partners.data.model.Permission
+import com.clutch.partners.ui.components.PermissionGate
 
 @Composable
 fun MainScreen(
@@ -40,6 +42,7 @@ fun MainScreen(
                 when (currentRoute) {
                     Screen.Home.route -> HomeScreen(navController)
                     Screen.Dashboard.route -> DashboardScreen(navController)
+                    Screen.POS.route -> com.clutch.partners.ui.screens.pos.POSScreen(navController)
                     Screen.Payments.route -> PaymentsScreen(navController)
                     Screen.Settings.route -> SettingsScreen(navController)
                 }
@@ -53,12 +56,19 @@ fun BottomNavigationBar(
     currentRoute: String?,
     onNavigate: (String) -> Unit
 ) {
-    val items = listOf(
-        BottomNavItem("Home", Screen.Home.route, Icons.Default.Home),
-        BottomNavItem("Dashboard", Screen.Dashboard.route, Icons.Default.Dashboard),
-        BottomNavItem("Payments", Screen.Payments.route, Icons.Default.Payment),
-        BottomNavItem("Settings", Screen.Settings.route, Icons.Default.Settings)
+    val allItems = listOf(
+        BottomNavItem("Home", Screen.Home.route, Icons.Default.Home, Permission.VIEW_DASHBOARD),
+        BottomNavItem("Dashboard", Screen.Dashboard.route, Icons.Default.Dashboard, Permission.VIEW_DASHBOARD),
+        BottomNavItem("POS", Screen.POS.route, Icons.Default.PointOfSale, Permission.MANAGE_ORDERS),
+        BottomNavItem("Payments", Screen.Payments.route, Icons.Default.Payment, Permission.VIEW_PAYMENTS),
+        BottomNavItem("Settings", Screen.Settings.route, Icons.Default.Settings, Permission.VIEW_SETTINGS)
     )
+    
+    // Filter items based on permissions
+    val items = allItems.filter { item ->
+        // For now, show all items - in real app, this would check permissions
+        true
+    }
     
     NavigationBar {
         items.forEach { item ->
@@ -75,5 +85,6 @@ fun BottomNavigationBar(
 data class BottomNavItem(
     val label: String,
     val route: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val requiredPermission: Permission
 )

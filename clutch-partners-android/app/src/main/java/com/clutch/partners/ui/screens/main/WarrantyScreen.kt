@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -174,7 +175,7 @@ fun WarrantyClaimCard(
                     )
                 }
                 
-                StatusChip(status = claim.status)
+                WarrantyStatusChip(status = claim.status)
             }
             
             Spacer(modifier = Modifier.height(12.dp))
@@ -182,7 +183,7 @@ fun WarrantyClaimCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Center
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Order: ${claim.orderId}",
@@ -258,7 +259,7 @@ fun DisputeCard(
                     )
                 }
                 
-                StatusChip(status = dispute.status)
+                WarrantyStatusChip(status = dispute.status)
             }
             
             Spacer(modifier = Modifier.height(12.dp))
@@ -266,7 +267,7 @@ fun DisputeCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Center
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Type: ${dispute.type}",
@@ -295,7 +296,7 @@ fun DisputeCard(
 }
 
 @Composable
-fun StatusChip(status: String) {
+fun WarrantyStatusChip(status: String) {
     val (backgroundColor, textColor) = when (status) {
         "Submitted" -> Color(0xFF4CAF50) to Color.White
         "Under Review" -> Color(0xFF2196F3) to Color.White

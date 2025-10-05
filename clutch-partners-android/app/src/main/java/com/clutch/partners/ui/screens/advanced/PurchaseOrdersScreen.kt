@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,9 +31,9 @@ fun PurchaseOrdersScreen(navController: NavController) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO: Create new PO */ }
+                onClick = { /* TODO: Create new order */ }
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Create PO")
+                Icon(Icons.Default.Add, contentDescription = "New Order")
             }
         }
     ) { paddingValues ->
@@ -50,19 +50,18 @@ fun PurchaseOrdersScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Purchase Orders",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Purchase Orders",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Manage purchase orders and track deliveries",
+                            text = "Manage supplier orders and inventory",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -73,40 +72,56 @@ fun PurchaseOrdersScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "Pending",
-                            value = "5",
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    Expanded {
-                        StatCard(
-                            title = "Received",
-                            value = "12",
-                            color = MaterialTheme.colorScheme.tertiary
-                        )
-                    }
-                }
-            }
-            
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Expanded {
-                        StatCard(
-                            title = "Approved",
+                            title = "Pending Orders",
                             value = "8",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Total Value",
                             value = "$12,450",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            }
+            
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        StatCard(
+                            title = "Delivered",
+                            value = "15",
                             color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        StatCard(
+                            title = "Overdue",
+                            value = "2",
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -114,65 +129,72 @@ fun PurchaseOrdersScreen(navController: NavController) {
             
             item {
                 Text(
-                    "Recent Purchase Orders",
+                    "Recent Orders",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
             }
             
-            items(samplePurchaseOrders) { po ->
-                PurchaseOrderCard(po = po)
+            items(sampleOrders) { order ->
+                OrderCard(order = order)
             }
         }
     }
 }
 
 @Composable
-fun PurchaseOrderCard(po: PurchaseOrder) {
+fun OrderCard(order: PurchaseOrder) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "PO #${po.id}",
+                    text = "Order #${order.id}",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = po.supplier,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "${po.items} items",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "$${po.total}",
+                    text = "$${order.total}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Supplier: ${order.supplier}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = po.status,
+                    text = "Status: ${order.status}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = when (po.status) {
-                        "Pending" -> MaterialTheme.colorScheme.error
-                        "Approved" -> MaterialTheme.colorScheme.primary
-                        "Received" -> MaterialTheme.colorScheme.tertiary
-                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = order.date,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -183,13 +205,14 @@ data class PurchaseOrder(
     val id: String,
     val supplier: String,
     val total: Double,
-    val items: Int,
-    val status: String
+    val status: String,
+    val date: String
 )
 
-val samplePurchaseOrders = listOf(
-    PurchaseOrder("PO001", "Auto Parts Supply", 1250.00, 15, "Pending"),
-    PurchaseOrder("PO002", "Brake Components Inc", 890.50, 8, "Approved"),
-    PurchaseOrder("PO003", "Filter Solutions", 450.75, 12, "Received"),
-    PurchaseOrder("PO004", "Engine Parts Co", 2100.00, 25, "Pending")
+val sampleOrders = listOf(
+    PurchaseOrder("PO001", "Tech Supplier Inc", 2500.00, "Pending", "2024-01-15"),
+    PurchaseOrder("PO002", "Electronics Plus", 1800.00, "Delivered", "2024-01-14"),
+    PurchaseOrder("PO003", "Gadget World", 3200.00, "Processing", "2024-01-13"),
+    PurchaseOrder("PO004", "Mobile Solutions", 1500.00, "Pending", "2024-01-12"),
+    PurchaseOrder("PO005", "Device Central", 2200.00, "Delivered", "2024-01-11")
 )

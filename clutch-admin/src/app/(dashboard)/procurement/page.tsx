@@ -40,6 +40,21 @@ import {
   LineChart,
   Activity
 } from 'lucide-react';
+import { 
+  ResponsiveContainer,
+  LineChart as RechartsLineChart,
+  Line,
+  BarChart as RechartsBarChart,
+  Bar,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend
+} from 'recharts';
 
 // Types
 interface ProcurementRequest {
@@ -298,7 +313,7 @@ export default function ProcurementPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-9">
+        <TabsList className="grid w-full grid-cols-10">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="requests">Requests</TabsTrigger>
           <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
@@ -307,6 +322,7 @@ export default function ProcurementPage() {
           <TabsTrigger value="contracts">Contracts</TabsTrigger>
           <TabsTrigger value="budgets">Budgets</TabsTrigger>
           <TabsTrigger value="receipts">Goods Receipt</TabsTrigger>
+          <TabsTrigger value="risk-management">Risk Management</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
@@ -675,36 +691,392 @@ export default function ProcurementPage() {
         </TabsContent>
 
         {/* Contracts Tab */}
-        <TabsContent value="contracts" className="space-y-4">
+        <TabsContent value="contracts" className="space-y-6">
+          {/* Contract Lifecycle Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Contract Lifecycle Management</h2>
+              <p className="text-muted-foreground">Manage supplier contracts from creation to renewal</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Export Contracts
+              </Button>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                New Contract
+              </Button>
+            </div>
+          </div>
+
+          {/* Contract Status Overview */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Contracts</CardTitle>
+                <FileCheck className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">48</div>
+                <p className="text-xs text-muted-foreground">+5 this month</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Contracts</CardTitle>
+                <CheckCircle className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">32</div>
+                <p className="text-xs text-muted-foreground">66.7% of total</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+                <Clock className="h-4 w-4 text-orange-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-600">8</div>
+                <p className="text-xs text-muted-foreground">Next 30 days</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-yellow-600">5</div>
+                <p className="text-xs text-muted-foreground">Awaiting approval</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contract Lifecycle Stages */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Draft</CardTitle>
+                <div className="text-2xl font-bold">3</div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>TechCorp Agreement</span>
+                    <Badge variant="outline">Draft</Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>OfficeMax Contract</span>
+                    <Badge variant="outline">Draft</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Under Review</CardTitle>
+                <div className="text-2xl font-bold">5</div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Service Solutions</span>
+                    <Badge variant="secondary">Review</Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Maintenance Plus</span>
+                    <Badge variant="secondary">Review</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Active</CardTitle>
+                <div className="text-2xl font-bold">32</div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Furniture World</span>
+                    <Badge className="bg-green-100 text-green-800">Active</Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>IT Equipment Co.</span>
+                    <Badge className="bg-green-100 text-green-800">Active</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Expiring</CardTitle>
+                <div className="text-2xl font-bold">8</div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Marketing Agency</span>
+                    <Badge variant="destructive">15 days</Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Cleaning Services</span>
+                    <Badge variant="destructive">7 days</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contract Management Table */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Contracts</CardTitle>
-                  <CardDescription>Manage supplier contracts and agreements</CardDescription>
+                  <CardTitle>Contract Management</CardTitle>
+                  <CardDescription>Manage contract lifecycle and renewals</CardDescription>
                 </div>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Contract
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <FileCheck className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-2 text-sm font-semibold">No contracts found</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Create contracts with your suppliers.
-                </p>
-                <div className="mt-6">
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Contract
+                <div className="flex items-center space-x-2">
+                  <Input placeholder="Search contracts..." className="w-64" />
+                  <Button variant="outline" size="sm">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filter
                   </Button>
                 </div>
               </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2">Contract</th>
+                      <th className="text-left py-2">Supplier</th>
+                      <th className="text-left py-2">Type</th>
+                      <th className="text-left py-2">Value</th>
+                      <th className="text-left py-2">Status</th>
+                      <th className="text-left py-2">Expiry</th>
+                      <th className="text-left py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b">
+                      <td className="py-2">
+                        <div>
+                          <div className="font-medium">CTR-2024-001</div>
+                          <div className="text-sm text-muted-foreground">IT Equipment Supply</div>
+                        </div>
+                      </td>
+                      <td className="py-2">TechCorp Inc.</td>
+                      <td className="py-2">Fixed Price</td>
+                      <td className="py-2">$450,000</td>
+                      <td className="py-2">
+                        <Badge className="bg-green-100 text-green-800">Active</Badge>
+                      </td>
+                      <td className="py-2">2024-12-31</td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">
+                        <div>
+                          <div className="font-medium">CTR-2024-002</div>
+                          <div className="text-sm text-muted-foreground">Office Supplies</div>
+                        </div>
+                      </td>
+                      <td className="py-2">OfficeMax Pro</td>
+                      <td className="py-2">Blanket</td>
+                      <td className="py-2">$180,000</td>
+                      <td className="py-2">
+                        <Badge variant="secondary">Under Review</Badge>
+                      </td>
+                      <td className="py-2">2025-03-15</td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">
+                        <div>
+                          <div className="font-medium">CTR-2024-003</div>
+                          <div className="text-sm text-muted-foreground">Furniture Supply</div>
+                        </div>
+                      </td>
+                      <td className="py-2">Furniture World</td>
+                      <td className="py-2">Time & Materials</td>
+                      <td className="py-2">$320,000</td>
+                      <td className="py-2">
+                        <Badge className="bg-green-100 text-green-800">Active</Badge>
+                      </td>
+                      <td className="py-2">2024-11-30</td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">
+                        <div>
+                          <div className="font-medium">CTR-2024-004</div>
+                          <div className="text-sm text-muted-foreground">Service Agreement</div>
+                        </div>
+                      </td>
+                      <td className="py-2">Service Solutions</td>
+                      <td className="py-2">Retainer</td>
+                      <td className="py-2">$280,000</td>
+                      <td className="py-2">
+                        <Badge variant="destructive">Expiring</Badge>
+                      </td>
+                      <td className="py-2">2024-02-15</td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-2">
+                        <div>
+                          <div className="font-medium">CTR-2024-005</div>
+                          <div className="text-sm text-muted-foreground">Maintenance Services</div>
+                        </div>
+                      </td>
+                      <td className="py-2">Maintenance Plus</td>
+                      <td className="py-2">Fixed Price</td>
+                      <td className="py-2">$150,000</td>
+                      <td className="py-2">
+                        <Badge variant="outline">Draft</Badge>
+                      </td>
+                      <td className="py-2">-</td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
+
+          {/* Contract Lifecycle Analytics */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Contract Status Distribution</CardTitle>
+                <CardDescription>Current distribution of contract statuses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={[
+                          { name: 'Active', value: 32, fill: '#22c55e' },
+                          { name: 'Under Review', value: 5, fill: '#eab308' },
+                          { name: 'Draft', value: 3, fill: '#6b7280' },
+                          { name: 'Expiring', value: 8, fill: '#ef4444' }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {[
+                          { name: 'Active', value: 32, fill: '#22c55e' },
+                          { name: 'Under Review', value: 5, fill: '#eab308' },
+                          { name: 'Draft', value: 3, fill: '#6b7280' },
+                          { name: 'Expiring', value: 8, fill: '#ef4444' }
+                        ].map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => [value, '']} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Contract Value Trends</CardTitle>
+                <CardDescription>Contract values over the past 6 months</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsLineChart data={[
+                      { month: 'Jul', value: 1200000, contracts: 8 },
+                      { month: 'Aug', value: 1500000, contracts: 10 },
+                      { month: 'Sep', value: 1800000, contracts: 12 },
+                      { month: 'Oct', value: 2200000, contracts: 15 },
+                      { month: 'Nov', value: 2500000, contracts: 18 },
+                      { month: 'Dec', value: 2800000, contracts: 20 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip formatter={(value, name) => [
+                        name === 'value' ? `$${value.toLocaleString()}` : value,
+                        name === 'value' ? 'Value' : 'Contracts'
+                      ]} />
+                      <Legend />
+                      <Line yAxisId="left" type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} name="Contract Value" />
+                      <Line yAxisId="right" type="monotone" dataKey="contracts" stroke="#82ca9d" strokeWidth={2} name="Number of Contracts" />
+                    </RechartsLineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Budgets Tab */}
@@ -773,36 +1145,563 @@ export default function ProcurementPage() {
           </Card>
         </TabsContent>
 
-        {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-4">
+        {/* Risk Management Tab */}
+        <TabsContent value="risk-management" className="space-y-6">
+          {/* Risk Management Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Risk Management</h2>
+              <p className="text-muted-foreground">Supplier risk assessment and monitoring</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Export Risk Report
+              </Button>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                New Assessment
+              </Button>
+            </div>
+          </div>
+
+          {/* Risk Overview Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Assessments</CardTitle>
+                <FileText className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">24</div>
+                <p className="text-xs text-muted-foreground">+3 this month</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Critical Risk</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">3</div>
+                <p className="text-xs text-muted-foreground">Requires immediate attention</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">High Risk</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-orange-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-600">7</div>
+                <p className="text-xs text-muted-foreground">Monitor closely</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Overdue Assessments</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">5</div>
+                <p className="text-xs text-muted-foreground">Need immediate review</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Risk Assessment Table */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Analytics</CardTitle>
-                  <CardDescription>Procurement insights and reporting</CardDescription>
+                  <CardTitle>Risk Assessments</CardTitle>
+                  <CardDescription>Current supplier risk assessment status</CardDescription>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Button variant="outline">
-                    <Download className="mr-2 h-4 w-4" />
-                    Export Report
+                  <Input placeholder="Search assessments..." className="w-64" />
+                  <Button variant="outline" size="sm">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filter
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <BarChart3 className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-2 text-sm font-semibold">Analytics Dashboard</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  View procurement analytics and insights.
-                </p>
-                <div className="mt-6">
-                  <Button>
-                    <BarChart3 className="mr-2 h-4 w-4" />
-                    View Analytics
-                  </Button>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2">Supplier</th>
+                      <th className="text-left py-2">Risk Level</th>
+                      <th className="text-left py-2">Risk Score</th>
+                      <th className="text-left py-2">Last Assessment</th>
+                      <th className="text-left py-2">Next Due</th>
+                      <th className="text-left py-2">Status</th>
+                      <th className="text-left py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b">
+                      <td className="py-2">TechCorp Inc.</td>
+                      <td className="py-2">
+                        <Badge variant="destructive">Critical</Badge>
+                      </td>
+                      <td className="py-2">92</td>
+                      <td className="py-2">2024-01-15</td>
+                      <td className="py-2">2024-02-15</td>
+                      <td className="py-2">
+                        <Badge variant="outline">Under Review</Badge>
+                      </td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">OfficeMax Pro</td>
+                      <td className="py-2">
+                        <Badge variant="secondary">High</Badge>
+                      </td>
+                      <td className="py-2">75</td>
+                      <td className="py-2">2024-01-10</td>
+                      <td className="py-2">2024-02-10</td>
+                      <td className="py-2">
+                        <Badge variant="default">Approved</Badge>
+                      </td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">Furniture World</td>
+                      <td className="py-2">
+                        <Badge variant="outline">Medium</Badge>
+                      </td>
+                      <td className="py-2">45</td>
+                      <td className="py-2">2024-01-05</td>
+                      <td className="py-2">2024-04-05</td>
+                      <td className="py-2">
+                        <Badge variant="default">Approved</Badge>
+                      </td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">Service Solutions</td>
+                      <td className="py-2">
+                        <Badge variant="secondary">High</Badge>
+                      </td>
+                      <td className="py-2">68</td>
+                      <td className="py-2">2023-12-20</td>
+                      <td className="py-2">2024-01-20</td>
+                      <td className="py-2">
+                        <Badge variant="destructive">Overdue</Badge>
+                      </td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-2">Maintenance Plus</td>
+                      <td className="py-2">
+                        <Badge className="bg-green-100 text-green-800">Low</Badge>
+                      </td>
+                      <td className="py-2">25</td>
+                      <td className="py-2">2024-01-12</td>
+                      <td className="py-2">2024-07-12</td>
+                      <td className="py-2">
+                        <Badge variant="default">Approved</Badge>
+                      </td>
+                      <td className="py-2">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Risk Trends Chart */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Risk Level Distribution</CardTitle>
+                <CardDescription>Current distribution of supplier risk levels</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={[
+                          { name: 'Low Risk', value: 8, fill: '#22c55e' },
+                          { name: 'Medium Risk', value: 6, fill: '#eab308' },
+                          { name: 'High Risk', value: 7, fill: '#f97316' },
+                          { name: 'Critical Risk', value: 3, fill: '#ef4444' }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {[
+                          { name: 'Low Risk', value: 8, fill: '#22c55e' },
+                          { name: 'Medium Risk', value: 6, fill: '#eab308' },
+                          { name: 'High Risk', value: 7, fill: '#f97316' },
+                          { name: 'Critical Risk', value: 3, fill: '#ef4444' }
+                        ].map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => [value, '']} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Risk Trends Over Time</CardTitle>
+                <CardDescription>Risk assessment trends over the past 6 months</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsLineChart data={[
+                      { month: 'Jul', critical: 1, high: 5, medium: 8, low: 6 },
+                      { month: 'Aug', critical: 2, high: 6, medium: 7, low: 5 },
+                      { month: 'Sep', critical: 1, high: 4, medium: 9, low: 6 },
+                      { month: 'Oct', critical: 3, high: 5, medium: 8, low: 4 },
+                      { month: 'Nov', critical: 2, high: 6, medium: 7, low: 5 },
+                      { month: 'Dec', critical: 3, high: 7, medium: 6, low: 8 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="critical" stroke="#ef4444" strokeWidth={2} name="Critical" />
+                      <Line type="monotone" dataKey="high" stroke="#f97316" strokeWidth={2} name="High" />
+                      <Line type="monotone" dataKey="medium" stroke="#eab308" strokeWidth={2} name="Medium" />
+                      <Line type="monotone" dataKey="low" stroke="#22c55e" strokeWidth={2} name="Low" />
+                    </RechartsLineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Analytics Tab */}
+        <TabsContent value="analytics" className="space-y-6">
+          {/* Analytics Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Analytics Dashboard</h2>
+              <p className="text-muted-foreground">Procurement insights and performance metrics</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Export Report
+              </Button>
+            </div>
+          </div>
+
+          {/* Key Metrics Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Spend</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">$2,450,000</div>
+                <p className="text-xs text-muted-foreground">+12% from last month</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Suppliers</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">156</div>
+                <p className="text-xs text-muted-foreground">+8 new this month</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Approval Rate</CardTitle>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">94.2%</div>
+                <p className="text-xs text-muted-foreground">+2.1% from last month</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Budget Utilization</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">78.5%</div>
+                <p className="text-xs text-muted-foreground">$1,925,000 of $2,450,000</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts Grid */}
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Spend Trends Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Spend Trends</CardTitle>
+                <CardDescription>Monthly procurement spending over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsLineChart data={[
+                      { month: 'Jan', spend: 180000, budget: 200000 },
+                      { month: 'Feb', spend: 220000, budget: 200000 },
+                      { month: 'Mar', spend: 195000, budget: 200000 },
+                      { month: 'Apr', spend: 240000, budget: 200000 },
+                      { month: 'May', spend: 210000, budget: 200000 },
+                      { month: 'Jun', spend: 260000, budget: 200000 },
+                      { month: 'Jul', spend: 230000, budget: 200000 },
+                      { month: 'Aug', spend: 280000, budget: 200000 },
+                      { month: 'Sep', spend: 250000, budget: 200000 },
+                      { month: 'Oct', spend: 290000, budget: 200000 },
+                      { month: 'Nov', spend: 270000, budget: 200000 },
+                      { month: 'Dec', spend: 320000, budget: 200000 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
+                      <Legend />
+                      <Line type="monotone" dataKey="spend" stroke="#8884d8" strokeWidth={2} name="Actual Spend" />
+                      <Line type="monotone" dataKey="budget" stroke="#82ca9d" strokeWidth={2} name="Budget" />
+                    </RechartsLineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Category Distribution Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Spend by Category</CardTitle>
+                <CardDescription>Procurement spending distribution by category</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={[
+                          { name: 'IT Equipment', value: 450000, fill: '#8884d8' },
+                          { name: 'Office Supplies', value: 180000, fill: '#82ca9d' },
+                          { name: 'Furniture', value: 320000, fill: '#ffc658' },
+                          { name: 'Services', value: 280000, fill: '#ff7300' },
+                          { name: 'Maintenance', value: 150000, fill: '#00ff00' },
+                          { name: 'Marketing', value: 200000, fill: '#ff00ff' },
+                          { name: 'Other', value: 870000, fill: '#0088fe' }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {[
+                          { name: 'IT Equipment', value: 450000, fill: '#8884d8' },
+                          { name: 'Office Supplies', value: 180000, fill: '#82ca9d' },
+                          { name: 'Furniture', value: 320000, fill: '#ffc658' },
+                          { name: 'Services', value: 280000, fill: '#ff7300' },
+                          { name: 'Maintenance', value: 150000, fill: '#00ff00' },
+                          { name: 'Marketing', value: 200000, fill: '#ff00ff' },
+                          { name: 'Other', value: 870000, fill: '#0088fe' }
+                        ].map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Supplier Performance Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Suppliers by Spend</CardTitle>
+                <CardDescription>Leading suppliers by procurement volume</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsBarChart data={[
+                      { name: 'TechCorp Inc.', spend: 450000, orders: 45 },
+                      { name: 'OfficeMax Pro', spend: 380000, orders: 32 },
+                      { name: 'Furniture World', spend: 320000, orders: 18 },
+                      { name: 'Service Solutions', spend: 280000, orders: 25 },
+                      { name: 'Maintenance Plus', spend: 150000, orders: 12 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
+                      <Legend />
+                      <Bar dataKey="spend" fill="#8884d8" name="Spend Amount" />
+                    </RechartsBarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Department Performance Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Department Performance</CardTitle>
+                <CardDescription>Procurement activity by department</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsBarChart data={[
+                      { department: 'IT', requests: 45, spend: 650000, avgValue: 14444 },
+                      { department: 'HR', requests: 28, spend: 180000, avgValue: 6429 },
+                      { department: 'Finance', requests: 32, spend: 220000, avgValue: 6875 },
+                      { department: 'Operations', requests: 38, spend: 420000, avgValue: 11053 },
+                      { department: 'Marketing', requests: 25, spend: 150000, avgValue: 6000 },
+                      { department: 'Sales', requests: 30, spend: 280000, avgValue: 9333 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="department" />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip formatter={(value, name) => [
+                        name === 'spend' ? `$${value.toLocaleString()}` : value,
+                        name === 'spend' ? 'Spend' : name === 'requests' ? 'Requests' : 'Avg Value'
+                      ]} />
+                      <Legend />
+                      <Bar yAxisId="left" dataKey="requests" fill="#8884d8" name="Requests" />
+                      <Bar yAxisId="right" dataKey="spend" fill="#82ca9d" name="Spend" />
+                    </RechartsBarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Performance Metrics Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Supplier Performance Metrics</CardTitle>
+              <CardDescription>Key performance indicators for top suppliers</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2">Supplier</th>
+                      <th className="text-left py-2">On-Time Delivery</th>
+                      <th className="text-left py-2">Quality Rating</th>
+                      <th className="text-left py-2">Cost Performance</th>
+                      <th className="text-left py-2">SPI Score</th>
+                      <th className="text-left py-2">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b">
+                      <td className="py-2">TechCorp Inc.</td>
+                      <td className="py-2">98.5%</td>
+                      <td className="py-2">4.8/5</td>
+                      <td className="py-2">Excellent</td>
+                      <td className="py-2">94.2</td>
+                      <td className="py-2"><Badge variant="default">Preferred</Badge></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">OfficeMax Pro</td>
+                      <td className="py-2">95.2%</td>
+                      <td className="py-2">4.6/5</td>
+                      <td className="py-2">Good</td>
+                      <td className="py-2">89.7</td>
+                      <td className="py-2"><Badge variant="secondary">Active</Badge></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">Furniture World</td>
+                      <td className="py-2">92.8%</td>
+                      <td className="py-2">4.4/5</td>
+                      <td className="py-2">Good</td>
+                      <td className="py-2">86.3</td>
+                      <td className="py-2"><Badge variant="secondary">Active</Badge></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2">Service Solutions</td>
+                      <td className="py-2">89.1%</td>
+                      <td className="py-2">4.2/5</td>
+                      <td className="py-2">Fair</td>
+                      <td className="py-2">82.1</td>
+                      <td className="py-2"><Badge variant="outline">Under Review</Badge></td>
+                    </tr>
+                    <tr>
+                      <td className="py-2">Maintenance Plus</td>
+                      <td className="py-2">96.7%</td>
+                      <td className="py-2">4.7/5</td>
+                      <td className="py-2">Excellent</td>
+                      <td className="py-2">91.8</td>
+                      <td className="py-2"><Badge variant="default">Preferred</Badge></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>

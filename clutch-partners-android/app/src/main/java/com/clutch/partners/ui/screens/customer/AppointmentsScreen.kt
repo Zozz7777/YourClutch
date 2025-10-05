@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -50,19 +50,18 @@ fun AppointmentsScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Appointment Management",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Appointment Management",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Manage customer appointments and bookings",
+                            text = "Schedule and manage customer appointments",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -73,18 +72,26 @@ fun AppointmentsScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "Today",
+                            title = "Today's Appointments",
                             value = "8",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
-                            title = "This Week",
-                            value = "24",
-                            color = MaterialTheme.colorScheme.tertiary
+                            title = "Pending",
+                            value = "12",
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -95,18 +102,26 @@ fun AppointmentsScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
-                        StatCard(
-                            title = "Pending",
-                            value = "3",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Completed",
-                            value = "15",
-                            color = MaterialTheme.colorScheme.primary
+                            value = "45",
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        StatCard(
+                            title = "Cancelled",
+                            value = "3",
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -114,7 +129,7 @@ fun AppointmentsScreen(navController: NavController) {
             
             item {
                 Text(
-                    "Today's Appointments",
+                    "Upcoming Appointments",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -131,49 +146,55 @@ fun AppointmentsScreen(navController: NavController) {
 fun AppointmentCard(appointment: Appointment) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = appointment.customerName,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = appointment.service,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = appointment.vehicle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = appointment.time,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Service: ${appointment.service}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = appointment.status,
+                    text = "Status: ${appointment.status}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = when (appointment.status) {
-                        "Scheduled" -> MaterialTheme.colorScheme.primary
-                        "In Progress" -> MaterialTheme.colorScheme.tertiary
-                        "Completed" -> MaterialTheme.colorScheme.primary
-                        "Cancelled" -> MaterialTheme.colorScheme.error
-                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = appointment.date,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -184,14 +205,15 @@ data class Appointment(
     val id: String,
     val customerName: String,
     val service: String,
-    val vehicle: String,
+    val date: String,
     val time: String,
     val status: String
 )
 
 val sampleAppointments = listOf(
-    Appointment("A001", "John Smith", "Oil Change", "2020 Honda Civic", "9:00 AM", "Scheduled"),
-    Appointment("A002", "Sarah Johnson", "Brake Inspection", "2019 Toyota Camry", "10:30 AM", "In Progress"),
-    Appointment("A003", "Mike Davis", "Tire Rotation", "2021 Ford F-150", "2:00 PM", "Scheduled"),
-    Appointment("A004", "Lisa Wilson", "Engine Diagnostic", "2018 BMW X3", "3:30 PM", "Completed")
+    Appointment("1", "John Smith", "iPhone Screen Repair", "2024-01-15", "10:00 AM", "Scheduled"),
+    Appointment("2", "Sarah Johnson", "Battery Replacement", "2024-01-15", "2:00 PM", "Confirmed"),
+    Appointment("3", "Mike Davis", "Software Update", "2024-01-16", "9:30 AM", "Pending"),
+    Appointment("4", "Lisa Wilson", "Water Damage Repair", "2024-01-16", "11:00 AM", "Scheduled"),
+    Appointment("5", "David Brown", "Screen Replacement", "2024-01-17", "3:00 PM", "Confirmed")
 )

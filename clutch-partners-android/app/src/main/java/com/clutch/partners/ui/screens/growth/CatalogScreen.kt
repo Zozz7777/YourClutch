@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +28,13 @@ fun CatalogScreen(navController: NavController) {
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { /* TODO: Add new product */ }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Product")
+            }
         }
     ) { paddingValues ->
         LazyColumn(
@@ -42,19 +50,18 @@ fun CatalogScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "Product Catalog",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "Product Catalog",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Browse and manage product catalog",
+                            text = "Manage your product catalog and offerings",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -65,18 +72,26 @@ fun CatalogScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Total Products",
-                            value = "1,245",
+                            value = "156",
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Expanded {
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         StatCard(
                             title = "Categories",
                             value = "12",
-                            color = MaterialTheme.colorScheme.tertiary
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -84,78 +99,69 @@ fun CatalogScreen(navController: NavController) {
             
             item {
                 Text(
-                    "Featured Products",
+                    "Product Categories",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
             }
             
-            items(sampleProducts) { product ->
-                ProductCard(product = product)
+            items(sampleCategories) { category ->
+                CategoryCard(category = category)
             }
         }
     }
 }
 
 @Composable
-fun ProductCard(product: Product) {
+fun CategoryCard(category: ProductCategory) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = product.name,
+                    text = category.name,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = product.category,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = product.supplier,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "$${product.price}",
+                    text = "${category.productCount} products",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    text = "Stock: ${product.stock}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = category.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
 
-data class Product(
+data class ProductCategory(
     val id: String,
     val name: String,
-    val category: String,
-    val supplier: String,
-    val price: Double,
-    val stock: Int
+    val description: String,
+    val productCount: Int
 )
 
-val sampleProducts = listOf(
-    Product("P001", "Brake Pads Set", "Brakes", "Auto Parts Supply", 45.99, 25),
-    Product("P002", "Oil Filter", "Filters", "Filter Solutions", 12.50, 8),
-    Product("P003", "Air Filter", "Filters", "Filter Solutions", 18.75, 0),
-    Product("P004", "Spark Plugs Set", "Ignition", "Engine Parts Co", 8.99, 5)
+val sampleCategories = listOf(
+    ProductCategory("1", "Smartphones", "Mobile phones and accessories", 45),
+    ProductCategory("2", "Laptops", "Laptop computers and components", 32),
+    ProductCategory("3", "Tablets", "Tablet devices and accessories", 28),
+    ProductCategory("4", "Accessories", "Cases, chargers, and other accessories", 51)
 )

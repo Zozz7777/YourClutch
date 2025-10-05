@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.clutch.partners.ui.components.StatCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +28,13 @@ fun POSScreen(navController: NavController) {
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { /* TODO: Start new sale */ }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "New Sale")
+            }
         }
     ) { paddingValues ->
         LazyColumn(
@@ -42,52 +50,49 @@ fun POSScreen(navController: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            "POS System",
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = "POS Dashboard",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Record sales, process refunds, and manage transactions",
+                            text = "Manage sales and transactions",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
             
             item {
-                Text(
-                    "Quick Actions",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            
-            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
-                        Button(
-                            onClick = { /* TODO: Navigate to record sale */ },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Record Sale")
-                        }
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        StatCard(
+                            title = "Today's Sales",
+                            value = "$2,450",
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
-                    Expanded {
-                        Button(
-                            onClick = { /* TODO: Navigate to process refund */ },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Process Refund")
-                        }
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        StatCard(
+                            title = "Transactions",
+                            value = "23",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
                     }
                 }
             }
@@ -97,21 +102,27 @@ fun POSScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Expanded {
-                        Button(
-                            onClick = { /* TODO: Navigate to split payment */ },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Split Payment")
-                        }
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        StatCard(
+                            title = "Average Sale",
+                            value = "$106.52",
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
                     }
-                    Expanded {
-                        Button(
-                            onClick = { /* TODO: Navigate to close shift */ },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Close Shift")
-                        }
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        StatCard(
+                            title = "Top Product",
+                            value = "iPhone 15",
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
@@ -135,53 +146,61 @@ fun POSScreen(navController: NavController) {
 fun TransactionCard(transaction: Transaction) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = "Transaction #${transaction.id}",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = transaction.customerName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = "$${transaction.amount}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    text = transaction.time,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Customer: ${transaction.customer}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = "Time: ${transaction.time}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
 
 data class Transaction(
     val id: String,
-    val customerName: String,
+    val customer: String,
     val amount: Double,
     val time: String
 )
 
 val sampleTransactions = listOf(
-    Transaction("T001", "John Smith", 150.00, "2:30 PM"),
-    Transaction("T002", "Sarah Johnson", 275.50, "1:15 PM"),
-    Transaction("T003", "Mike Davis", 89.99, "11:45 AM")
+    Transaction("001", "John Doe", 299.99, "2:30 PM"),
+    Transaction("002", "Jane Smith", 149.99, "2:15 PM"),
+    Transaction("003", "Mike Johnson", 89.99, "1:45 PM"),
+    Transaction("004", "Sarah Wilson", 199.99, "1:30 PM"),
+    Transaction("005", "David Brown", 79.99, "1:15 PM")
 )
