@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { apiService } from '@/lib/api';
+import { toast } from 'sonner';
 import { 
   ShoppingCart, 
   Users, 
@@ -197,85 +199,39 @@ export default function ProcurementPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock data for demonstration
+  // Load real data from API
   useEffect(() => {
-    const mockDashboardData: DashboardData = {
-      overview: {
-        totalRequests: 156,
-        approvedRequests: 142,
-        pendingRequests: 14,
-        totalSpend: 2450000,
-        totalSuppliers: 89,
-        activeSuppliers: 76,
-        totalContracts: 23,
-        activeContracts: 18,
-        totalBudget: 5000000,
-        spentBudget: 2450000,
-        availableBudget: 2550000,
-        budgetUtilization: 49
-      },
-      metrics: {
-        approvalRate: 91,
-        averageRequestValue: 15705,
-        supplierUtilization: 85,
-        contractUtilization: 78
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch procurement data from backend
+        const [dashboardResponse, requestsResponse, suppliersResponse] = await Promise.all([
+          apiService.get('/procurement/dashboard'),
+          apiService.get('/procurement'),
+          apiService.get('/procurement-suppliers')
+        ]);
+
+        if (dashboardResponse.success && dashboardResponse.data) {
+          setDashboardData(dashboardResponse.data);
+        }
+
+        if (requestsResponse.success && requestsResponse.data) {
+          setRequests(requestsResponse.data);
+        }
+
+        if (suppliersResponse.success && suppliersResponse.data) {
+          setSuppliers(suppliersResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching procurement data:', error);
+        toast.error('Failed to load procurement data');
+      } finally {
+        setLoading(false);
       }
     };
 
-    const mockRequests: ProcurementRequest[] = [
-      {
-        id: '1',
-        requestNumber: 'REQ-2024-001',
-        requestedBy: 'John Smith',
-        department: 'IT',
-        totalAmount: 15000,
-        status: 'pending_approval',
-        createdAt: '2024-01-15',
-        items: [
-          { itemName: 'Laptop', quantity: 5, unitPrice: 3000, totalPrice: 15000, category: 'IT Equipment' }
-        ]
-      },
-      {
-        id: '2',
-        requestNumber: 'REQ-2024-002',
-        requestedBy: 'Sarah Johnson',
-        department: 'Marketing',
-        totalAmount: 8500,
-        status: 'approved',
-        createdAt: '2024-01-14',
-        items: [
-          { itemName: 'Marketing Materials', quantity: 100, unitPrice: 85, totalPrice: 8500, category: 'Marketing' }
-        ]
-      }
-    ];
-
-    const mockSuppliers: Supplier[] = [
-      {
-        id: '1',
-        supplierName: 'Tech Solutions Ltd',
-        contactInfo: {
-          primaryContact: {
-            name: 'Mike Wilson',
-            email: 'mike@techsolutions.com',
-            phone: '+1-555-0123'
-          }
-        },
-        performance: {
-          overallSPI: 92,
-          deliveryScore: 95,
-          qualityScore: 88,
-          complianceScore: 93
-        },
-        risk: { riskLevel: 'low' },
-        status: { isActive: true, isPreferred: true },
-        productCategories: ['IT Equipment', 'Software']
-      }
-    ];
-
-    setDashboardData(mockDashboardData);
-    setRequests(mockRequests);
-    setSuppliers(mockSuppliers);
-    setLoading(false);
+    fetchData();
   }, []);
 
   const getStatusColor = (status: string) => {
@@ -379,7 +335,7 @@ export default function ProcurementPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      ${dashboardData.overview.totalSpend.toLocaleString()}
+                      EGP {dashboardData.overview.totalSpend.toLocaleString()}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       This month
@@ -406,7 +362,7 @@ export default function ProcurementPage() {
                   <CardContent>
                     <div className="text-2xl font-bold">{dashboardData.overview.budgetUtilization}%</div>
                     <p className="text-xs text-muted-foreground">
-                      ${dashboardData.overview.availableBudget.toLocaleString()} available
+                      EGP {dashboardData.overview.availableBudget.toLocaleString()} available
                     </p>
                   </CardContent>
                 </Card>
@@ -555,7 +511,7 @@ export default function ProcurementPage() {
                       </div>
                       <div className="mt-2">
                         <p className="text-sm text-muted-foreground">
-                          {request.items.length} items • ${request.totalAmount.toLocaleString()}
+                          {request.items.length} items • EGP {request.totalAmount.toLocaleString()}
                         </p>
                       </div>
                     </div>

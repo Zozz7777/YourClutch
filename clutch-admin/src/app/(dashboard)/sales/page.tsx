@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { Plus, Search, Filter, Download, Upload, Eye, Edit, Trash2, CheckCircle, XCircle, Clock, FileText, Users, Building2, MapPin, Phone, Mail, Calendar, AlertCircle } from "lucide-react";
 import { apiService } from "@/lib/api";
 import { toast } from "sonner";
