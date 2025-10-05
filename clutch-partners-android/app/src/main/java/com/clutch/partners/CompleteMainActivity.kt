@@ -77,6 +77,17 @@ fun MainScreen() {
     var currentScreen by remember { mutableStateOf("splash") }
     var selectedPartnerType by remember { mutableStateOf<com.clutch.partners.ui.screens.PartnerType?>(null) }
     
+    fun navigateBack() {
+        when (currentScreen) {
+            "signup", "request", "signin" -> currentScreen = "auth"
+            "auth" -> currentScreen = "partnerType"
+            "partnerType" -> currentScreen = "onboarding"
+            "onboarding" -> currentScreen = "splash"
+            "kyc" -> currentScreen = "auth"
+            else -> {}
+        }
+    }
+    
     when (currentScreen) {
         "splash" -> SplashScreen(
             onSplashComplete = { currentScreen = "onboarding" }
@@ -92,13 +103,20 @@ fun MainScreen() {
         )
         "auth" -> AuthScreen(
             onSignUpClick = { currentScreen = "signup" },
-            onRequestToJoinClick = { currentScreen = "request" }
+            onRequestToJoinClick = { currentScreen = "request" },
+            onSignInClick = { currentScreen = "signin" }
         )
         "signup" -> SignUpForm(
-            onAuthenticated = { currentScreen = "kyc" }
+            onAuthenticated = { currentScreen = "kyc" },
+            onBackClick = { navigateBack() }
         )
         "request" -> RequestToJoinForm(
-            onAuthenticated = { currentScreen = "kyc" }
+            onAuthenticated = { currentScreen = "kyc" },
+            onBackClick = { navigateBack() }
+        )
+        "signin" -> SignInForm(
+            onAuthenticated = { currentScreen = "main" },
+            onBackClick = { navigateBack() }
         )
         "kyc" -> KYCVerificationScreen(
             onVerificationComplete = { currentScreen = "main" }
@@ -368,7 +386,8 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
 @Composable
 fun AuthScreen(
     onSignUpClick: () -> Unit,
-    onRequestToJoinClick: () -> Unit
+    onRequestToJoinClick: () -> Unit,
+    onSignInClick: () -> Unit
 ) {
     val context = LocalContext.current
     val isRTL = LanguageManager.isRTL(context)
@@ -486,7 +505,7 @@ fun AuthScreen(
                     textAlign = TextAlign.Center
                 )
                 
-                TextButton(onClick = { /* TODO: Add sign in */ }) {
+                TextButton(onClick = onSignInClick) {
                     Text(
                         text = if (isRTL) "تسجيل الدخول" else "Sign In",
                         color = PartnersBlue,
@@ -499,7 +518,7 @@ fun AuthScreen(
 }
 
 @Composable
-fun SignUpForm(onAuthenticated: () -> Unit) {
+fun SignUpForm(onAuthenticated: () -> Unit, onBackClick: () -> Unit) {
     var partnerId by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -524,7 +543,7 @@ fun SignUpForm(onAuthenticated: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* TODO: Navigate back */ }) {
+                IconButton(onClick = onBackClick) {
                     Icon(
                         Icons.Default.ArrowBack,
                         contentDescription = "Back",
@@ -701,7 +720,198 @@ fun SignUpForm(onAuthenticated: () -> Unit) {
 }
 
 @Composable
-fun RequestToJoinForm(onAuthenticated: () -> Unit) {
+fun SignInForm(onAuthenticated: () -> Unit, onBackClick: () -> Unit) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    val authViewModel: AuthViewModel = viewModel()
+    val authState by authViewModel.authState.collectAsState()
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = if (isRTL) DarkForeground else LightForeground
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (isRTL) "تسجيل الدخول" else "Sign In",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isRTL) DarkForeground else LightForeground
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // Form
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isRTL) DarkCard else LightCard
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp)
+                ) {
+                    Text(
+                        text = if (isRTL) "تسجيل الدخول إلى حسابك" else "Sign in to your account",
+                        fontSize = 16.sp,
+                        color = if (isRTL) DarkMutedForeground else LightMutedForeground,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text(if (isRTL) "البريد الإلكتروني" else "Email") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PartnersBlue,
+                            unfocusedBorderColor = if (isRTL) DarkBorder else LightBorder
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text(if (isRTL) "كلمة المرور" else "Password") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PartnersBlue,
+                            unfocusedBorderColor = if (isRTL) DarkBorder else LightBorder
+                        ),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                )
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Forgot Password
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = { /* TODO: Add forgot password */ }) {
+                            Text(
+                                text = if (isRTL) "نسيت كلمة المرور؟" else "Forgot Password?",
+                                color = PartnersBlue,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    LaunchedEffect(authState) {
+                        when (authState) {
+                            is AuthState.Success -> {
+                                onAuthenticated()
+                            }
+                            else -> {}
+                        }
+                    }
+
+                    Button(
+                        onClick = {
+                            if (email.isNotEmpty() && password.isNotEmpty()) {
+                                authViewModel.signIn(email, password)
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PartnersBlue),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = authState !is AuthState.Loading
+                    ) {
+                        if (authState is AuthState.Loading) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        } else {
+                            Text(
+                                text = if (isRTL) "تسجيل الدخول" else "Sign In",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+            }
+            
+            // Show error message if any
+            val currentAuthState = authState
+            when (currentAuthState) {
+                is AuthState.Error -> {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = LightDestructive.copy(alpha = 0.1f)
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = currentAuthState.message,
+                            color = LightDestructive,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+}
+
+@Composable
+fun RequestToJoinForm(onAuthenticated: () -> Unit, onBackClick: () -> Unit) {
     var businessName by remember { mutableStateOf("") }
     var ownerName by remember { mutableStateOf("") }
     var emailOrPhone by remember { mutableStateOf("") }
@@ -726,7 +936,7 @@ fun RequestToJoinForm(onAuthenticated: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* TODO: Navigate back */ }) {
+                IconButton(onClick = onBackClick) {
                     Icon(
                         Icons.Default.ArrowBack,
                         contentDescription = "Back",
@@ -1000,6 +1210,206 @@ fun MainAppScreen() {
 }
 
 @Composable
+fun HomeScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "الصفحة الرئيسية" else "Home",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
+
+@Composable
+fun BusinessDashboardScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "لوحة التحكم" else "Dashboard",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
+
+@Composable
+fun PaymentsScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "المدفوعات" else "Payments",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
+
+@Composable
+fun NotificationsScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "الإشعارات" else "Notifications",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
+
+@Composable
+fun SupportScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "الدعم" else "Support",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
+
+@Composable
+fun AuditLogScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "سجل التدقيق" else "Audit Log",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
+
+@Composable
+fun WarrantyDisputesScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "الضمان والنزاعات" else "Warranty & Disputes",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
+
+@Composable
+fun DataExportScreen() {
+    val context = LocalContext.current
+    val isRTL = LanguageManager.isRTL(context)
+    val layoutDirection = if (isRTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "تصدير البيانات" else "Data Export",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
+
+@Composable
 fun StoreSettingsScreen() {
     val context = LocalContext.current
     val isRTL = LanguageManager.isRTL(context)
@@ -1007,6 +1417,22 @@ fun StoreSettingsScreen() {
     
     CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isRTL) DarkBackground else LightBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isRTL) "إعدادات المتجر" else "Store Settings",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isRTL) DarkForeground else LightForeground
+            )
+        }
+    }
+}
             modifier = Modifier
                 .fillMaxSize()
                 .background(if (isRTL) DarkBackground else LightBackground)

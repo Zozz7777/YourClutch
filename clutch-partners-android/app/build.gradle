@@ -6,6 +6,8 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'kotlinx-serialization'
     id 'com.google.devtools.ksp'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -146,6 +148,16 @@ dependencies {
     // Animation - Latest
     implementation 'androidx.compose.animation:animation:1.7.6'
     implementation 'androidx.compose.animation:animation-graphics:1.7.6'
+    
+    // Firebase - Latest
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-crashlytics'
+    
+    // Barcode Scanning
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation 'com.google.zxing:core:3.5.2'
     
     // Testing - Latest
     testImplementation 'junit:junit:4.13.2'

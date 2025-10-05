@@ -74,7 +74,10 @@
     "sort": "Sort",
     "export": "Export",
     "import": "Import",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "ok": "OK",
+    "connectionSuccess": "Connection successful",
+    "connectionFailed": "Connection failed"
   },
   "status": {
     "connected": "Connected to server",

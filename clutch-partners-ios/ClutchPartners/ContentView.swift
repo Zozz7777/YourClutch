@@ -1,22 +1,14 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var authService = AuthService()
-    
     var body: some View {
-        Group {
-            if authService.isAuthenticated {
-                DashboardView()
-                    .environmentObject(authService)
-            } else {
-                SplashView()
-                    .environmentObject(authService)
-            }
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello, world!")
         }
-        .onAppear {
-            // Check if user is already authenticated
-            authService.checkAuthenticationStatus()
-        }
+        .padding()
     }
 }
 

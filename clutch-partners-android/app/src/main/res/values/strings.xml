@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Clutch Partners</string>
+    <string name="notifications_title">Notifications</string>
     <string name="default_notification_channel_id">clutch_partners_channel</string>
     
     <!-- Navigation -->

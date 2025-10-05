@@ -74,7 +74,10 @@
     "sort": "ترتيب",
     "export": "تصدير",
     "import": "استيراد",
-    "refresh": "تحديث"
+    "refresh": "تحديث",
+    "ok": "موافق",
+    "connectionSuccess": "تم الاتصال بنجاح",
+    "connectionFailed": "فشل في الاتصال"
   },
   "status": {
     "connected": "متصل بالخادم",

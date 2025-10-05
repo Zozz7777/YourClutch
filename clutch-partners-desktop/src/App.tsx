@@ -12,7 +12,11 @@ import {
   Loader2,
   Globe,
   Menu,
-  X
+  X,
+  AlertCircle,
+  AlertTriangle,
+  Info,
+  CheckCircle2
 } from 'lucide-react'
 import { i18n, type Language } from './i18n'
 
@@ -36,6 +40,13 @@ interface Sale {
   timestamp: string
 }
 
+interface PopupMessage {
+  type: 'success' | 'error' | 'warning' | 'info'
+  title: string
+  message: string
+  show: boolean
+}
+
 function App() {
   const [currentTab, setCurrentTab] = useState('auth')
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking')
@@ -45,6 +56,12 @@ function App() {
   const [message, setMessage] = useState('')
   const [language, setLanguage] = useState<Language>('ar')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [popup, setPopup] = useState<PopupMessage>({
+    type: 'info',
+    title: '',
+    message: '',
+    show: false
+  })
 
   // Form states
   const [partnerId, setPartnerId] = useState('')
@@ -75,9 +92,11 @@ function App() {
       const result = await invoke<string>('test_connection')
       setMessage(result)
       setConnectionStatus('connected')
+      showPopup('success', t.common.connectionSuccess, result)
     } catch (error) {
       setMessage(`Connection failed: ${error}`)
       setConnectionStatus('disconnected')
+      showPopup('error', t.common.connectionFailed, `فشل في الاتصال: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -85,7 +104,7 @@ function App() {
 
   const validatePartnerId = async () => {
     if (!partnerId.trim()) {
-      setMessage(i18n.t().auth.validationFailed)
+      showPopup('warning', t.auth.validationFailed, 'يرجى إدخال معرف الشريك')
       return
     }
 
@@ -93,8 +112,10 @@ function App() {
       setLoading(true)
       const result = await invoke<string>('validate_partner_id', { partnerId })
       setMessage(i18n.t().auth.validationSuccess)
+      showPopup('success', t.auth.validationSuccess, 'تم التحقق من معرف الشريك بنجاح')
     } catch (error) {
       setMessage(`${i18n.t().auth.validationFailed}: ${error}`)
+      showPopup('error', t.auth.validationFailed, `فشل في التحقق من معرف الشريك: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -102,7 +123,7 @@ function App() {
 
   const login = async () => {
     if (!email.trim() || !password.trim()) {
-      setMessage(i18n.t().auth.loginFailed)
+      showPopup('warning', t.auth.loginFailed, 'يرجى إدخال البريد الإلكتروني وكلمة المرور')
       return
     }
 
@@ -110,10 +131,12 @@ function App() {
       setLoading(true)
       const result = await invoke<string>('login', { email, password })
       setMessage(i18n.t().auth.loginSuccess)
+      showPopup('success', t.auth.loginSuccess, 'تم تسجيل الدخول بنجاح')
       setCurrentTab('main')
       loadProducts()
     } catch (error) {
       setMessage(`${i18n.t().auth.loginFailed}: ${error}`)
+      showPopup('error', t.auth.loginFailed, `فشل في تسجيل الدخول: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -130,7 +153,7 @@ function App() {
 
   const addProduct = async () => {
     if (!productForm.sku.trim() || !productForm.name.trim()) {
-      setMessage('Please enter SKU and name')
+      showPopup('warning', t.inventory.addProduct, 'يرجى إدخال رمز المنتج والاسم')
       return
     }
 
@@ -145,10 +168,12 @@ function App() {
         barcode: productForm.barcode
       })
       setMessage('Product added successfully!')
+      showPopup('success', t.inventory.addProduct, 'تم إضافة المنتج بنجاح')
       setProductForm({ sku: '', name: '', price: 0, stock: 0, category: '', barcode: '' })
       loadProducts()
     } catch (error) {
       setMessage(`Failed to add product: ${error}`)
+      showPopup('error', t.inventory.addProduct, `فشل في إضافة المنتج: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -156,7 +181,7 @@ function App() {
 
   const processSale = async () => {
     if (!saleForm.productId.trim() || saleForm.quantity <= 0) {
-      setMessage('Please enter valid product ID and quantity')
+      showPopup('warning', t.pos.title, 'يرجى إدخال معرف المنتج والكمية الصحيحة')
       return
     }
 
@@ -168,10 +193,12 @@ function App() {
         customerName: saleForm.customerName
       })
       setMessage('Sale processed successfully!')
+      showPopup('success', t.pos.title, 'تم معالجة البيع بنجاح')
       setSaleForm({ productId: '', quantity: 1, customerName: '' })
       loadProducts()
     } catch (error) {
       setMessage(`Failed to process sale: ${error}`)
+      showPopup('error', t.pos.title, `فشل في معالجة البيع: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -182,8 +209,10 @@ function App() {
       setLoading(true)
       const result = await invoke<string>('check_for_updates')
       setMessage('Update check completed')
+      showPopup('info', t.common.checkUpdates, 'تم فحص التحديثات بنجاح')
     } catch (error) {
       setMessage(`Update check failed: ${error}`)
+      showPopup('error', t.common.checkUpdates, `فشل في فحص التحديثات: ${error}`)
     } finally {
       setLoading(false)
     }
@@ -192,6 +221,18 @@ function App() {
   const toggleLanguage = () => {
     const newLanguage = language === 'ar' ? 'en' : 'ar'
     setLanguage(newLanguage)
+  }
+
+  const showPopup = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => {
+    setPopup({ type, title, message, show: true })
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      setPopup(prev => ({ ...prev, show: false }))
+    }, 5000)
+  }
+
+  const hidePopup = () => {
+    setPopup(prev => ({ ...prev, show: false }))
   }
 
   const t = i18n.t()
@@ -593,6 +634,38 @@ function App() {
           </div>
         )}
       </div>
+
+      {/* Popup Modal */}
+      {popup.show && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                {popup.type === 'success' && <CheckCircle2 className="w-6 h-6 text-green-500" />}
+                {popup.type === 'error' && <XCircle className="w-6 h-6 text-red-500" />}
+                {popup.type === 'warning' && <AlertTriangle className="w-6 h-6 text-yellow-500" />}
+                {popup.type === 'info' && <Info className="w-6 h-6 text-blue-500" />}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {popup.title}
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  {popup.message}
+                </p>
+                <div className="flex justify-end">
+                  <button
+                    onClick={hidePopup}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    {t.common.ok}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -2,11 +2,9 @@ package com.clutch.partners.data.model
 
 data class Payment(
     val id: String,
+    val orderId: String,
     val amount: Double,
-    val currency: String,
+    val method: String,
     val status: String,
-    val createdAt: String,
-    val paidAt: String? = null,
-    val orderCount: Int,
-    val period: String
-)
+    val createdAt: Long
+) : com.clutch.partners.offline.SyncableData
