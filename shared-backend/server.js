@@ -85,6 +85,7 @@ const enterpriseRoutes = require('./routes/enterprise');
 const enterpriseAuthRoutes = require('./routes/enterpriseAuth');
 const aiRoutes = require('./routes/ai');
 const hrRoutes = require('./routes/hr');
+const careersRoutes = require('./routes/careers');
 const legalRoutes = require('./routes/legal');
 const projectsRoutes = require('./routes/projects');
 const featureFlagsRoutes = require('./routes/feature-flags');
@@ -397,7 +398,7 @@ app.use('/api/v1/procurement/analytics', require('./routes/procurement-analytics
 // app.use('/api/v1/communication', communicationRoutes); // Not defined
 // app.use('/api/v1/mobile-cms', mobileCmsRoutes); // Not defined
 // app.use('/api/v1/ops', opsRoutes); // Not defined
-// app.use('/api/v1/careers', careersRoutes); // Not defined
+app.use(`${apiPrefix}/careers`, careersRoutes);
 // All routes will be loaded dynamically - no mountings needed
 
 // All routes will be loaded dynamically - no mountings needed
