@@ -31,7 +31,7 @@ const generateMockMobileAppSettings = () => ({
 });
 
 // GET mobile app settings
-router.get('/settings', authenticateToken, checkRole(['head_administrator', 'mobile_manager', 'cms_manager']), async (req, res) => {
+router.get('/settings', authenticateToken, requirePermission('read_cms'), async (req, res) => {
   try {
     const settingsCollection = await getCollection('mobile_app_settings');
     if (!settingsCollection) {
@@ -55,7 +55,7 @@ router.get('/settings', authenticateToken, checkRole(['head_administrator', 'mob
 });
 
 // POST save mobile app settings
-router.post('/settings', authenticateToken, checkRole(['head_administrator', 'mobile_manager', 'cms_manager']), async (req, res) => {
+router.post('/settings', authenticateToken, requirePermission('read_cms'), async (req, res) => {
   try {
     const settingsCollection = await getCollection('mobile_app_settings');
     if (!settingsCollection) {
@@ -89,7 +89,7 @@ router.post('/settings', authenticateToken, checkRole(['head_administrator', 'mo
 });
 
 // GET mobile app preview
-router.get('/preview', authenticateToken, checkRole(['head_administrator', 'mobile_manager', 'cms_manager']), async (req, res) => {
+router.get('/preview', authenticateToken, requirePermission('read_cms'), async (req, res) => {
   try {
     // For now, return a mock preview URL
     // In a real implementation, this would generate a preview URL

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { getCollection } = require('../config/database');
 const PartnerFinancial = require('../models/PartnerFinancial');
 const Commission = require('../models/Commission');
@@ -16,7 +16,7 @@ const financialRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/financial/overview - Dashboard stats
-router.get('/overview', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), financialRateLimit, async (req, res) => {
+router.get('/overview', authenticateToken, requirePermission('read_financial'), financialRateLimit, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
@@ -122,7 +122,7 @@ router.get('/overview', authenticateToken, checkRole(['head_administrator', 'fin
 });
 
 // GET /api/v1/financial/partners - All partners with revenue/commission summary
-router.get('/partners', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), financialRateLimit, async (req, res) => {
+router.get('/partners', authenticateToken, requirePermission('read_financial'), financialRateLimit, async (req, res) => {
   try {
     const { page = 1, limit = 20, search = '', sortBy = 'financials.totalRevenue', sortOrder = 'desc' } = req.query;
 
@@ -169,7 +169,7 @@ router.get('/partners', authenticateToken, checkRole(['head_administrator', 'fin
 });
 
 // GET /api/v1/financial/partners/:id - Detailed partner financial breakdown
-router.get('/partners/:id', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), financialRateLimit, async (req, res) => {
+router.get('/partners/:id', authenticateToken, requirePermission('read_financial'), financialRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const { startDate, endDate } = req.query;
@@ -258,7 +258,7 @@ router.get('/partners/:id', authenticateToken, checkRole(['head_administrator', 
 });
 
 // PUT /api/v1/financial/partners/:id/commission - Update commission structure
-router.put('/partners/:id/commission', authenticateToken, checkRole(['head_administrator', 'finance_officer']), financialRateLimit, async (req, res) => {
+router.put('/partners/:id/commission', authenticateToken, requirePermission('update_financial'), financialRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const { commissionStructure, vatApplicable, vatRate, clutchMarkupStrategy, markupPercentage } = req.body;
@@ -300,7 +300,7 @@ router.put('/partners/:id/commission', authenticateToken, checkRole(['head_admin
 });
 
 // GET /api/v1/financial/commissions - List all commissions with filters
-router.get('/commissions', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), financialRateLimit, async (req, res) => {
+router.get('/commissions', authenticateToken, requirePermission('read_financial'), financialRateLimit, async (req, res) => {
   try {
     const {
       partnerId = '',
@@ -362,7 +362,7 @@ router.get('/commissions', authenticateToken, checkRole(['head_administrator', '
 });
 
 // POST /api/v1/financial/commissions/:id/pay - Mark commission as paid
-router.post('/commissions/:id/pay', authenticateToken, checkRole(['head_administrator', 'finance_officer']), financialRateLimit, async (req, res) => {
+router.post('/commissions/:id/pay', authenticateToken, requirePermission('update_financial'), financialRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const { payoutId } = req.body;
@@ -414,7 +414,7 @@ router.post('/commissions/:id/pay', authenticateToken, checkRole(['head_administ
 });
 
 // POST /api/v1/financial/payouts - Create bulk payout
-router.post('/payouts', authenticateToken, checkRole(['head_administrator', 'finance_officer']), financialRateLimit, async (req, res) => {
+router.post('/payouts', authenticateToken, requirePermission('create_financial'), financialRateLimit, async (req, res) => {
   try {
     const { partnerIds, method, scheduledDate, notes } = req.body;
 
@@ -471,7 +471,7 @@ router.post('/payouts', authenticateToken, checkRole(['head_administrator', 'fin
 });
 
 // GET /api/v1/financial/revenue-by-payment-method - Revenue breakdown
-router.get('/revenue-by-payment-method', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), financialRateLimit, async (req, res) => {
+router.get('/revenue-by-payment-method', authenticateToken, requirePermission('read_financial'), financialRateLimit, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
@@ -513,7 +513,7 @@ router.get('/revenue-by-payment-method', authenticateToken, checkRole(['head_adm
 });
 
 // GET /api/v1/financial/costs/referrals - Referral costs
-router.get('/costs/referrals', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), financialRateLimit, async (req, res) => {
+router.get('/costs/referrals', authenticateToken, requirePermission('read_financial'), financialRateLimit, async (req, res) => {
   try {
     // This would integrate with referral tracking system
     // For now, return mock data structure
@@ -540,7 +540,7 @@ router.get('/costs/referrals', authenticateToken, checkRole(['head_administrator
 });
 
 // GET /api/v1/financial/costs/promocodes - Promo code costs
-router.get('/costs/promocodes', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), financialRateLimit, async (req, res) => {
+router.get('/costs/promocodes', authenticateToken, requirePermission('read_financial'), financialRateLimit, async (req, res) => {
   try {
     // This would integrate with promo code system
     // For now, return mock data structure

@@ -9,7 +9,7 @@ const { authenticateToken, checkRole, checkPermission } = require('../middleware
 const { getCollection } = require('../config/optimized-database');
 
 // GET /api/v1/payments - Get all payments
-router.get('/', authenticateToken, checkRole(['head_administrator', 'finance_officer']), async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_payments'), async (req, res) => {
   try {
     const { page = 1, limit = 20, status, method, startDate, endDate } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -64,7 +64,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator', 'finance_off
 });
 
 // GET /api/v1/payments/:id - Get payment details
-router.get('/:id', authenticateToken, checkRole(['head_administrator', 'finance_officer']), async (req, res) => {
+router.get('/:id', authenticateToken, requirePermission('read_payments'), async (req, res) => {
   try {
     const { id } = req.params;
     const transactionsCollection = await getCollection('transactions');
@@ -99,7 +99,7 @@ router.get('/:id', authenticateToken, checkRole(['head_administrator', 'finance_
 });
 
 // POST /api/v1/payments - Create new payment
-router.post('/', authenticateToken, checkRole(['head_administrator', 'finance_officer']), async (req, res) => {
+router.post('/', authenticateToken, requirePermission('read_payments'), async (req, res) => {
   try {
     const { 
       userId, 
@@ -167,7 +167,7 @@ router.post('/', authenticateToken, checkRole(['head_administrator', 'finance_of
 });
 
 // PUT /api/v1/payments/:id/status - Update payment status
-router.put('/:id/status', authenticateToken, checkRole(['head_administrator', 'finance_officer']), async (req, res) => {
+router.put('/:id/status', authenticateToken, requirePermission('read_payments'), async (req, res) => {
   try {
     const { id } = req.params;
     const { status, transactionId, failureReason } = req.body;
@@ -250,7 +250,7 @@ router.put('/:id/status', authenticateToken, checkRole(['head_administrator', 'f
 });
 
 // GET /api/v1/payments/stats - Get payment statistics
-router.get('/stats', authenticateToken, checkRole(['head_administrator', 'finance_officer']), async (req, res) => {
+router.get('/stats', authenticateToken, requirePermission('read_payments'), async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     const transactionsCollection = await getCollection('transactions');

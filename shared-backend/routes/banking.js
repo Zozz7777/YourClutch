@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { body, param, query, validationResult } = require('express-validator');
 const { logger } = require('../config/logger');
 const { toObjectId } = require('../utils/databaseUtils');
@@ -19,7 +19,7 @@ const bankingRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/banking/accounts - List all bank accounts
-router.get('/accounts', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), bankingRateLimit, [
+router.get('/accounts', authenticateToken, requirePermission('read_financial'), bankingRateLimit, [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
@@ -66,7 +66,7 @@ router.get('/accounts', authenticateToken, checkRole(['head_administrator', 'fin
 });
 
 // POST /api/v1/banking/accounts - Add bank account
-router.post('/accounts', authenticateToken, checkRole(['head_administrator', 'finance_officer']), bankingRateLimit, [
+router.post('/accounts', authenticateToken, requirePermission('read_financial'), bankingRateLimit, [
   body('bankName').notEmpty().withMessage('Bank name is required'),
   body('accountNumber').notEmpty().withMessage('Account number is required'),
   body('accountType').isIn(['checking', 'savings', 'money_market', 'cd', 'line_of_credit', 'other']).withMessage('Invalid account type'),
@@ -99,7 +99,7 @@ router.post('/accounts', authenticateToken, checkRole(['head_administrator', 'fi
 });
 
 // GET /api/v1/banking/accounts/:id/transactions - Get transactions for account
-router.get('/accounts/:id/transactions', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), bankingRateLimit, [
+router.get('/accounts/:id/transactions', authenticateToken, requirePermission('read_financial'), bankingRateLimit, [
   param('id').isMongoId().withMessage('Invalid account ID'),
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format'),
@@ -157,7 +157,7 @@ router.get('/accounts/:id/transactions', authenticateToken, checkRole(['head_adm
 });
 
 // POST /api/v1/banking/transactions/import - Import bank statement
-router.post('/transactions/import', authenticateToken, checkRole(['head_administrator', 'finance_officer']), bankingRateLimit, [
+router.post('/transactions/import', authenticateToken, requirePermission('read_financial'), bankingRateLimit, [
   body('bankAccountId').isMongoId().withMessage('Valid bank account ID is required'),
   body('transactions').isArray().withMessage('Transactions must be an array'),
   body('transactions.*.date').isISO8601().withMessage('Valid transaction date is required'),
@@ -218,7 +218,7 @@ router.post('/transactions/import', authenticateToken, checkRole(['head_administ
 });
 
 // POST /api/v1/banking/transactions/categorize - Auto-categorize transactions
-router.post('/transactions/categorize', authenticateToken, checkRole(['head_administrator', 'finance_officer']), bankingRateLimit, [
+router.post('/transactions/categorize', authenticateToken, requirePermission('read_financial'), bankingRateLimit, [
   body('bankAccountId').isMongoId().withMessage('Valid bank account ID is required'),
   body('transactionIds').isArray().withMessage('Transaction IDs must be an array'),
   body('transactionIds.*').isMongoId().withMessage('Each transaction ID must be a valid Mongo ID'),
@@ -261,7 +261,7 @@ router.post('/transactions/categorize', authenticateToken, checkRole(['head_admi
 });
 
 // POST /api/v1/banking/reconciliation - Start reconciliation
-router.post('/reconciliation', authenticateToken, checkRole(['head_administrator', 'finance_officer']), bankingRateLimit, [
+router.post('/reconciliation', authenticateToken, requirePermission('read_financial'), bankingRateLimit, [
   body('bankAccountId').isMongoId().withMessage('Valid bank account ID is required'),
   body('statementDate').isISO8601().withMessage('Valid statement date is required'),
   body('statementBalance').isFloat().withMessage('Statement balance must be a number')
@@ -343,7 +343,7 @@ router.post('/reconciliation', authenticateToken, checkRole(['head_administrator
 });
 
 // POST /api/v1/banking/reconciliation/:id/complete - Complete reconciliation
-router.post('/reconciliation/:id/complete', authenticateToken, checkRole(['head_administrator', 'finance_officer']), bankingRateLimit, [
+router.post('/reconciliation/:id/complete', authenticateToken, requirePermission('read_financial'), bankingRateLimit, [
   param('id').isMongoId().withMessage('Invalid reconciliation ID'),
   body('adjustments').optional().isArray().withMessage('Adjustments must be an array'),
   body('notes').optional().isString().withMessage('Notes must be a string')
@@ -412,7 +412,7 @@ router.post('/reconciliation/:id/complete', authenticateToken, checkRole(['head_
 });
 
 // GET /api/v1/banking/cash-flow - Cash flow statement
-router.get('/cash-flow', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), bankingRateLimit, [
+router.get('/cash-flow', authenticateToken, requirePermission('read_financial'), bankingRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format'),
   query('bankAccountId').optional().isMongoId().withMessage('Invalid bank account ID')

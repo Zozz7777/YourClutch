@@ -18,7 +18,7 @@ router.use(authenticateToken);
 // ===== ALERTS MANAGEMENT =====
 
 // GET /api/v1/alerts - Get all alerts
-router.get('/', checkRole(['head_administrator', 'security_manager']), async (req, res) => {
+router.get('/', requirePermission('read_general'), async (req, res) => {
   try {
     const alertsCollection = await getCollection('alerts');
     

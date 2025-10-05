@@ -16,7 +16,7 @@ const analyticsRateLimit = createRateLimit({ windowMs: 60 * 1000, max: 100 });
 // ==================== USER ANALYTICS ====================
 
 // GET /api/v1/analytics/users - Get user analytics
-router.get('/users', authenticateToken, checkRole(['head_administrator', 'analyst']), analyticsRateLimit, async (req, res) => {
+router.get('/users', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   try {
     const { period = '30d', limit = 100 } = req.query;
     
@@ -69,7 +69,7 @@ router.get('/users', authenticateToken, checkRole(['head_administrator', 'analys
 // ==================== SERVICE ANALYTICS ====================
 
 // GET /api/v1/analytics/services - Get service analytics
-router.get('/services', authenticateToken, checkRole(['head_administrator', 'analyst']), analyticsRateLimit, async (req, res) => {
+router.get('/services', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   try {
     const { period = '30d', serviceType } = req.query;
     
@@ -144,7 +144,7 @@ router.get('/services', authenticateToken, checkRole(['head_administrator', 'ana
 // ==================== FINANCIAL ANALYTICS ====================
 
 // GET /api/v1/analytics/financial - Get financial analytics
-router.get('/financial', authenticateToken, checkRole(['head_administrator', 'finance']), analyticsRateLimit, async (req, res) => {
+router.get('/financial', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   try {
     const { period = '30d', type = 'all' } = req.query;
     
@@ -207,7 +207,7 @@ router.get('/financial', authenticateToken, checkRole(['head_administrator', 'fi
 // ==================== PERFORMANCE ANALYTICS ====================
 
 // GET /api/v1/analytics/performance - Get system performance analytics
-router.get('/performance', authenticateToken, checkRole(['head_administrator', 'devops']), analyticsRateLimit, async (req, res) => {
+router.get('/performance', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   try {
     const { period = '24h' } = req.query;
     
@@ -258,7 +258,7 @@ router.get('/performance', authenticateToken, checkRole(['head_administrator', '
 // ==================== DASHBOARD ANALYTICS ====================
 
 // GET /api/v1/analytics/dashboard - Get consolidated dashboard data
-router.get('/dashboard', authenticateToken, checkRole(['head_administrator', 'analyst']), analyticsRateLimit, async (req, res) => {
+router.get('/dashboard', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   try {
     const { period = '30d' } = req.query;
     
@@ -319,7 +319,7 @@ router.get('/dashboard', authenticateToken, checkRole(['head_administrator', 'an
 // ==================== EXPORT ANALYTICS ====================
 
 // POST /api/v1/analytics/export - Export analytics data
-router.post('/export', authenticateToken, checkRole(['head_administrator', 'analyst']), analyticsRateLimit, async (req, res) => {
+router.post('/export', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   try {
     const { type, period, format = 'json' } = req.body;
     
@@ -363,7 +363,7 @@ router.post('/export', authenticateToken, checkRole(['head_administrator', 'anal
 // ==================== GENERIC HANDLERS ====================
 
 // GET /api/v1/analytics - Get analytics overview
-router.get('/', authenticateToken, checkRole(['head_administrator', 'analyst']), analyticsRateLimit, async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   res.json({
     success: true,
     message: 'Consolidated Analytics API is running',
@@ -380,7 +380,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator', 'analyst']),
 });
 
 // GET /api/v1/analytics/feature-usage - Get feature usage analytics
-router.get('/feature-usage', authenticateToken, checkRole(['head_administrator', 'analyst']), analyticsRateLimit, async (req, res) => {
+router.get('/feature-usage', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   try {
     const analyticsCollection = await getCollection('analytics');
     
@@ -488,7 +488,7 @@ router.get('/feature-usage', authenticateToken, checkRole(['head_administrator',
 });
 
 // GET /api/v1/analytics/churn-attribution - Get churn attribution data
-router.get('/churn-attribution', authenticateToken, checkRole(['head_administrator', 'analyst']), analyticsRateLimit, async (req, res) => {
+router.get('/churn-attribution', authenticateToken, requirePermission('read_analytics'), analyticsRateLimit, async (req, res) => {
   try {
     const analyticsCollection = await getCollection('analytics');
     

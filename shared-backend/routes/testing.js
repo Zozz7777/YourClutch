@@ -5,7 +5,7 @@ const { getCollection } = require('../config/optimized-database');
 const { ObjectId } = require('mongodb');
 
 // GET /api/v1/testing/chaos-experiments - Get chaos experiments
-router.get('/chaos-experiments', authenticateToken, checkRole(['head_administrator', 'developer', 'qa_manager']), async (req, res) => {
+router.get('/chaos-experiments', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const experimentsCollection = await getCollection('chaos_experiments');
     if (!experimentsCollection) {
@@ -49,7 +49,7 @@ router.get('/chaos-experiments', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/testing/black-swan-events - Get black swan events
-router.get('/black-swan-events', authenticateToken, checkRole(['head_administrator', 'risk_manager']), async (req, res) => {
+router.get('/black-swan-events', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const eventsCollection = await getCollection('black_swan_events');
     if (!eventsCollection) {
@@ -93,7 +93,7 @@ router.get('/black-swan-events', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/testing/chaos-experiments - Get chaos experiments
-router.get('/chaos-experiments', authenticateToken, checkRole(['head_administrator', 'developer', 'qa_manager']), async (req, res) => {
+router.get('/chaos-experiments', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const experimentsCollection = await getCollection('chaos_experiments');
     if (!experimentsCollection) {
@@ -137,7 +137,7 @@ router.get('/chaos-experiments', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/testing/black-swan-events - Get black swan events
-router.get('/black-swan-events', authenticateToken, checkRole(['head_administrator', 'risk_manager']), async (req, res) => {
+router.get('/black-swan-events', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const eventsCollection = await getCollection('black_swan_events');
     if (!eventsCollection) {
@@ -181,7 +181,7 @@ router.get('/black-swan-events', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/testing/chaos-experiments - Get chaos experiments
-router.get('/chaos-experiments', authenticateToken, checkRole(['head_administrator', 'developer', 'qa_manager']), async (req, res) => {
+router.get('/chaos-experiments', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const experimentsCollection = await getCollection('chaos_experiments');
     if (!experimentsCollection) {
@@ -225,7 +225,7 @@ router.get('/chaos-experiments', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/testing/black-swan-events - Get black swan events
-router.get('/black-swan-events', authenticateToken, checkRole(['head_administrator', 'risk_manager']), async (req, res) => {
+router.get('/black-swan-events', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const eventsCollection = await getCollection('black_swan_events');
     if (!eventsCollection) {

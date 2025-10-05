@@ -76,7 +76,7 @@ const generateMockUserActivities = (count = 20) => {
 };
 
 // GET fleet locations
-router.get('/fleet-locations', authenticateToken, checkRole(['head_administrator', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.get('/fleet-locations', authenticateToken, requirePermission('read_operations'), async (req, res) => {
   try {
     const locationsCollection = await getCollection('fleet_locations');
     if (!locationsCollection) {
@@ -100,7 +100,7 @@ router.get('/fleet-locations', authenticateToken, checkRole(['head_administrator
 });
 
 // GET revenue hotspots
-router.get('/revenue-hotspots', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'operations_manager']), async (req, res) => {
+router.get('/revenue-hotspots', authenticateToken, requirePermission('read_operations'), async (req, res) => {
   try {
     const hotspotsCollection = await getCollection('revenue_hotspots');
     if (!hotspotsCollection) {
@@ -124,7 +124,7 @@ router.get('/revenue-hotspots', authenticateToken, checkRole(['head_administrato
 });
 
 // GET live user activities
-router.get('/user-activities', authenticateToken, checkRole(['head_administrator', 'hr_manager', 'operations_manager']), async (req, res) => {
+router.get('/user-activities', authenticateToken, requirePermission('read_operations'), async (req, res) => {
   try {
     const activitiesCollection = await getCollection('user_activities');
     if (!activitiesCollection) {

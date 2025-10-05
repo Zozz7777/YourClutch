@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { body, param, query, validationResult } = require('express-validator');
 const { logger } = require('../config/logger');
 const { toObjectId } = require('../utils/databaseUtils');
@@ -19,7 +19,7 @@ const apRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/ap/vendors - List all vendors
-router.get('/vendors', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), apRateLimit, [
+router.get('/vendors', authenticateToken, requirePermission('read_financial'), apRateLimit, [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('search').optional().isString().withMessage('Search must be a string'),
@@ -73,7 +73,7 @@ router.get('/vendors', authenticateToken, checkRole(['head_administrator', 'fina
 });
 
 // POST /api/v1/ap/vendors - Create vendor
-router.post('/vendors', authenticateToken, checkRole(['head_administrator', 'finance_officer']), apRateLimit, [
+router.post('/vendors', authenticateToken, requirePermission('read_financial'), apRateLimit, [
   body('vendorName').notEmpty().withMessage('Vendor name is required'),
   body('contactInfo.primaryContact.email').isEmail().withMessage('Valid email is required'),
   body('businessInfo.businessType').isIn(['individual', 'company', 'partnership', 'corporation']).withMessage('Invalid business type'),
@@ -105,7 +105,7 @@ router.post('/vendors', authenticateToken, checkRole(['head_administrator', 'fin
 });
 
 // GET /api/v1/ap/vendors/:id/aging - Vendor aging report
-router.get('/vendors/:id/aging', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), apRateLimit, [
+router.get('/vendors/:id/aging', authenticateToken, requirePermission('read_financial'), apRateLimit, [
   param('id').isMongoId().withMessage('Invalid vendor ID')
 ], async (req, res) => {
   try {
@@ -218,7 +218,7 @@ router.get('/vendors/:id/aging', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/ap/bills - List all bills
-router.get('/bills', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), apRateLimit, [
+router.get('/bills', authenticateToken, requirePermission('read_financial'), apRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format'),
   query('vendorId').optional().isMongoId().withMessage('Invalid vendor ID'),
@@ -272,7 +272,7 @@ router.get('/bills', authenticateToken, checkRole(['head_administrator', 'financ
 });
 
 // POST /api/v1/ap/bills - Create bill
-router.post('/bills', authenticateToken, checkRole(['head_administrator', 'finance_officer']), apRateLimit, [
+router.post('/bills', authenticateToken, requirePermission('read_financial'), apRateLimit, [
   body('vendorId').isMongoId().withMessage('Valid vendor ID is required'),
   body('billDate').isISO8601().withMessage('Valid bill date is required'),
   body('dueDate').isISO8601().withMessage('Valid due date is required'),
@@ -327,7 +327,7 @@ router.post('/bills', authenticateToken, checkRole(['head_administrator', 'finan
 });
 
 // GET /api/v1/ap/bills/overdue - Get overdue bills
-router.get('/bills/overdue', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), apRateLimit, async (req, res) => {
+router.get('/bills/overdue', authenticateToken, requirePermission('read_financial'), apRateLimit, async (req, res) => {
   try {
     const overdueBills = await Bill.find({
       status: { $in: ['sent', 'partial'] },
@@ -353,7 +353,7 @@ router.get('/bills/overdue', authenticateToken, checkRole(['head_administrator',
 });
 
 // POST /api/v1/ap/payments - Record vendor payment
-router.post('/payments', authenticateToken, checkRole(['head_administrator', 'finance_officer']), apRateLimit, [
+router.post('/payments', authenticateToken, requirePermission('read_financial'), apRateLimit, [
   body('vendorId').isMongoId().withMessage('Valid vendor ID is required'),
   body('billIds').isArray().withMessage('Bill IDs must be an array'),
   body('billIds.*').isMongoId().withMessage('Each bill ID must be a valid Mongo ID'),

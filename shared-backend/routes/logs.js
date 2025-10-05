@@ -18,7 +18,7 @@ router.use(authenticateToken);
 // ===== LOGS MANAGEMENT =====
 
 // GET /api/v1/logs - Get all logs
-router.get('/', checkRole(['head_administrator', 'auditor']), async (req, res) => {
+router.get('/', requirePermission('read_logs'), async (req, res) => {
   try {
     const logsCollection = await getCollection('logs');
     

@@ -124,7 +124,7 @@ router.get('/requirements', complianceLimiter, authenticateToken, async (req, re
 });
 
 // POST /api/v1/compliance/update - Update compliance status
-router.post('/update', complianceLimiter, authenticateToken, checkRole(['admin', 'compliance_officer']), async (req, res) => {
+router.post('/update', complianceLimiter, authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { itemId, status, notes, updatedBy } = req.body;
     

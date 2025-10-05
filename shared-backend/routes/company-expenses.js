@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { body, param, query, validationResult } = require('express-validator');
 const { logger } = require('../config/logger');
 const { toObjectId } = require('../utils/databaseUtils');
@@ -17,7 +17,7 @@ const expenseRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/company-expenses - List all company expenses
-router.get('/', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, [
+router.get('/', authenticateToken, requirePermission('read_financial'), expenseRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format'),
   query('expenseType').optional().isIn(['rent', 'utilities', 'marketing', 'software', 'office_supplies', 'travel', 'entertainment', 'professional_fees', 'insurance', 'maintenance', 'equipment', 'training', 'legal', 'accounting', 'other']).withMessage('Invalid expense type'),
@@ -73,7 +73,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator', 'finance_off
 });
 
 // POST /api/v1/company-expenses - Create expense
-router.post('/', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, [
+router.post('/', authenticateToken, requirePermission('read_financial'), expenseRateLimit, [
   body('expenseType').isIn(['rent', 'utilities', 'marketing', 'software', 'office_supplies', 'travel', 'entertainment', 'professional_fees', 'insurance', 'maintenance', 'equipment', 'training', 'legal', 'accounting', 'other']).withMessage('Invalid expense type'),
   body('category').notEmpty().withMessage('Category is required'),
   body('vendor.vendorName').notEmpty().withMessage('Vendor name is required'),
@@ -109,7 +109,7 @@ router.post('/', authenticateToken, checkRole(['head_administrator', 'finance_of
 });
 
 // PUT /api/v1/company-expenses/:id - Update expense
-router.put('/:id', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, [
+router.put('/:id', authenticateToken, requirePermission('read_financial'), expenseRateLimit, [
   param('id').isMongoId().withMessage('Invalid expense ID'),
   body('expenseType').optional().isIn(['rent', 'utilities', 'marketing', 'software', 'office_supplies', 'travel', 'entertainment', 'professional_fees', 'insurance', 'maintenance', 'equipment', 'training', 'legal', 'accounting', 'other']).withMessage('Invalid expense type'),
   body('amount').optional().isFloat({ min: 0 }).withMessage('Amount must be a positive number'),
@@ -149,7 +149,7 @@ router.put('/:id', authenticateToken, checkRole(['head_administrator', 'finance_
 });
 
 // DELETE /api/v1/company-expenses/:id - Delete expense
-router.delete('/:id', authenticateToken, checkRole(['head_administrator', 'finance_officer']), expenseRateLimit, [
+router.delete('/:id', authenticateToken, requirePermission('read_financial'), expenseRateLimit, [
   param('id').isMongoId().withMessage('Invalid expense ID')
 ], async (req, res) => {
   try {
@@ -177,7 +177,7 @@ router.delete('/:id', authenticateToken, checkRole(['head_administrator', 'finan
 });
 
 // GET /api/v1/company-expenses/by-category - Expenses by category
-router.get('/by-category', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, [
+router.get('/by-category', authenticateToken, requirePermission('read_financial'), expenseRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format')
 ], async (req, res) => {
@@ -223,7 +223,7 @@ router.get('/by-category', authenticateToken, checkRole(['head_administrator', '
 });
 
 // GET /api/v1/company-expenses/by-department - Expenses by department
-router.get('/by-department', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, [
+router.get('/by-department', authenticateToken, requirePermission('read_financial'), expenseRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format')
 ], async (req, res) => {
@@ -269,7 +269,7 @@ router.get('/by-department', authenticateToken, checkRole(['head_administrator',
 });
 
 // GET /api/v1/company-expenses/recurring - Recurring expenses
-router.get('/recurring', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, async (req, res) => {
+router.get('/recurring', authenticateToken, requirePermission('read_financial'), expenseRateLimit, async (req, res) => {
   try {
     const recurringExpenses = await CompanyExpense.find({
       'recurringSchedule.isRecurring': true,
@@ -289,7 +289,7 @@ router.get('/recurring', authenticateToken, checkRole(['head_administrator', 'fi
 });
 
 // GET /api/v1/company-expenses/upcoming - Upcoming expenses
-router.get('/upcoming', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, [
+router.get('/upcoming', authenticateToken, requirePermission('read_financial'), expenseRateLimit, [
   query('days').optional().isInt({ min: 1, max: 365 }).withMessage('Days must be between 1 and 365')
 ], async (req, res) => {
   try {
@@ -323,7 +323,7 @@ router.get('/upcoming', authenticateToken, checkRole(['head_administrator', 'fin
 });
 
 // GET /api/v1/company-expenses/overdue - Overdue expenses
-router.get('/overdue', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, async (req, res) => {
+router.get('/overdue', authenticateToken, requirePermission('read_financial'), expenseRateLimit, async (req, res) => {
   try {
     const overdueExpenses = await CompanyExpense.find({
       dueDate: { $lt: new Date() },
@@ -343,7 +343,7 @@ router.get('/overdue', authenticateToken, checkRole(['head_administrator', 'fina
 });
 
 // GET /api/v1/company-expenses/analysis - Operating cost analysis
-router.get('/analysis', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), expenseRateLimit, [
+router.get('/analysis', authenticateToken, requirePermission('read_financial'), expenseRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format'),
   query('groupBy').optional().isIn(['month', 'quarter', 'year', 'category', 'department']).withMessage('Invalid group by option')

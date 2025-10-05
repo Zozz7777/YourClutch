@@ -1117,7 +1117,7 @@ router.get('/roles', authenticateToken, async (req, res) => {
 });
 
 // POST /api/v1/auth/roles - Create new role
-router.post('/roles', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.post('/roles', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { name, description, permissions } = req.body;
 
@@ -1148,7 +1148,7 @@ router.post('/roles', authenticateToken, checkRole(['head_administrator']), asyn
 });
 
 // PUT /api/v1/auth/roles/:id - Update role
-router.put('/roles/:id', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.put('/roles/:id', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, permissions } = req.body;
@@ -1179,7 +1179,7 @@ router.put('/roles/:id', authenticateToken, checkRole(['head_administrator']), a
 });
 
 // DELETE /api/v1/auth/roles/:id - Delete role
-router.delete('/roles/:id', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.delete('/roles/:id', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -1200,7 +1200,7 @@ router.delete('/roles/:id', authenticateToken, checkRole(['head_administrator'])
 });
 
 // POST /api/v1/auth/users/:userId/roles - Assign role to user
-router.post('/users/:userId/roles', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.post('/users/:userId/roles', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { userId } = req.params;
     const { roleId } = req.body;
@@ -1222,7 +1222,7 @@ router.post('/users/:userId/roles', authenticateToken, checkRole(['head_administ
 });
 
 // DELETE /api/v1/auth/users/:userId/roles/:roleId - Remove role from user
-router.delete('/users/:userId/roles/:roleId', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.delete('/users/:userId/roles/:roleId', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { userId, roleId } = req.params;
 
@@ -1353,7 +1353,7 @@ router.post('/change-password', authenticateToken, async (req, res) => {
 });
 
 // POST /api/v1/auth/create-employee - Create employee
-router.post('/create-employee', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.post('/create-employee', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { email, password, name, department, role } = req.body;
     

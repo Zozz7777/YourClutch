@@ -63,7 +63,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/v1/reports/generate - Generate a new report
-router.post('/generate', checkRole(['head_administrator', 'analyst', 'manager']), async (req, res) => {
+router.post('/generate', requirePermission('read_reports'), async (req, res) => {
   try {
     const { type, parameters, format = 'json', dateRange } = req.body;
     
@@ -283,7 +283,7 @@ router.post('/generate', checkRole(['head_administrator', 'analyst', 'manager'])
 
 
 // POST /api/v1/reports - Create new report
-router.post('/', checkRole(['head_administrator', 'report_manager']), async (req, res) => {
+router.post('/', requirePermission('read_reports'), async (req, res) => {
   try {
     const reportsCollection = await getCollection('reports');
     const { 
@@ -347,7 +347,7 @@ router.post('/', checkRole(['head_administrator', 'report_manager']), async (req
 // ===== REPORT GENERATION =====
 
 // POST /api/v1/reports/generate - Generate report
-router.post('/generate', checkRole(['head_administrator', 'report_manager', 'employee']), async (req, res) => {
+router.post('/generate', requirePermission('read_reports'), async (req, res) => {
   try {
     const reportsCollection = await getCollection('reports');
     const { reportId, parameters, format, emailTo } = req.body;
@@ -464,7 +464,7 @@ router.get('/templates', async (req, res) => {
 });
 
 // POST /api/v1/reports/templates - Create report template
-router.post('/templates', checkRole(['head_administrator', 'report_manager']), async (req, res) => {
+router.post('/templates', requirePermission('read_reports'), async (req, res) => {
   try {
     const templatesCollection = await getCollection('report_templates');
     const { 
@@ -731,7 +731,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // PUT /api/v1/reports/:id - Update report
-router.put('/:id', checkRole(['head_administrator', 'report_manager']), async (req, res) => {
+router.put('/:id', requirePermission('read_reports'), async (req, res) => {
   try {
     const reportsCollection = await getCollection('reports');
     const { 
@@ -787,7 +787,7 @@ router.put('/:id', checkRole(['head_administrator', 'report_manager']), async (r
 });
 
 // DELETE /api/v1/reports/:id - Delete report
-router.delete('/:id', checkRole(['head_administrator']), async (req, res) => {
+router.delete('/:id', requirePermission('read_reports'), async (req, res) => {
   try {
     const reportsCollection = await getCollection('reports');
     const result = await reportsCollection.deleteOne({ _id: req.params.id });

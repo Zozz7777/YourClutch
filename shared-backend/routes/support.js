@@ -208,7 +208,7 @@ router.put('/tickets/:id', supportLimiter, authenticateToken, async (req, res) =
 });
 
 // GET /api/v1/support/stats - Get support statistics
-router.get('/stats', supportLimiter, authenticateToken, checkRole(['admin', 'support_manager']), async (req, res) => {
+router.get('/stats', supportLimiter, authenticateToken, requirePermission('read_support'), async (req, res) => {
   try {
     const ticketsCollection = await getCollection('support_tickets');
     

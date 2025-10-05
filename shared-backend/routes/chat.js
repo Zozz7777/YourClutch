@@ -24,7 +24,7 @@ router.use(authenticateToken);
 // ===== CHAT SESSIONS =====
 
 // GET /api/v1/chat/sessions - Get all chat sessions
-router.get('/sessions', checkRole(['head_administrator', 'admin', 'support_agent']), async (req, res) => {
+router.get('/sessions', requirePermission('read_general'), async (req, res) => {
   try {
     const sessionsCollection = await getCollection('chat_sessions');
     const { page = 1, limit = 50, status, customerId } = req.query;
@@ -110,7 +110,7 @@ router.get('/messages', async (req, res) => {
 });
 
 // POST /api/v1/chat/send - Send a message
-router.post('/send', checkRole(['head_administrator', 'admin', 'support_agent', 'user']), async (req, res) => {
+router.post('/send', requirePermission('read_general'), async (req, res) => {
   try {
     const messagesCollection = await getCollection('chat_messages');
     const { 
@@ -269,7 +269,7 @@ router.get('/channels', async (req, res) => {
 });
 
 // POST /api/v1/chat/channels - Create new channel
-router.post('/channels', checkRole(['head_administrator']), async (req, res) => {
+router.post('/channels', requirePermission('read_general'), async (req, res) => {
   try {
     const channelsCollection = await getCollection('chat_channels');
     const { 
@@ -371,7 +371,7 @@ router.get('/analytics', async (req, res) => {
 // ============================================================================
 
 // GET /api/v1/chat/messages/:channelId - Get messages for specific channel
-router.get('/messages/:channelId', checkRole(['head_administrator', 'admin', 'support_agent', 'user']), async (req, res) => {
+router.get('/messages/:channelId', requirePermission('read_general'), async (req, res) => {
   try {
     const messagesCollection = await getCollection('chat_messages');
     const { channelId } = req.params;

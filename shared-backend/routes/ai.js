@@ -4,7 +4,7 @@ const { authenticateToken, checkRole } = require('../middleware/unified-auth');
 const { getCollection } = require('../config/optimized-database');
 
 // Get anomaly detections
-router.get('/anomaly-detections', authenticateToken, checkRole(['head_administrator', 'security_manager', 'developer']), async (req, res) => {
+router.get('/anomaly-detections', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const anomaliesCollection = await getCollection('anomaly_detections');
     if (!anomaliesCollection) {
@@ -36,7 +36,7 @@ router.get('/anomaly-detections', authenticateToken, checkRole(['head_administra
 // ===== FRAUD CASES =====
 
 // GET /api/v1/ai/fraud-cases - Get fraud cases
-router.get('/fraud-cases', authenticateToken, checkRole(['head_administrator', 'security_manager', 'fraud_analyst']), async (req, res) => {
+router.get('/fraud-cases', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const fraudCasesCollection = await getCollection('fraud_cases');
     if (!fraudCasesCollection) {
@@ -87,7 +87,7 @@ router.get('/fraud-cases', authenticateToken, checkRole(['head_administrator', '
 });
 
 // POST /api/v1/ai/fraud-cases - Create fraud case
-router.post('/fraud-cases', authenticateToken, checkRole(['head_administrator', 'security_manager']), async (req, res) => {
+router.post('/fraud-cases', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const fraudCasesCollection = await getCollection('fraud_cases');
     const { 
@@ -146,7 +146,7 @@ router.post('/fraud-cases', authenticateToken, checkRole(['head_administrator', 
 // ===== AI MODELS =====
 
 // GET /api/v1/ai/models - Get AI models
-router.get('/models', authenticateToken, checkRole(['head_administrator', 'ai_engineer', 'data_scientist']), async (req, res) => {
+router.get('/models', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const modelsCollection = await getCollection('ai_models');
     if (!modelsCollection) {
@@ -192,7 +192,7 @@ router.get('/models', authenticateToken, checkRole(['head_administrator', 'ai_en
 });
 
 // POST /api/v1/ai/models - Create AI model
-router.post('/models', authenticateToken, checkRole(['head_administrator', 'ai_engineer']), async (req, res) => {
+router.post('/models', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const modelsCollection = await getCollection('ai_models');
     const { 
@@ -297,7 +297,7 @@ router.get('/recommendations', authenticateToken, async (req, res) => {
 });
 
 // POST /api/v1/ai/recommendations - Create AI recommendation
-router.post('/recommendations', authenticateToken, checkRole(['head_administrator', 'ai_engineer']), async (req, res) => {
+router.post('/recommendations', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const recommendationsCollection = await getCollection('ai_recommendations');
     const { 
@@ -354,7 +354,7 @@ router.post('/recommendations', authenticateToken, checkRole(['head_administrato
 // ===== RECOMMENDATION UPLIFT =====
 
 // GET /api/v1/ai/recommendation-uplift - Get recommendation uplift metrics
-router.get('/recommendation-uplift', authenticateToken, checkRole(['head_administrator', 'ai_engineer', 'data_scientist']), async (req, res) => {
+router.get('/recommendation-uplift', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const upliftCollection = await getCollection('recommendation_uplift');
     if (!upliftCollection) {
@@ -419,7 +419,7 @@ router.get('/recommendation-uplift', authenticateToken, checkRole(['head_adminis
 });
 
 // POST /api/v1/ai/recommendation-uplift - Create recommendation uplift record
-router.post('/recommendation-uplift', authenticateToken, checkRole(['head_administrator', 'ai_engineer']), async (req, res) => {
+router.post('/recommendation-uplift', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const upliftCollection = await getCollection('recommendation_uplift');
     const { 
@@ -475,7 +475,7 @@ router.post('/recommendation-uplift', authenticateToken, checkRole(['head_admini
 // ===== TRAINING ROI =====
 
 // GET /api/v1/ai/training-roi - Get training ROI metrics
-router.get('/training-roi', authenticateToken, checkRole(['head_administrator', 'ai_engineer', 'data_scientist']), async (req, res) => {
+router.get('/training-roi', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const roiCollection = await getCollection('training_roi');
     if (!roiCollection) {
@@ -541,7 +541,7 @@ router.get('/training-roi', authenticateToken, checkRole(['head_administrator', 
 });
 
 // POST /api/v1/ai/training-roi - Create training ROI record
-router.post('/training-roi', authenticateToken, checkRole(['head_administrator', 'ai_engineer']), async (req, res) => {
+router.post('/training-roi', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const roiCollection = await getCollection('training_roi');
     const { 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { body, param, query, validationResult } = require('express-validator');
 const { logger } = require('../config/logger');
 const { toObjectId } = require('../utils/databaseUtils');
@@ -19,7 +19,7 @@ const arRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/ar/customers - List all customers
-router.get('/customers', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), arRateLimit, [
+router.get('/customers', authenticateToken, requirePermission('read_financial'), arRateLimit, [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('search').optional().isString().withMessage('Search must be a string'),
@@ -73,7 +73,7 @@ router.get('/customers', authenticateToken, checkRole(['head_administrator', 'fi
 });
 
 // POST /api/v1/ar/customers - Create customer
-router.post('/customers', authenticateToken, checkRole(['head_administrator', 'finance_officer']), arRateLimit, [
+router.post('/customers', authenticateToken, requirePermission('read_financial'), arRateLimit, [
   body('customerName').notEmpty().withMessage('Customer name is required'),
   body('contactInfo.primaryContact.email').isEmail().withMessage('Valid email is required'),
   body('businessInfo.businessType').isIn(['individual', 'company', 'partnership', 'corporation']).withMessage('Invalid business type'),
@@ -105,7 +105,7 @@ router.post('/customers', authenticateToken, checkRole(['head_administrator', 'f
 });
 
 // GET /api/v1/ar/customers/:id/aging - Customer aging report
-router.get('/customers/:id/aging', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), arRateLimit, [
+router.get('/customers/:id/aging', authenticateToken, requirePermission('read_financial'), arRateLimit, [
   param('id').isMongoId().withMessage('Invalid customer ID')
 ], async (req, res) => {
   try {
@@ -218,7 +218,7 @@ router.get('/customers/:id/aging', authenticateToken, checkRole(['head_administr
 });
 
 // GET /api/v1/ar/invoices - List all invoices
-router.get('/invoices', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), arRateLimit, [
+router.get('/invoices', authenticateToken, requirePermission('read_financial'), arRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format'),
   query('customerId').optional().isMongoId().withMessage('Invalid customer ID'),
@@ -272,7 +272,7 @@ router.get('/invoices', authenticateToken, checkRole(['head_administrator', 'fin
 });
 
 // POST /api/v1/ar/invoices - Create invoice
-router.post('/invoices', authenticateToken, checkRole(['head_administrator', 'finance_officer']), arRateLimit, [
+router.post('/invoices', authenticateToken, requirePermission('read_financial'), arRateLimit, [
   body('customerId').isMongoId().withMessage('Valid customer ID is required'),
   body('invoiceDate').isISO8601().withMessage('Valid invoice date is required'),
   body('dueDate').isISO8601().withMessage('Valid due date is required'),
@@ -327,7 +327,7 @@ router.post('/invoices', authenticateToken, checkRole(['head_administrator', 'fi
 });
 
 // POST /api/v1/ar/invoices/:id/send - Send invoice via email
-router.post('/invoices/:id/send', authenticateToken, checkRole(['head_administrator', 'finance_officer']), arRateLimit, [
+router.post('/invoices/:id/send', authenticateToken, requirePermission('read_financial'), arRateLimit, [
   param('id').isMongoId().withMessage('Invalid invoice ID'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('subject').optional().isString().withMessage('Subject must be a string'),
@@ -376,7 +376,7 @@ router.post('/invoices/:id/send', authenticateToken, checkRole(['head_administra
 });
 
 // GET /api/v1/ar/invoices/overdue - Get overdue invoices
-router.get('/invoices/overdue', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), arRateLimit, async (req, res) => {
+router.get('/invoices/overdue', authenticateToken, requirePermission('read_financial'), arRateLimit, async (req, res) => {
   try {
     const overdueInvoices = await Invoice.find({
       status: { $in: ['sent', 'partial'] },
@@ -402,7 +402,7 @@ router.get('/invoices/overdue', authenticateToken, checkRole(['head_administrato
 });
 
 // POST /api/v1/ar/payments - Record customer payment
-router.post('/payments', authenticateToken, checkRole(['head_administrator', 'finance_officer']), arRateLimit, [
+router.post('/payments', authenticateToken, requirePermission('read_financial'), arRateLimit, [
   body('customerId').isMongoId().withMessage('Valid customer ID is required'),
   body('invoiceIds').isArray().withMessage('Invoice IDs must be an array'),
   body('invoiceIds.*').isMongoId().withMessage('Each invoice ID must be a valid Mongo ID'),

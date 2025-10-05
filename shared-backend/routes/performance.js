@@ -9,7 +9,7 @@ const { authenticateToken, checkRole, checkPermission } = require('../middleware
 const { getCollection } = require('../config/optimized-database');
 
 // GET /api/v1/performance/monitor - Get performance metrics
-router.get('/monitor', authenticateToken, checkRole(['head_administrator', 'platform_admin', 'executive', 'admin', 'system_admin']), async (req, res) => {
+router.get('/monitor', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const analyticsCollection = await getCollection('analytics');
     
@@ -81,7 +81,7 @@ router.get('/monitor', authenticateToken, checkRole(['head_administrator', 'plat
 });
 
 // GET /api/v1/performance/analytics - Get detailed analytics
-router.get('/analytics', authenticateToken, checkRole(['head_administrator', 'system_admin']), async (req, res) => {
+router.get('/analytics', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { startDate, endDate, type } = req.query;
     const analyticsCollection = await getCollection('analytics');
@@ -183,7 +183,7 @@ router.post('/metrics', authenticateToken, async (req, res) => {
 });
 
 // GET /api/v1/performance/health - Get system health status
-router.get('/health', authenticateToken, checkRole(['head_administrator', 'system_admin']), async (req, res) => {
+router.get('/health', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const analyticsCollection = await getCollection('analytics');
     
@@ -240,7 +240,7 @@ router.get('/health', authenticateToken, checkRole(['head_administrator', 'syste
 });
 
 // GET /api/v1/performance/reports - Get performance reports
-router.get('/reports', authenticateToken, checkRole(['head_administrator', 'system_admin']), async (req, res) => {
+router.get('/reports', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { period = '24h' } = req.query;
     
@@ -346,7 +346,7 @@ router.get('/reports', authenticateToken, checkRole(['head_administrator', 'syst
 });
 
 // GET /api/v1/system/performance - System performance endpoint (alias for monitor)
-router.get('/', authenticateToken, checkRole(['head_administrator', 'system_admin']), async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const analyticsCollection = await getCollection('analytics');
     
@@ -427,7 +427,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator', 'system_admi
 });
 
 // GET /api/v1/performance-metrics - Get performance metrics (frontend endpoint)
-router.get('/performance-metrics', authenticateToken, checkRole(['head_administrator', 'platform_admin', 'executive', 'admin', 'system_admin']), async (req, res) => {
+router.get('/performance-metrics', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const analyticsCollection = await getCollection('analytics');
     

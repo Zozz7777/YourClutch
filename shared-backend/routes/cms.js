@@ -16,7 +16,7 @@ const cmsRateLimit = createRateLimit({ windowMs: 60 * 1000, max: 100 });
 // ==================== CONTENT MANAGEMENT ====================
 
 // GET /api/v1/cms/content - Get all content
-router.get('/content', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.get('/content', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { page = 1, limit = 50, type, status, category, search } = req.query;
     const skip = (page - 1) * limit;
@@ -71,7 +71,7 @@ router.get('/content', authenticateToken, checkRole(['head_administrator', 'cont
 });
 
 // GET /api/v1/cms/content/:id - Get content by ID
-router.get('/content/:id', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.get('/content/:id', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const contentCollection = await getCollection('emails');
@@ -142,7 +142,7 @@ router.get('/content/slug/:slug', cmsRateLimit, async (req, res) => {
 });
 
 // POST /api/v1/cms/content - Create new content
-router.post('/content', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.post('/content', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const {
       title,
@@ -219,7 +219,7 @@ router.post('/content', authenticateToken, checkRole(['head_administrator', 'con
 });
 
 // PUT /api/v1/cms/content/:id - Update content
-router.put('/content/:id', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.put('/content/:id', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body, updatedAt: new Date() };
@@ -260,7 +260,7 @@ router.put('/content/:id', authenticateToken, checkRole(['head_administrator', '
 });
 
 // DELETE /api/v1/cms/content/:id - Delete content
-router.delete('/content/:id', authenticateToken, checkRole(['head_administrator']), cmsRateLimit, async (req, res) => {
+router.delete('/content/:id', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const contentCollection = await getCollection('emails');
@@ -296,7 +296,7 @@ router.delete('/content/:id', authenticateToken, checkRole(['head_administrator'
 // ==================== MEDIA MANAGEMENT ====================
 
 // GET /api/v1/cms/media - Get all media
-router.get('/media', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.get('/media', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { page = 1, limit = 50, type, category, search } = req.query;
     const skip = (page - 1) * limit;
@@ -350,7 +350,7 @@ router.get('/media', authenticateToken, checkRole(['head_administrator', 'conten
 });
 
 // POST /api/v1/cms/media - Upload media
-router.post('/media', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.post('/media', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const {
       filename,
@@ -408,7 +408,7 @@ router.post('/media', authenticateToken, checkRole(['head_administrator', 'conte
 });
 
 // DELETE /api/v1/cms/media/:id - Delete media
-router.delete('/media/:id', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.delete('/media/:id', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const mediaCollection = await getCollection('cms_media');
@@ -444,7 +444,7 @@ router.delete('/media/:id', authenticateToken, checkRole(['head_administrator', 
 // ==================== CATEGORIES MANAGEMENT ====================
 
 // GET /api/v1/cms/categories - Get all categories
-router.get('/categories', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.get('/categories', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { page = 1, limit = 50, parent, search } = req.query;
     const skip = (page - 1) * limit;
@@ -497,7 +497,7 @@ router.get('/categories', authenticateToken, checkRole(['head_administrator', 'c
 });
 
 // GET /api/v1/cms/categories/:id - Get category by ID
-router.get('/categories/:id', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.get('/categories/:id', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const categoriesCollection = await getCollection('cms_categories');
@@ -531,7 +531,7 @@ router.get('/categories/:id', authenticateToken, checkRole(['head_administrator'
 });
 
 // POST /api/v1/cms/categories - Create new category
-router.post('/categories', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.post('/categories', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const {
       name,
@@ -603,7 +603,7 @@ router.post('/categories', authenticateToken, checkRole(['head_administrator', '
 });
 
 // PUT /api/v1/cms/categories/:id - Update category
-router.put('/categories/:id', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.put('/categories/:id', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body, updatedAt: new Date() };
@@ -644,7 +644,7 @@ router.put('/categories/:id', authenticateToken, checkRole(['head_administrator'
 });
 
 // DELETE /api/v1/cms/categories/:id - Delete category
-router.delete('/categories/:id', authenticateToken, checkRole(['head_administrator']), cmsRateLimit, async (req, res) => {
+router.delete('/categories/:id', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const categoriesCollection = await getCollection('cms_categories');
@@ -795,7 +795,7 @@ router.get('/help-articles/:id', cmsRateLimit, async (req, res) => {
 });
 
 // POST /api/v1/cms/help-articles - Create help article
-router.post('/help-articles', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.post('/help-articles', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const {
       title,
@@ -867,7 +867,7 @@ router.post('/help-articles', authenticateToken, checkRole(['head_administrator'
 // ==================== CMS ANALYTICS ====================
 
 // GET /api/v1/cms/analytics - Get CMS analytics
-router.get('/analytics', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.get('/analytics', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const { period = '30d' } = req.query;
     
@@ -971,7 +971,7 @@ router.get('/analytics', authenticateToken, checkRole(['head_administrator', 'co
 // ==================== SEO MANAGEMENT ====================
 
 // GET /api/v1/cms/seo - Get SEO data
-router.get('/seo', authenticateToken, checkRole(['head_administrator', 'content_manager', 'seo_specialist']), cmsRateLimit, async (req, res) => {
+router.get('/seo', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const seoCollection = await getCollection('seo_data');
     
@@ -993,7 +993,7 @@ router.get('/seo', authenticateToken, checkRole(['head_administrator', 'content_
 });
 
 // POST /api/v1/cms/seo/refresh - Refresh SEO analysis
-router.post('/seo/refresh', authenticateToken, checkRole(['head_administrator', 'content_manager', 'seo_specialist']), cmsRateLimit, async (req, res) => {
+router.post('/seo/refresh', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const seoCollection = await getCollection('seo_data');
     
@@ -1022,7 +1022,7 @@ router.post('/seo/refresh', authenticateToken, checkRole(['head_administrator', 
 });
 
 // POST /api/v1/cms/seo/optimize - Optimize SEO
-router.post('/seo/optimize', authenticateToken, checkRole(['head_administrator', 'content_manager', 'seo_specialist']), cmsRateLimit, async (req, res) => {
+router.post('/seo/optimize', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   try {
     const seoCollection = await getCollection('seo_data');
     
@@ -1053,7 +1053,7 @@ router.post('/seo/optimize', authenticateToken, checkRole(['head_administrator',
 // ==================== GENERIC HANDLERS ====================
 
 // GET /api/v1/cms - Get CMS overview
-router.get('/', authenticateToken, checkRole(['head_administrator', 'content_manager']), cmsRateLimit, async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_cms'), cmsRateLimit, async (req, res) => {
   res.json({
     success: true,
     message: 'CMS API is running',

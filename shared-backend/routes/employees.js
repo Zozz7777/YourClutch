@@ -20,7 +20,7 @@ const employeeRateLimit = createRateLimit({ windowMs: 15 * 60 * 1000, max: 20 })
 // This ensures proper email sending and invitation management
 
 // GET /api/v1/employees/invitations - Get all employee invitations
-router.get('/invitations', authenticateToken, checkRole(['head_administrator', 'hr']), async (req, res) => {
+router.get('/invitations', authenticateToken, requirePermission('read_hr'), async (req, res) => {
   try {
     const invitationsCollection = await getCollection('employee_invitations');
     const { page = 1, limit = 20, status } = req.query;
@@ -66,7 +66,7 @@ router.get('/invitations', authenticateToken, checkRole(['head_administrator', '
 // ==================== EMPLOYEE REGISTRATION ====================
 
 // POST /api/v1/employees/register - Register new employee (admin only)
-router.post('/register', authenticateToken, checkRole(['head_administrator', 'hr']), employeeRateLimit, async (req, res) => {
+router.post('/register', authenticateToken, requirePermission('read_hr'), employeeRateLimit, async (req, res) => {
   try {
     const { 
       email, 
@@ -374,7 +374,7 @@ router.post('/change-password', authenticateToken, async (req, res) => {
 // ==================== EMPLOYEE PASSWORD MANAGEMENT ====================
 
 // POST /api/v1/employees/:id/set-password - Set password for existing employee
-router.post('/:id/set-password', authenticateToken, checkRole(['head_administrator', 'hr']), async (req, res) => {
+router.post('/:id/set-password', authenticateToken, requirePermission('read_hr'), async (req, res) => {
   try {
     const { id } = req.params;
     const { password } = req.body;
@@ -466,7 +466,7 @@ router.post('/:id/set-password', authenticateToken, checkRole(['head_administrat
 // ==================== EMPLOYEE MANAGEMENT ====================
 
 // GET /api/v1/employees - Get all employees (admin/hr only)
-router.get('/', authenticateToken, checkRole(['head_administrator', 'hr']), async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_hr'), async (req, res) => {
   try {
     const { page = 1, limit = 20, role, department, isActive } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -535,7 +535,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator', 'hr']), asyn
 });
 
 // GET /api/v1/employees/:id - Get employee by ID
-router.get('/:id', authenticateToken, checkRole(['head_administrator', 'hr']), async (req, res) => {
+router.get('/:id', authenticateToken, requirePermission('read_hr'), async (req, res) => {
   try {
     const { id } = req.params;
     const employeesCollection = await getCollection('employees');
@@ -601,7 +601,7 @@ router.get('/:id', authenticateToken, checkRole(['head_administrator', 'hr']), a
 });
 
 // PUT /api/v1/employees/:id - Update employee
-router.put('/:id', authenticateToken, checkRole(['head_administrator', 'hr', 'hr_manager']), async (req, res) => {
+router.put('/:id', authenticateToken, requirePermission('read_hr'), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, phoneNumber, role, department, position, salary, permissions, isActive } = req.body;
@@ -740,7 +740,7 @@ router.put('/:id', authenticateToken, checkRole(['head_administrator', 'hr', 'hr
 });
 
 // DELETE /api/v1/employees/:id - Deactivate employee (soft delete)
-router.delete('/:id', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.delete('/:id', authenticateToken, requirePermission('read_hr'), async (req, res) => {
   try {
     const { id } = req.params;
     const usersCollection = await getCollection('users');

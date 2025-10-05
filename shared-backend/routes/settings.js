@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
 });
 
 // PUT /api/settings - Update settings
-router.put('/', checkRole(['head_administrator']), async (req, res) => {
+router.put('/', requirePermission('read_settings'), async (req, res) => {
   try {
     const settingsCollection = await getCollection('settings');
     const { settings } = req.body;
@@ -90,7 +90,7 @@ router.put('/', checkRole(['head_administrator']), async (req, res) => {
 
 
 // PUT /api/settings/:category/:key - Update specific setting
-router.put('/:category/:key', checkRole(['head_administrator']), async (req, res) => {
+router.put('/:category/:key', requirePermission('read_settings'), async (req, res) => {
   try {
     const settingsCollection = await getCollection('settings');
     const { value } = req.body;
@@ -191,7 +191,7 @@ router.put('/user/preferences', async (req, res) => {
 // ===== SYSTEM CONFIGURATION =====
 
 // GET /api/settings/system/config - Get system configuration
-router.get('/system/config', checkRole(['head_administrator']), async (req, res) => {
+router.get('/system/config', requirePermission('read_settings'), async (req, res) => {
   try {
     const configCollection = await getCollection('system_config');
     const config = await configCollection.findOne({ type: 'main' });
@@ -211,7 +211,7 @@ router.get('/system/config', checkRole(['head_administrator']), async (req, res)
 });
 
 // PUT /api/settings/system/config - Update system configuration
-router.put('/system/config', checkRole(['head_administrator']), async (req, res) => {
+router.put('/system/config', requirePermission('read_settings'), async (req, res) => {
   try {
     const configCollection = await getCollection('system_config');
     const { config } = req.body;
@@ -252,7 +252,7 @@ router.put('/system/config', checkRole(['head_administrator']), async (req, res)
 // ===== SETTINGS ANALYTICS =====
 
 // GET /api/settings/analytics - Get settings analytics
-router.get('/analytics', checkRole(['head_administrator']), async (req, res) => {
+router.get('/analytics', requirePermission('read_settings'), async (req, res) => {
   try {
     const settingsCollection = await getCollection('settings');
     const preferencesCollection = await getCollection('user_preferences');
@@ -317,7 +317,7 @@ router.get('/system', async (req, res) => {
 });
 
 // PUT /api/v1/settings/system - Update system settings
-router.put('/system', checkRole(['head_administrator']), async (req, res) => {
+router.put('/system', requirePermission('read_settings'), async (req, res) => {
   try {
     const settingsCollection = await getCollection('settings');
     const { settings } = req.body;
@@ -393,7 +393,7 @@ router.get('/integrations', async (req, res) => {
 });
 
 // PUT /api/v1/settings/integrations - Update integration settings
-router.put('/integrations', checkRole(['head_administrator']), async (req, res) => {
+router.put('/integrations', requirePermission('read_settings'), async (req, res) => {
   try {
     const settingsCollection = await getCollection('settings');
     const { settings } = req.body;

@@ -89,7 +89,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/v1/vendors - Create new vendor
-router.post('/', checkRole(['head_administrator', 'vendor_manager']), async (req, res) => {
+router.post('/', requirePermission('read_vendors'), async (req, res) => {
   try {
     const vendorsCollection = await getCollection('vendors');
     const { 
@@ -161,7 +161,7 @@ router.post('/', checkRole(['head_administrator', 'vendor_manager']), async (req
 });
 
 // PUT /api/v1/vendors/:id - Update vendor
-router.put('/:id', checkRole(['head_administrator', 'vendor_manager']), async (req, res) => {
+router.put('/:id', requirePermission('read_vendors'), async (req, res) => {
   try {
     const vendorsCollection = await getCollection('vendors');
     const { 
@@ -229,7 +229,7 @@ router.put('/:id', checkRole(['head_administrator', 'vendor_manager']), async (r
 });
 
 // DELETE /api/v1/vendors/:id - Delete vendor
-router.delete('/:id', checkRole(['head_administrator']), async (req, res) => {
+router.delete('/:id', requirePermission('read_vendors'), async (req, res) => {
   try {
     const vendorsCollection = await getCollection('vendors');
     const result = await vendorsCollection.deleteOne({ _id: req.params.id });
@@ -302,7 +302,7 @@ router.get('/contracts', async (req, res) => {
 });
 
 // POST /api/v1/vendor-contracts - Create vendor contract
-router.post('/contracts', checkRole(['head_administrator', 'vendor_manager']), async (req, res) => {
+router.post('/contracts', requirePermission('read_vendors'), async (req, res) => {
   try {
     const contractsCollection = await getCollection('vendor_contracts');
     const { 
@@ -378,7 +378,7 @@ router.post('/contracts', checkRole(['head_administrator', 'vendor_manager']), a
 });
 
 // PUT /api/v1/vendor-contracts/:id - Update vendor contract
-router.put('/contracts/:id', checkRole(['head_administrator', 'vendor_manager']), async (req, res) => {
+router.put('/contracts/:id', requirePermission('read_vendors'), async (req, res) => {
   try {
     const contractsCollection = await getCollection('vendor_contracts');
     const { 
@@ -484,7 +484,7 @@ router.get('/communications', async (req, res) => {
 });
 
 // POST /api/v1/vendor-communications - Create vendor communication
-router.post('/communications', checkRole(['head_administrator', 'vendor_manager', 'employee']), async (req, res) => {
+router.post('/communications', requirePermission('read_vendors'), async (req, res) => {
   try {
     const communicationsCollection = await getCollection('vendor_communications');
     const { 
@@ -550,7 +550,7 @@ router.post('/communications', checkRole(['head_administrator', 'vendor_manager'
 });
 
 // PUT /api/v1/vendor-communications/:id - Update vendor communication
-router.put('/communications/:id', checkRole(['head_administrator', 'vendor_manager', 'employee']), async (req, res) => {
+router.put('/communications/:id', requirePermission('read_vendors'), async (req, res) => {
   try {
     const communicationsCollection = await getCollection('vendor_communications');
     const { 

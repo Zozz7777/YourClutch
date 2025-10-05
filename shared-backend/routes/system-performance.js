@@ -17,7 +17,7 @@ const systemMonitor = new RealSystemMonitoringService();
 const performanceMonitor = new RealPerformanceMetricsService();
 
 // GET /api/v1/system-performance - Get system performance metrics (root route)
-router.get('/', performanceLimiter, authenticateToken, checkRole(['head_administrator', 'platform_admin', 'executive', 'admin', 'asset_manager']), async (req, res) => {
+router.get('/', performanceLimiter, authenticateToken, requirePermission('read_system'), async (req, res) => {
   try {
     const systemMetrics = await systemMonitor.getSystemMetrics();
     const performanceMetrics = performanceMonitor.getPerformanceMetrics();
@@ -41,7 +41,7 @@ router.get('/', performanceLimiter, authenticateToken, checkRole(['head_administ
 });
 
 // GET /api/v1/system/performance - Get system performance metrics
-router.get('/performance', performanceLimiter, authenticateToken, checkRole(['head_administrator', 'platform_admin', 'executive', 'admin', 'asset_manager']), async (req, res) => {
+router.get('/performance', performanceLimiter, authenticateToken, requirePermission('read_system'), async (req, res) => {
   try {
     const systemMetrics = await systemMonitor.getSystemMetrics();
     const performanceMetrics = performanceMonitor.getPerformanceMetrics();
@@ -67,7 +67,7 @@ router.get('/performance', performanceLimiter, authenticateToken, checkRole(['he
 });
 
 // GET /api/v1/system/performance/cpu - Get CPU usage
-router.get('/performance/cpu', performanceLimiter, authenticateToken, checkRole(['head_administrator', 'platform_admin', 'executive', 'admin', 'asset_manager']), async (req, res) => {
+router.get('/performance/cpu', performanceLimiter, authenticateToken, requirePermission('read_system'), async (req, res) => {
   try {
     const cpuUsage = await systemMonitor.getCPUUsage();
     const memoryUsage = systemMonitor.getMemoryUsage();

@@ -20,7 +20,7 @@ router.use(authenticateToken);
 // ============================================================================
 
 // GET /api/v1/crm/customer-health-scores - Get customer health scores
-router.get('/customer-health-scores', checkRole(['head_administrator', 'crm_manager']), async (req, res) => {
+router.get('/customer-health-scores', requirePermission('read_general'), async (req, res) => {
   try {
     const healthScoresCollection = await getCollection('customer_health_scores');
     
@@ -112,7 +112,7 @@ router.get('/customers', async (req, res) => {
 });
 
 // POST /api/v1/crm/customers - Create new customer
-router.post('/customers', checkRole(['head_administrator', 'customer_support']), async (req, res) => {
+router.post('/customers', requirePermission('read_general'), async (req, res) => {
   try {
     const customersCollection = await getCollection('customers');
     const { 
@@ -306,7 +306,7 @@ router.get('/tickets', async (req, res) => {
 });
 
 // POST /api/v1/crm/tickets - Create new ticket
-router.post('/tickets', checkRole(['head_administrator', 'customer_support']), async (req, res) => {
+router.post('/tickets', requirePermission('read_general'), async (req, res) => {
   try {
     const ticketsCollection = await getCollection('tickets');
     const { 
@@ -421,7 +421,7 @@ router.get('/analytics', async (req, res) => {
 // ============================================================================
 
 // GET /api/v1/crm/critical-accounts - Get critical accounts
-router.get('/critical-accounts', checkRole(['head_administrator', 'admin', 'crm_manager', 'account_manager']), async (req, res) => {
+router.get('/critical-accounts', requirePermission('read_general'), async (req, res) => {
   try {
     const accountsCollection = await getCollection('critical_accounts');
     const { page = 1, limit = 50, tier, status } = req.query;
@@ -464,7 +464,7 @@ router.get('/critical-accounts', checkRole(['head_administrator', 'admin', 'crm_
 });
 
 // POST /api/v1/crm/critical-accounts - Create critical account
-router.post('/critical-accounts', checkRole(['head_administrator', 'admin', 'crm_manager', 'account_manager']), async (req, res) => {
+router.post('/critical-accounts', requirePermission('read_general'), async (req, res) => {
   try {
     const accountsCollection = await getCollection('critical_accounts');
     const accountData = {
@@ -525,7 +525,7 @@ router.get('/customers/:id', async (req, res) => {
 });
 
 // PUT /api/v1/crm/customers/:id - Update customer
-router.put('/customers/:id', checkRole(['head_administrator', 'customer_support']), async (req, res) => {
+router.put('/customers/:id', requirePermission('read_general'), async (req, res) => {
   try {
     const customersCollection = await getCollection('customers');
     const { id } = req.params;
@@ -562,7 +562,7 @@ router.put('/customers/:id', checkRole(['head_administrator', 'customer_support'
 });
 
 // DELETE /api/v1/crm/customers/:id - Delete customer
-router.delete('/customers/:id', checkRole(['head_administrator']), async (req, res) => {
+router.delete('/customers/:id', requirePermission('read_general'), async (req, res) => {
   try {
     const customersCollection = await getCollection('customers');
     const { id } = req.params;
@@ -591,7 +591,7 @@ router.delete('/customers/:id', checkRole(['head_administrator']), async (req, r
 });
 
 // GET /api/v1/crm/critical-accounts/:id - Get specific critical account
-router.get('/critical-accounts/:id', checkRole(['head_administrator', 'admin', 'crm_manager', 'account_manager']), async (req, res) => {
+router.get('/critical-accounts/:id', requirePermission('read_general'), async (req, res) => {
   try {
     const accountsCollection = await getCollection('critical_accounts');
     const { id } = req.params;
@@ -624,7 +624,7 @@ router.get('/critical-accounts/:id', checkRole(['head_administrator', 'admin', '
 });
 
 // PUT /api/v1/crm/critical-accounts/:id - Update critical account
-router.put('/critical-accounts/:id', checkRole(['head_administrator', 'admin', 'crm_manager', 'account_manager']), async (req, res) => {
+router.put('/critical-accounts/:id', requirePermission('read_general'), async (req, res) => {
   try {
     const accountsCollection = await getCollection('critical_accounts');
     const { id } = req.params;
@@ -666,7 +666,7 @@ router.put('/critical-accounts/:id', checkRole(['head_administrator', 'admin', '
 });
 
 // POST /api/v1/crm/critical-accounts/:id/actions - Add action to critical account
-router.post('/critical-accounts/:id/actions', checkRole(['head_administrator', 'admin', 'crm_manager', 'account_manager']), async (req, res) => {
+router.post('/critical-accounts/:id/actions', requirePermission('read_general'), async (req, res) => {
   try {
     const accountsCollection = await getCollection('critical_accounts');
     const { id } = req.params;

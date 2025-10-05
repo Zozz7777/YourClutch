@@ -89,7 +89,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/v1/projects - Create new project
-router.post('/', checkRole(['head_administrator', 'project_manager']), async (req, res) => {
+router.post('/', requirePermission('read_general'), async (req, res) => {
   try {
     const projectsCollection = await getCollection('projects');
     const { name, description, status, priority, assignee, dueDate, tags } = req.body;
@@ -138,7 +138,7 @@ router.post('/', checkRole(['head_administrator', 'project_manager']), async (re
 });
 
 // PUT /api/v1/projects/:id - Update project
-router.put('/:id', checkRole(['head_administrator', 'project_manager']), async (req, res) => {
+router.put('/:id', requirePermission('read_general'), async (req, res) => {
   try {
     const projectsCollection = await getCollection('projects');
     const { name, description, status, priority, assignee, dueDate, tags, progress } = req.body;
@@ -183,7 +183,7 @@ router.put('/:id', checkRole(['head_administrator', 'project_manager']), async (
 });
 
 // DELETE /api/v1/projects/:id - Delete project
-router.delete('/:id', checkRole(['head_administrator']), async (req, res) => {
+router.delete('/:id', requirePermission('read_general'), async (req, res) => {
   try {
     const projectsCollection = await getCollection('projects');
     const result = await projectsCollection.deleteOne({ _id: req.params.id });
@@ -239,7 +239,7 @@ router.get('/:id/tasks', async (req, res) => {
 });
 
 // POST /api/v1/projects/:id/tasks - Add task to project
-router.post('/:id/tasks', checkRole(['head_administrator', 'project_manager']), async (req, res) => {
+router.post('/:id/tasks', requirePermission('read_general'), async (req, res) => {
   try {
     const projectsCollection = await getCollection('projects');
     const { title, description, status, priority, assignee, dueDate } = req.body;
@@ -294,7 +294,7 @@ router.post('/:id/tasks', checkRole(['head_administrator', 'project_manager']), 
 });
 
 // PUT /api/v1/projects/:id/tasks/:taskId - Update project task
-router.put('/:id/tasks/:taskId', checkRole(['head_administrator', 'project_manager']), async (req, res) => {
+router.put('/:id/tasks/:taskId', requirePermission('read_general'), async (req, res) => {
   try {
     const projectsCollection = await getCollection('projects');
     const { title, description, status, priority, assignee, dueDate } = req.body;
@@ -336,7 +336,7 @@ router.put('/:id/tasks/:taskId', checkRole(['head_administrator', 'project_manag
 });
 
 // DELETE /api/v1/projects/:id/tasks/:taskId - Delete project task
-router.delete('/:id/tasks/:taskId', checkRole(['head_administrator', 'project_manager']), async (req, res) => {
+router.delete('/:id/tasks/:taskId', requirePermission('read_general'), async (req, res) => {
   try {
     const projectsCollection = await getCollection('projects');
     const result = await projectsCollection.updateOne(
@@ -398,7 +398,7 @@ router.get('/:id/time-tracking', async (req, res) => {
 });
 
 // POST /api/v1/projects/:id/time-tracking - Add time entry
-router.post('/:id/time-tracking', checkRole(['head_administrator', 'project_manager', 'employee']), async (req, res) => {
+router.post('/:id/time-tracking', requirePermission('read_general'), async (req, res) => {
   try {
     const projectsCollection = await getCollection('projects');
     const { taskId, description, duration, date } = req.body;

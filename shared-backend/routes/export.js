@@ -125,7 +125,7 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
 });
 
 // GET /api/v1/export/users - Export users data
-router.get('/users', authenticateToken, checkRole(['head_administrator', 'hr']), async (req, res) => {
+router.get('/users', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     console.log('👥 Users export requested by user:', req.user?.email);
     
@@ -165,7 +165,7 @@ router.get('/users', authenticateToken, checkRole(['head_administrator', 'hr']),
 });
 
 // GET /api/v1/export/vehicles - Export vehicles data
-router.get('/vehicles', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.get('/vehicles', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     console.log('🚗 Vehicles export requested by user:', req.user?.email);
     
@@ -203,7 +203,7 @@ router.get('/vehicles', authenticateToken, checkRole(['head_administrator', 'ass
 });
 
 // GET /api/v1/export/bookings - Export bookings data
-router.get('/bookings', authenticateToken, checkRole(['head_administrator', 'booking_manager']), async (req, res) => {
+router.get('/bookings', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     console.log('📅 Bookings export requested by user:', req.user?.email);
     

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { body, param, query, validationResult } = require('express-validator');
 const { logger } = require('../config/logger');
 const { toObjectId } = require('../utils/databaseUtils');
@@ -18,7 +18,7 @@ const payrollRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/payroll - List all payrolls
-router.get('/', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'hr_manager']), payrollRateLimit, [
+router.get('/', authenticateToken, requirePermission('read_financial'), payrollRateLimit, [
   query('year').optional().isInt({ min: 2020, max: 2030 }).withMessage('Invalid year'),
   query('month').optional().isInt({ min: 1, max: 12 }).withMessage('Invalid month'),
   query('status').optional().isIn(['draft', 'approved', 'processing', 'completed', 'cancelled']).withMessage('Invalid status'),
@@ -67,7 +67,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator', 'finance_off
 });
 
 // POST /api/v1/payroll/generate - Generate payroll for period
-router.post('/generate', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'hr_manager']), payrollRateLimit, [
+router.post('/generate', authenticateToken, requirePermission('read_financial'), payrollRateLimit, [
   body('startDate').isISO8601().withMessage('Invalid start date format'),
   body('endDate').isISO8601().withMessage('Invalid end date format'),
   body('month').isInt({ min: 1, max: 12 }).withMessage('Month must be between 1 and 12'),
@@ -199,7 +199,7 @@ router.post('/generate', authenticateToken, checkRole(['head_administrator', 'fi
 });
 
 // POST /api/v1/payroll/:id/approve - Approve payroll
-router.post('/:id/approve', authenticateToken, checkRole(['head_administrator', 'finance_officer']), payrollRateLimit, [
+router.post('/:id/approve', authenticateToken, requirePermission('read_financial'), payrollRateLimit, [
   param('id').isMongoId().withMessage('Invalid payroll ID'),
   body('approvalNotes').optional().isString().withMessage('Approval notes must be a string')
 ], async (req, res) => {
@@ -243,7 +243,7 @@ router.post('/:id/approve', authenticateToken, checkRole(['head_administrator', 
 });
 
 // POST /api/v1/payroll/:id/process - Process payments
-router.post('/:id/process', authenticateToken, checkRole(['head_administrator', 'finance_officer']), payrollRateLimit, [
+router.post('/:id/process', authenticateToken, requirePermission('read_financial'), payrollRateLimit, [
   param('id').isMongoId().withMessage('Invalid payroll ID'),
   body('paymentMethod').isIn(['bank_transfer', 'cash', 'check']).withMessage('Invalid payment method'),
   body('bankAccount').optional().isObject().withMessage('Bank account must be an object')
@@ -305,7 +305,7 @@ router.post('/:id/process', authenticateToken, checkRole(['head_administrator', 
 });
 
 // GET /api/v1/payroll/cost-analysis - Payroll cost analysis
-router.get('/cost-analysis', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'hr_manager']), payrollRateLimit, [
+router.get('/cost-analysis', authenticateToken, requirePermission('read_financial'), payrollRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format'),
   query('groupBy').optional().isIn(['month', 'year', 'department']).withMessage('Invalid group by option')
@@ -364,7 +364,7 @@ router.get('/cost-analysis', authenticateToken, checkRole(['head_administrator',
 });
 
 // GET /api/v1/payroll/tax-summary - Tax deductions summary
-router.get('/tax-summary', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'hr_manager']), payrollRateLimit, [
+router.get('/tax-summary', authenticateToken, requirePermission('read_financial'), payrollRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format')
 ], async (req, res) => {

@@ -64,7 +64,7 @@ router.get('/events', authenticateToken, (req, res) => {
 });
 
 // POST /api/v1/realtime/broadcast - Broadcast message to all connected users
-router.post('/broadcast', authenticateToken, checkRole(['head_administrator', 'manager']), async (req, res) => {
+router.post('/broadcast', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     console.log('📡 Broadcasting message to all connected users');
     
@@ -596,7 +596,7 @@ async function getDashboardData(userId) {
 }
 
 // GET /api/v1/realtime/connections - Get active connections (admin only)
-router.get('/connections', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.get('/connections', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     console.log('📡 Fetching active connections');
     

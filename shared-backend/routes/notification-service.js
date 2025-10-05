@@ -9,7 +9,7 @@ const { authenticateToken, checkRole } = require('../middleware/unified-auth');
 const { getCollection } = require('../config/optimized-database');
 
 // POST /api/v1/notifications/send-invitation - Send invitation via alternative methods
-router.post('/send-invitation', authenticateToken, checkRole(['head_administrator', 'hr_manager']), async (req, res) => {
+router.post('/send-invitation', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { email, name, role, department, invitationToken } = req.body;
     
@@ -101,7 +101,7 @@ router.post('/send-invitation', authenticateToken, checkRole(['head_administrato
 });
 
 // GET /api/v1/notifications/pending - Get pending notifications
-router.get('/pending', authenticateToken, checkRole(['head_administrator', 'hr_manager']), async (req, res) => {
+router.get('/pending', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -145,7 +145,7 @@ router.get('/pending', authenticateToken, checkRole(['head_administrator', 'hr_m
 });
 
 // POST /api/v1/notifications/:id/mark-sent - Mark notification as sent
-router.post('/:id/mark-sent', authenticateToken, checkRole(['head_administrator', 'hr_manager']), async (req, res) => {
+router.post('/:id/mark-sent', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { id } = req.params;
     const notificationsCollection = await getCollection('notifications');

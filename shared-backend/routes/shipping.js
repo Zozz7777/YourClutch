@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { getCollection } = require('../config/database');
 const ShippingZone = require('../models/ShippingZone');
 const fs = require('fs');
@@ -15,7 +15,7 @@ const shippingRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/shipping/zones - List all shipping zones with search/filter
-router.get('/zones', authenticateToken, checkRole(['head_administrator', 'operations_manager', 'system_admin']), shippingRateLimit, async (req, res) => {
+router.get('/zones', authenticateToken, requirePermission('read_shipping'), shippingRateLimit, async (req, res) => {
   try {
     const {
       governorate = '',
@@ -78,7 +78,7 @@ router.get('/zones', authenticateToken, checkRole(['head_administrator', 'operat
 });
 
 // POST /api/v1/shipping/zones - Create shipping zone
-router.post('/zones', authenticateToken, checkRole(['head_administrator', 'operations_manager']), shippingRateLimit, async (req, res) => {
+router.post('/zones', authenticateToken, requirePermission('create_shipping'), shippingRateLimit, async (req, res) => {
   try {
     const {
       governorate,
@@ -153,7 +153,7 @@ router.post('/zones', authenticateToken, checkRole(['head_administrator', 'opera
 });
 
 // PUT /api/v1/shipping/zones/:id - Update zone cost/details
-router.put('/zones/:id', authenticateToken, checkRole(['head_administrator', 'operations_manager']), shippingRateLimit, async (req, res) => {
+router.put('/zones/:id', authenticateToken, requirePermission('update_shipping'), shippingRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -188,7 +188,7 @@ router.put('/zones/:id', authenticateToken, checkRole(['head_administrator', 'op
 });
 
 // DELETE /api/v1/shipping/zones/:id - Remove zone
-router.delete('/zones/:id', authenticateToken, checkRole(['head_administrator']), shippingRateLimit, async (req, res) => {
+router.delete('/zones/:id', authenticateToken, requirePermission('delete_shipping'), shippingRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -331,7 +331,7 @@ router.get('/locations', async (req, res) => {
 });
 
 // POST /api/v1/shipping/bulk-update - Bulk update costs by governorate
-router.post('/bulk-update', authenticateToken, checkRole(['head_administrator', 'operations_manager']), shippingRateLimit, async (req, res) => {
+router.post('/bulk-update', authenticateToken, requirePermission('update_shipping'), shippingRateLimit, async (req, res) => {
   try {
     const { governorate, updates } = req.body;
 
@@ -377,7 +377,7 @@ router.post('/bulk-update', authenticateToken, checkRole(['head_administrator', 
 });
 
 // POST /api/v1/shipping/seed-zones - Seed initial shipping zones from Egypt locations
-router.post('/seed-zones', authenticateToken, checkRole(['head_administrator']), shippingRateLimit, async (req, res) => {
+router.post('/seed-zones', authenticateToken, requirePermission('create_shipping'), shippingRateLimit, async (req, res) => {
   try {
     const locationsPath = path.join(__dirname, '../data/egypt-locations.json');
     const locationsData = JSON.parse(fs.readFileSync(locationsPath, 'utf8'));

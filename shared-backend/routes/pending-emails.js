@@ -9,7 +9,7 @@ const { authenticateToken, checkRole } = require('../middleware/unified-auth');
 const { getCollection } = require('../config/optimized-database');
 
 // GET /api/v1/pending-emails - Get all pending emails
-router.get('/', authenticateToken, checkRole(['head_administrator', 'hr_manager']), async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { page = 1, limit = 20, status = 'all' } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -69,7 +69,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator', 'hr_manager'
 });
 
 // GET /api/v1/pending-emails/:id - Get specific pending email
-router.get('/:id', authenticateToken, checkRole(['head_administrator', 'hr_manager']), async (req, res) => {
+router.get('/:id', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { id } = req.params;
     const pendingEmailsCollection = await getCollection('pending_emails');
@@ -104,7 +104,7 @@ router.get('/:id', authenticateToken, checkRole(['head_administrator', 'hr_manag
 });
 
 // POST /api/v1/pending-emails/:id/mark-sent - Mark email as sent
-router.post('/:id/mark-sent', authenticateToken, checkRole(['head_administrator', 'hr_manager']), async (req, res) => {
+router.post('/:id/mark-sent', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { id } = req.params;
     const pendingEmailsCollection = await getCollection('pending_emails');
@@ -147,7 +147,7 @@ router.post('/:id/mark-sent', authenticateToken, checkRole(['head_administrator'
 });
 
 // DELETE /api/v1/pending-emails/:id - Delete pending email
-router.delete('/:id', authenticateToken, checkRole(['head_administrator', 'hr_manager']), async (req, res) => {
+router.delete('/:id', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { id } = req.params;
     const pendingEmailsCollection = await getCollection('pending_emails');

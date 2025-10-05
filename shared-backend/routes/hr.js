@@ -16,7 +16,7 @@ const hrRateLimit = createRateLimit({ windowMs: 60 * 1000, max: 100 });
 // ==================== EMPLOYEE MANAGEMENT ====================
 
 // GET /api/v1/hr/employees - Get all employees
-router.get('/employees', authenticateToken, checkRole(['head_administrator', 'platform_admin', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.get('/employees', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { page = 1, limit = 50, department, status, search } = req.query;
     const skip = (page - 1) * limit;
@@ -130,7 +130,7 @@ router.get('/employees', authenticateToken, checkRole(['head_administrator', 'pl
 });
 
 // GET /api/v1/hr/employees/:id - Get employee by ID
-router.get('/employees/:id', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.get('/employees/:id', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const employeesCollection = await getCollection('employees');
@@ -164,7 +164,7 @@ router.get('/employees/:id', authenticateToken, checkRole(['head_administrator',
 });
 
 // POST /api/v1/hr/employees - Create new employee
-router.post('/employees', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.post('/employees', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const {
       firstName,
@@ -244,7 +244,7 @@ router.post('/employees', authenticateToken, checkRole(['head_administrator', 'h
 });
 
 // PUT /api/v1/hr/employees/:id - Update employee
-router.put('/employees/:id', authenticateToken, checkRole(['head_administrator', 'hr_manager', 'hr']), hrRateLimit, async (req, res) => {
+router.put('/employees/:id', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body, updatedAt: new Date() };
@@ -318,7 +318,7 @@ router.put('/employees/:id', authenticateToken, checkRole(['head_administrator',
 });
 
 // DELETE /api/v1/hr/employees/:id - Delete employee
-router.delete('/employees/:id', authenticateToken, checkRole(['head_administrator']), hrRateLimit, async (req, res) => {
+router.delete('/employees/:id', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const employeesCollection = await getCollection('employees');
@@ -354,7 +354,7 @@ router.delete('/employees/:id', authenticateToken, checkRole(['head_administrato
 // ==================== PAYROLL MANAGEMENT ====================
 
 // GET /api/v1/hr/payroll - Get payroll data
-router.get('/payroll', authenticateToken, checkRole(['head_administrator', 'hr_manager', 'finance_officer']), hrRateLimit, async (req, res) => {
+router.get('/payroll', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { month, year, employeeId, status } = req.query;
     const payrollCollection = await getCollection('payroll');
@@ -405,7 +405,7 @@ router.get('/payroll', authenticateToken, checkRole(['head_administrator', 'hr_m
 });
 
 // POST /api/v1/hr/payroll - Process payroll
-router.post('/payroll', authenticateToken, checkRole(['head_administrator', 'hr_manager', 'finance_officer']), hrRateLimit, async (req, res) => {
+router.post('/payroll', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { month, year, employeeIds } = req.body;
     
@@ -489,7 +489,7 @@ router.post('/payroll', authenticateToken, checkRole(['head_administrator', 'hr_
 // ==================== RECRUITMENT MANAGEMENT ====================
 
 // GET /api/v1/hr/recruitment - Get recruitment data
-router.get('/recruitment', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.get('/recruitment', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { status, position, department } = req.query;
     const recruitmentCollection = await getCollection('recruitment');
@@ -537,7 +537,7 @@ router.get('/recruitment', authenticateToken, checkRole(['head_administrator', '
 });
 
 // POST /api/v1/hr/recruitment - Add new candidate
-router.post('/recruitment', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.post('/recruitment', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const {
       firstName,
@@ -613,7 +613,7 @@ router.post('/recruitment', authenticateToken, checkRole(['head_administrator', 
 // ==================== HR ANALYTICS ====================
 
 // GET /api/v1/hr/analytics - Get HR analytics
-router.get('/analytics', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.get('/analytics', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { period = '30d' } = req.query;
     
@@ -691,7 +691,7 @@ router.get('/analytics', authenticateToken, checkRole(['head_administrator', 'hr
 // ==================== JOB APPLICATIONS ====================
 
 // GET /api/v1/hr/applications - Get job applications
-router.get('/applications', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.get('/applications', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const { status, position, department } = req.query;
     const applicationsCollection = await getCollection('job_applications');
@@ -727,7 +727,7 @@ router.get('/applications', authenticateToken, checkRole(['head_administrator', 
 // ==================== HR STATISTICS ====================
 
 // GET /api/v1/hr/debug-salary - Debug salary data
-router.get('/debug-salary', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.get('/debug-salary', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const employeesCollection = await getCollection('employees');
     
@@ -770,7 +770,7 @@ router.get('/debug-salary', authenticateToken, checkRole(['head_administrator', 
 });
 
 // POST /api/v1/hr/fix-salary - Fix salary data
-router.post('/fix-salary', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.post('/fix-salary', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const employeesCollection = await getCollection('employees');
     
@@ -831,7 +831,7 @@ router.post('/fix-salary', authenticateToken, checkRole(['head_administrator', '
 });
 
 // GET /api/v1/hr/stats - Get HR statistics
-router.get('/stats', authenticateToken, checkRole(['head_administrator', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.get('/stats', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   try {
     const employeesCollection = await getCollection('employees');
     const applicationsCollection = await getCollection('job_applications');
@@ -907,7 +907,7 @@ router.get('/stats', authenticateToken, checkRole(['head_administrator', 'hr_man
 // ==================== GENERIC HANDLERS ====================
 
 // GET /api/v1/hr - Get HR overview
-router.get('/', authenticateToken, checkRole(['head_administrator', 'platform_admin', 'hr_manager']), hrRateLimit, async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_hr'), hrRateLimit, async (req, res) => {
   res.json({
     success: true,
     message: 'HR Management API is running',

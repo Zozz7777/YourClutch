@@ -354,7 +354,7 @@ router.get('/v1/auto-parts/inventory', authenticateToken, async (req, res) => {
 });
 
 // POST /api/v1/auto-parts/inventory/bulk - Bulk inventory operations
-router.post('/v1/auto-parts/inventory/bulk', authenticateToken, checkRole(['head_administrator', 'inventory_manager']), async (req, res) => {
+router.post('/v1/auto-parts/inventory/bulk', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { operation, items } = req.body;
     

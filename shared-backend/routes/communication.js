@@ -79,7 +79,7 @@ const generateMockConversations = (count = 5) => {
 };
 
 // GET all chat channels
-router.get('/chat-channels', authenticateToken, checkRole(['head_administrator', 'communication_manager', 'support_manager']), async (req, res) => {
+router.get('/chat-channels', authenticateToken, requirePermission('read_communication'), async (req, res) => {
   try {
     const channelsCollection = await getCollection('chat_channels');
     if (!channelsCollection) {
@@ -103,7 +103,7 @@ router.get('/chat-channels', authenticateToken, checkRole(['head_administrator',
 });
 
 // GET all support tickets
-router.get('/tickets', authenticateToken, checkRole(['head_administrator', 'support_manager', 'customer_service']), async (req, res) => {
+router.get('/tickets', authenticateToken, requirePermission('read_communication'), async (req, res) => {
   try {
     const ticketsCollection = await getCollection('support_tickets');
     if (!ticketsCollection) {
@@ -127,7 +127,7 @@ router.get('/tickets', authenticateToken, checkRole(['head_administrator', 'supp
 });
 
 // GET /api/v1/communication/chat - Get chat messages
-router.get('/chat', authenticateToken, checkRole(['head_administrator', 'communication_manager', 'support_manager']), async (req, res) => {
+router.get('/chat', authenticateToken, requirePermission('read_communication'), async (req, res) => {
   try {
     const { chatId } = req.query;
     const messagesCollection = await getCollection('chat_messages');
@@ -163,7 +163,7 @@ router.get('/chat', authenticateToken, checkRole(['head_administrator', 'communi
 });
 
 // GET /api/v1/communication/chat/conversations - Get chat conversations
-router.get('/chat/conversations', authenticateToken, checkRole(['head_administrator', 'communication_manager', 'support_manager', 'user']), async (req, res) => {
+router.get('/chat/conversations', authenticateToken, requirePermission('read_communication'), async (req, res) => {
   try {
     const conversationsCollection = await getCollection('chat_conversations');
     
@@ -205,7 +205,7 @@ router.get('/chat/conversations', authenticateToken, checkRole(['head_administra
 });
 
 // POST /api/v1/communication/chat - Send chat message
-router.post('/chat', authenticateToken, checkRole(['head_administrator', 'communication_manager', 'support_manager', 'user']), async (req, res) => {
+router.post('/chat', authenticateToken, requirePermission('read_communication'), async (req, res) => {
   try {
     const { chatId, message, senderId, senderName } = req.body;
     
@@ -254,7 +254,7 @@ router.post('/chat', authenticateToken, checkRole(['head_administrator', 'commun
 });
 
 // GET /api/v1/communication/email - Get email history
-router.get('/email', authenticateToken, checkRole(['head_administrator', 'communication_manager', 'support_manager']), async (req, res) => {
+router.get('/email', authenticateToken, requirePermission('read_communication'), async (req, res) => {
   try {
     const emailsCollection = await getCollection('email_history');
     
@@ -284,7 +284,7 @@ router.get('/email', authenticateToken, checkRole(['head_administrator', 'commun
 });
 
 // POST /api/v1/communication/email - Send email
-router.post('/email', authenticateToken, checkRole(['head_administrator', 'communication_manager', 'support_manager']), async (req, res) => {
+router.post('/email', authenticateToken, requirePermission('read_communication'), async (req, res) => {
   try {
     const { to, subject, body, type = 'outbound' } = req.body;
     

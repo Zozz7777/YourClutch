@@ -176,7 +176,7 @@ router.get('/analytics/health', customerLimiter, authenticateToken, async (req, 
 });
 
 // POST /api/v1/customers - Create new customer
-router.post('/', customerLimiter, authenticateToken, checkRole(['admin', 'sales']), async (req, res) => {
+router.post('/', customerLimiter, authenticateToken, requirePermission('read_customers'), async (req, res) => {
   try {
     const customerData = req.body;
     

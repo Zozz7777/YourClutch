@@ -13,7 +13,7 @@ const { getCollection } = require('../config/optimized-database');
 // ============================================================================
 
 // GET /api/v1/fleet/fuel-cost-metrics - Get fuel cost metrics
-router.get('/fuel-cost-metrics', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.get('/fuel-cost-metrics', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const fuelCostsCollection = await getCollection('fuel_costs');
     
@@ -61,7 +61,7 @@ router.get('/fuel-cost-metrics', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/fleet/downtime-metrics - Get downtime metrics
-router.get('/downtime-metrics', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.get('/downtime-metrics', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const downtimeCollection = await getCollection('downtime_records');
     
@@ -109,7 +109,7 @@ router.get('/downtime-metrics', authenticateToken, checkRole(['head_administrato
 });
 
 // GET /api/v1/fleet/vehicles - Get all fleet vehicles
-router.get('/vehicles', authenticateToken, checkRole(['head_administrator', 'platform_admin', 'executive', 'admin', 'asset_manager']), async (req, res) => {
+router.get('/vehicles', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { page = 1, limit = 20, status, make, model } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -160,7 +160,7 @@ router.get('/vehicles', authenticateToken, checkRole(['head_administrator', 'pla
 });
 
 // GET /api/v1/fleet/drivers - Get all fleet drivers
-router.get('/drivers', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.get('/drivers', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { page = 1, limit = 20, status, department } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -213,7 +213,7 @@ router.get('/drivers', authenticateToken, checkRole(['head_administrator', 'asse
 });
 
 // POST /api/v1/fleet/vehicles - Add new vehicle to fleet
-router.post('/vehicles', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.post('/vehicles', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { 
       make, 
@@ -309,7 +309,7 @@ router.post('/vehicles', authenticateToken, checkRole(['head_administrator', 'as
 });
 
 // GET /api/v1/fleet/stats - Get fleet statistics
-router.get('/stats', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.get('/stats', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const vehiclesCollection = await getCollection('vehicles');
     const usersCollection = await getCollection('users');
@@ -357,7 +357,7 @@ router.get('/stats', authenticateToken, checkRole(['head_administrator', 'asset_
 });
 
 // POST /api/v1/fleet/maintenance - Create maintenance record
-router.post('/maintenance', authenticateToken, checkRole(['head_administrator', 'admin']), async (req, res) => {
+router.post('/maintenance', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { vehicleId, type, description, scheduledDate, status = 'scheduled' } = req.body;
     
@@ -443,7 +443,7 @@ router.post('/maintenance', authenticateToken, checkRole(['head_administrator', 
 });
 
 // GET /api/v1/fleet/maintenance - Get maintenance records
-router.get('/maintenance', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.get('/maintenance', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { page = 1, limit = 20, vehicleId, status } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -493,7 +493,7 @@ router.get('/maintenance', authenticateToken, checkRole(['head_administrator', '
 });
 
 // POST /api/v1/fleet/optimize-routes - Optimize fleet routes
-router.post('/optimize-routes', authenticateToken, checkRole(['head_administrator', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.post('/optimize-routes', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { vehicles, destinations, constraints } = req.body;
     
@@ -540,7 +540,7 @@ router.post('/optimize-routes', authenticateToken, checkRole(['head_administrato
 });
 
 // GET /api/v1/fleet/obd2 - Get OBD2 data for vehicles
-router.get('/obd2', authenticateToken, checkRole(['head_administrator', 'admin', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.get('/obd2', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { vehicleId, limit = 100 } = req.query;
     
@@ -579,7 +579,7 @@ router.get('/obd2', authenticateToken, checkRole(['head_administrator', 'admin',
 // ============================================================================
 
 // GET /api/v1/fleet/maintenance/tasks - Get AI maintenance tasks
-router.get('/maintenance/tasks', authenticateToken, checkRole(['head_administrator', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.get('/maintenance/tasks', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const tasksCollection = await getCollection('maintenance_tasks');
     const { page = 1, limit = 50, status, priority, vehicleId } = req.query;
@@ -623,7 +623,7 @@ router.get('/maintenance/tasks', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/fleet/maintenance/schedules - Get maintenance schedules
-router.get('/maintenance/schedules', authenticateToken, checkRole(['head_administrator', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.get('/maintenance/schedules', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const schedulesCollection = await getCollection('maintenance_schedules');
     const { page = 1, limit = 50, status } = req.query;
@@ -665,7 +665,7 @@ router.get('/maintenance/schedules', authenticateToken, checkRole(['head_adminis
 });
 
 // GET /api/v1/fleet/technicians - Get technicians
-router.get('/technicians', authenticateToken, checkRole(['head_administrator', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.get('/technicians', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const techniciansCollection = await getCollection('technicians');
     const { page = 1, limit = 50, availability, skill } = req.query;
@@ -708,7 +708,7 @@ router.get('/technicians', authenticateToken, checkRole(['head_administrator', '
 });
 
 // POST /api/v1/fleet/maintenance/tasks - Create maintenance task
-router.post('/maintenance/tasks', authenticateToken, checkRole(['head_administrator', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.post('/maintenance/tasks', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const tasksCollection = await getCollection('maintenance_tasks');
     const taskData = {
@@ -738,7 +738,7 @@ router.post('/maintenance/tasks', authenticateToken, checkRole(['head_administra
 });
 
 // GET /api/v1/fleet/maintenance/forecast - Get maintenance forecast predictions
-router.get('/maintenance/forecast', authenticateToken, checkRole(['head_administrator', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.get('/maintenance/forecast', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const vehiclesCollection = await getCollection('vehicles');
     const maintenanceCollection = await getCollection('maintenance_records');
@@ -857,7 +857,7 @@ router.get('/maintenance/forecast', authenticateToken, checkRole(['head_administ
 // ============================================================================
 
 // PUT /api/v1/fleet/vehicles/:id - Update vehicle
-router.put('/vehicles/:id', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.put('/vehicles/:id', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -920,7 +920,7 @@ router.put('/vehicles/:id', authenticateToken, checkRole(['head_administrator', 
 });
 
 // DELETE /api/v1/fleet/vehicles/:id - Remove vehicle from fleet
-router.delete('/vehicles/:id', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.delete('/vehicles/:id', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { id } = req.params;
     const vehiclesCollection = await getCollection('vehicles');
@@ -976,7 +976,7 @@ router.delete('/vehicles/:id', authenticateToken, checkRole(['head_administrator
 });
 
 // GET /api/v1/fleet/vehicles/:id - Get vehicle details
-router.get('/vehicles/:id', authenticateToken, checkRole(['head_administrator', 'asset_manager']), async (req, res) => {
+router.get('/vehicles/:id', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const { id } = req.params;
     const vehiclesCollection = await getCollection('vehicles');
@@ -1011,7 +1011,7 @@ router.get('/vehicles/:id', authenticateToken, checkRole(['head_administrator', 
 });
 
 // PUT /api/v1/fleet/maintenance/tasks/:id - Update maintenance task
-router.put('/maintenance/tasks/:id', authenticateToken, checkRole(['head_administrator', 'asset_manager', 'operations_manager']), async (req, res) => {
+router.put('/maintenance/tasks/:id', authenticateToken, requirePermission('read_fleet'), async (req, res) => {
   try {
     const tasksCollection = await getCollection('maintenance_tasks');
     const { id } = req.params;

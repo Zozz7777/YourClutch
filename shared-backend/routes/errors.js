@@ -87,7 +87,7 @@ router.post('/frontend', async (req, res) => {
 });
 
 // GET /errors/frontend - Get frontend errors (admin only)
-router.get('/frontend', authenticateToken, checkRole(['head_administrator', 'technology_admin']), async (req, res) => {
+router.get('/frontend', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { page = 1, limit = 20, severity, component, resolved, dateFrom, dateTo } = req.query;
     
@@ -171,7 +171,7 @@ router.get('/frontend', authenticateToken, checkRole(['head_administrator', 'tec
 });
 
 // PUT /errors/frontend/:id/resolve - Mark error as resolved
-router.put('/frontend/:id/resolve', authenticateToken, checkRole(['head_administrator', 'technology_admin']), async (req, res) => {
+router.put('/frontend/:id/resolve', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { id } = req.params;
     const { resolution, notes } = req.body;
@@ -212,7 +212,7 @@ router.put('/frontend/:id/resolve', authenticateToken, checkRole(['head_administ
 });
 
 // GET /errors/frontend/stats - Get error statistics
-router.get('/frontend/stats', authenticateToken, checkRole(['head_administrator', 'technology_admin']), async (req, res) => {
+router.get('/frontend/stats', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { period = '7d' } = req.query;
     

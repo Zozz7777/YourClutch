@@ -110,7 +110,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/audit-trail - Create audit log entry
-router.post('/', checkRole(['head_administrator']), async (req, res) => {
+router.post('/', requirePermission('read_audit'), async (req, res) => {
   try {
     const auditCollection = await getCollection('audit_logs');
     const { 
@@ -164,7 +164,7 @@ router.post('/', checkRole(['head_administrator']), async (req, res) => {
 // ===== SECURITY AUDIT =====
 
 // GET /api/audit-trail/security - Get security audit logs
-router.get('/security', checkRole(['head_administrator', 'hr_manager', 'admin']), async (req, res) => {
+router.get('/security', requirePermission('read_audit'), async (req, res) => {
   try {
     const auditCollection = await getCollection('audit_logs');
     const { page = 1, limit = 50, dateFrom, dateTo } = req.query;
@@ -223,7 +223,7 @@ router.get('/security', checkRole(['head_administrator', 'hr_manager', 'admin'])
 // ===== USER ACTIVITY AUDIT =====
 
 // GET /api/audit-trail/user-activity - Get user activity audit logs
-router.get('/user-activity', checkRole(['head_administrator', 'hr_manager', 'admin']), async (req, res) => {
+router.get('/user-activity', requirePermission('read_audit'), async (req, res) => {
   try {
     const auditCollection = await getCollection('audit_logs');
     const { page = 1, limit = 50, userId, dateFrom, dateTo } = req.query;
@@ -280,7 +280,7 @@ router.get('/user-activity', checkRole(['head_administrator', 'hr_manager', 'adm
 // ===== AUDIT ANALYTICS =====
 
 // GET /api/audit-trail/analytics - Get audit analytics
-router.get('/analytics', checkRole(['head_administrator']), async (req, res) => {
+router.get('/analytics', requirePermission('read_audit'), async (req, res) => {
   try {
     const auditCollection = await getCollection('audit_logs');
     
@@ -333,7 +333,7 @@ router.get('/analytics', checkRole(['head_administrator']), async (req, res) => 
 // ===== COMPLIANCE AUDIT =====
 
 // GET /api/audit-trail/compliance - Get compliance audit logs
-router.get('/compliance', checkRole(['head_administrator']), async (req, res) => {
+router.get('/compliance', requirePermission('read_audit'), async (req, res) => {
   try {
     const auditCollection = await getCollection('audit_logs');
     const { page = 1, limit = 50, dateFrom, dateTo } = req.query;
@@ -384,7 +384,7 @@ router.get('/compliance', checkRole(['head_administrator']), async (req, res) =>
 // ===== AUDIT EXPORT =====
 
 // GET /api/audit-trail/export - Export audit logs
-router.get('/export', checkRole(['head_administrator']), async (req, res) => {
+router.get('/export', requirePermission('read_audit'), async (req, res) => {
   try {
     const auditCollection = await getCollection('audit_logs');
     const { format = 'json', dateFrom, dateTo } = req.query;

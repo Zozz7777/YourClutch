@@ -19,7 +19,7 @@ router.use(authenticateToken);
 // ===== FINANCE PAYMENTS =====
 
 // GET /api/v1/finance/budgets - Get all budgets
-router.get('/budgets', checkRole(['head_administrator', 'finance_manager']), async (req, res) => {
+router.get('/budgets', requirePermission('read_general'), async (req, res) => {
   try {
     const budgetsCollection = await getCollection('budgets');
     
@@ -68,7 +68,7 @@ router.get('/budgets', checkRole(['head_administrator', 'finance_manager']), asy
 });
 
 // GET /api/v1/finance/expenses - Get all expenses
-router.get('/expenses', checkRole(['head_administrator', 'finance_manager']), async (req, res) => {
+router.get('/expenses', requirePermission('read_general'), async (req, res) => {
   try {
     const expensesCollection = await getCollection('expenses');
     
@@ -192,7 +192,7 @@ router.get('/payments/:id', async (req, res) => {
 });
 
 // POST /api/finance/payments - Create new payment
-router.post('/payments', checkRole(['head_administrator', 'finance_officer']), async (req, res) => {
+router.post('/payments', requirePermission('read_general'), async (req, res) => {
   try {
     const paymentsCollection = await getCollection('payments');
     const { 
@@ -293,7 +293,7 @@ router.get('/invoices', async (req, res) => {
 });
 
 // POST /api/finance/invoices - Create new invoice
-router.post('/invoices', checkRole(['head_administrator', 'finance_officer']), async (req, res) => {
+router.post('/invoices', requirePermission('read_general'), async (req, res) => {
   try {
     const invoicesCollection = await getCollection('invoices');
     const { 
@@ -437,7 +437,7 @@ router.get('/subscriptions', async (req, res) => {
 });
 
 // POST /api/v1/finance/subscriptions - Create new subscription
-router.post('/subscriptions', checkRole(['head_administrator', 'finance_officer']), async (req, res) => {
+router.post('/subscriptions', requirePermission('read_general'), async (req, res) => {
   try {
     const subscriptionsCollection = await getCollection('subscriptions');
     const { 
@@ -630,7 +630,7 @@ router.get('/expenses', async (req, res) => {
 });
 
 // POST /api/finance/expenses - Create new expense
-router.post('/expenses', checkRole(['head_administrator', 'admin']), async (req, res) => {
+router.post('/expenses', requirePermission('read_general'), async (req, res) => {
   try {
     const { amount, category, description, vendor, status = 'pending' } = req.body;
     
@@ -718,7 +718,7 @@ router.get('/analytics', async (req, res) => {
 });
 
 // GET /pricing-plans - Get pricing plans
-router.get('/pricing-plans', authenticateToken, checkRole(['head_administrator', 'finance_manager']), async (req, res) => {
+router.get('/pricing-plans', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const pricingPlansCollection = await getCollection('pricing_plans');
     
@@ -755,7 +755,7 @@ router.get('/pricing-plans', authenticateToken, checkRole(['head_administrator',
 });
 
 // GET /pricing-analytics - Get pricing analytics
-router.get('/pricing-analytics', authenticateToken, checkRole(['head_administrator', 'finance_manager']), async (req, res) => {
+router.get('/pricing-analytics', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const pricingPlansCollection = await getCollection('pricing_plans');
     const subscriptionsCollection = await getCollection('subscriptions');
@@ -811,7 +811,7 @@ router.get('/pricing-analytics', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /budget-breaches - Get budget breaches
-router.get('/budget-breaches', authenticateToken, checkRole(['head_administrator', 'finance_manager']), async (req, res) => {
+router.get('/budget-breaches', authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const budgetBreachesCollection = await getCollection('budget_breaches');
     

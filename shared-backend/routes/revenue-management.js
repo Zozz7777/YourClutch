@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { body, param, query, validationResult } = require('express-validator');
 const { logger } = require('../config/logger');
 const { toObjectId } = require('../utils/databaseUtils');
@@ -20,7 +20,7 @@ const revenueRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/revenue/orders - List all orders with revenue details
-router.get('/orders', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), revenueRateLimit, [
+router.get('/orders', authenticateToken, requirePermission('read_financial'), revenueRateLimit, [
   query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
   query('endDate').optional().isISO8601().withMessage('Invalid end date format'),
   query('partnerId').optional().isMongoId().withMessage('Invalid partner ID'),
@@ -76,7 +76,7 @@ router.get('/orders', authenticateToken, checkRole(['head_administrator', 'finan
 });
 
 // GET /api/v1/revenue/collections - Payment collections dashboard
-router.get('/collections', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), revenueRateLimit, async (req, res) => {
+router.get('/collections', authenticateToken, requirePermission('read_financial'), revenueRateLimit, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
@@ -142,7 +142,7 @@ router.get('/collections', authenticateToken, checkRole(['head_administrator', '
 });
 
 // POST /api/v1/revenue/collections - Record payment collection
-router.post('/collections', authenticateToken, checkRole(['head_administrator', 'finance_officer']), revenueRateLimit, [
+router.post('/collections', authenticateToken, requirePermission('read_financial'), revenueRateLimit, [
   body('orderIds').isArray().withMessage('Order IDs must be an array'),
   body('orderIds.*').isString().withMessage('Each order ID must be a string'),
   body('collectionMethod').isIn(['payment_gateway', 'delivery_partner', 'delivery_team', 'installment_provider', 'cash_from_partner']).withMessage('Invalid collection method'),
@@ -189,7 +189,7 @@ router.post('/collections', authenticateToken, checkRole(['head_administrator', 
 });
 
 // GET /api/v1/revenue/analytics - Revenue analytics by payment method
-router.get('/analytics', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), revenueRateLimit, async (req, res) => {
+router.get('/analytics', authenticateToken, requirePermission('read_financial'), revenueRateLimit, async (req, res) => {
   try {
     const { startDate, endDate, groupBy = 'paymentMethod' } = req.query;
     
@@ -235,7 +235,7 @@ router.get('/analytics', authenticateToken, checkRole(['head_administrator', 'fi
 });
 
 // GET /api/v1/revenue/weekly-payout-summary - Weekly payout calculation
-router.get('/weekly-payout-summary', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), revenueRateLimit, async (req, res) => {
+router.get('/weekly-payout-summary', authenticateToken, requirePermission('read_financial'), revenueRateLimit, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
@@ -305,7 +305,7 @@ router.get('/weekly-payout-summary', authenticateToken, checkRole(['head_adminis
 });
 
 // POST /api/v1/revenue/generate-payouts - Generate weekly partner payouts
-router.post('/generate-payouts', authenticateToken, checkRole(['head_administrator', 'finance_officer']), revenueRateLimit, [
+router.post('/generate-payouts', authenticateToken, requirePermission('read_financial'), revenueRateLimit, [
   body('startDate').isISO8601().withMessage('Invalid start date format'),
   body('endDate').isISO8601().withMessage('Invalid end date format'),
   body('payoutDate').isISO8601().withMessage('Invalid payout date format')
@@ -401,7 +401,7 @@ router.post('/generate-payouts', authenticateToken, checkRole(['head_administrat
 });
 
 // GET /api/v1/revenue/cash-flow - Complete cash flow tracking
-router.get('/cash-flow', authenticateToken, checkRole(['head_administrator', 'finance_officer', 'finance']), revenueRateLimit, async (req, res) => {
+router.get('/cash-flow', authenticateToken, requirePermission('read_financial'), revenueRateLimit, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     

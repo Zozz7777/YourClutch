@@ -63,7 +63,7 @@ router.get('/health', async (req, res) => {
 // Removed duplicate api-performance route - using the one below
 
 // GET /api/v1/system-health/detailed - Get detailed system health
-router.get('/detailed', checkRole(['head_administrator']), async (req, res) => {
+router.get('/detailed', requirePermission('read_system'), async (req, res) => {
   try {
     const detailedHealthData = await getDetailedSystemHealthData();
     
@@ -87,7 +87,7 @@ router.get('/detailed', checkRole(['head_administrator']), async (req, res) => {
 // Removed duplicate logs route - using the one below
 
 // GET /api/v1/system-health/api-performance - Get API performance metrics
-router.get('/api-performance', checkRole(['head_administrator']), async (req, res) => {
+router.get('/api-performance', requirePermission('read_system'), async (req, res) => {
   try {
     const performanceData = await getAPIPerformanceData();
     
@@ -127,7 +127,7 @@ router.get('/performance', async (req, res) => {
 });
 
 // GET /api/v1/system-health/database - Get database health
-router.get('/database', checkRole(['head_administrator']), async (req, res) => {
+router.get('/database', requirePermission('read_system'), async (req, res) => {
   try {
     const dbHealthData = await getDatabaseHealthData();
     
@@ -149,7 +149,7 @@ router.get('/database', checkRole(['head_administrator']), async (req, res) => {
 // Removed duplicate services route - using the one below
 
 // GET /api/v1/system-health/logs - Get system logs
-router.get('/logs', checkRole(['head_administrator']), async (req, res) => {
+router.get('/logs', requirePermission('read_system'), async (req, res) => {
   try {
     const { level, limit = 100, startDate, endDate } = req.query;
     
@@ -176,7 +176,7 @@ router.get('/logs', checkRole(['head_administrator']), async (req, res) => {
 });
 
 // POST /api/v1/system-health/test-connection - Test external service connections
-router.post('/test-connection', checkRole(['head_administrator']), async (req, res) => {
+router.post('/test-connection', requirePermission('read_system'), async (req, res) => {
   try {
     const { service } = req.body;
     
@@ -205,7 +205,7 @@ router.post('/test-connection', checkRole(['head_administrator']), async (req, r
 });
 
 // GET /api/v1/system-health/alerts - Get system alerts
-router.get('/alerts', checkRole(['head_administrator', 'admin']), async (req, res) => {
+router.get('/alerts', requirePermission('read_system'), async (req, res) => {
   try {
     const { status, severity, limit = 50 } = req.query;
     
@@ -231,7 +231,7 @@ router.get('/alerts', checkRole(['head_administrator', 'admin']), async (req, re
 });
 
 // POST /api/v1/system-health/alerts/:id/acknowledge - Acknowledge an alert
-router.post('/alerts/:id/acknowledge', checkRole(['head_administrator', 'admin']), async (req, res) => {
+router.post('/alerts/:id/acknowledge', requirePermission('read_system'), async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -254,7 +254,7 @@ router.post('/alerts/:id/acknowledge', checkRole(['head_administrator', 'admin']
 });
 
 // GET /api/v1/system-health/sla - Get SLA metrics
-router.get('/sla', checkRole(['head_administrator', 'admin']), async (req, res) => {
+router.get('/sla', requirePermission('read_system'), async (req, res) => {
   try {
     const slaData = await getSLAMetrics();
     
@@ -274,7 +274,7 @@ router.get('/sla', checkRole(['head_administrator', 'admin']), async (req, res) 
 });
 
 // GET /api/v1/system-health/services - Get service health status
-router.get('/services', checkRole(['head_administrator', 'admin']), async (req, res) => {
+router.get('/services', requirePermission('read_system'), async (req, res) => {
   try {
     const serviceData = await getServiceHealth();
     

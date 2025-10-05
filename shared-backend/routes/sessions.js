@@ -133,7 +133,7 @@ router.get('/statistics', sessionLimiter, authenticateToken, async (req, res) =>
 });
 
 // DELETE /api/v1/sessions/:sessionId - Terminate a session
-router.delete('/:sessionId', sessionLimiter, authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.delete('/:sessionId', sessionLimiter, authenticateToken, requirePermission('read_general'), async (req, res) => {
   try {
     const { sessionId } = req.params;
     

@@ -185,7 +185,7 @@ const complianceStatus = {
  * @desc Get security threat events
  * @access Private (Admin only)
  */
-router.get('/threat-events', authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.get('/threat-events', authenticateToken, requirePermission('read_security'), async (req, res) => {
   try {
     const { severity, status, timeRange } = req.query;
     
@@ -222,7 +222,7 @@ router.get('/threat-events', authenticateToken, checkRole(['admin', 'super_admin
  * @desc Get security threat patterns
  * @access Private (Admin only)
  */
-router.get('/threat-patterns', authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.get('/threat-patterns', authenticateToken, requirePermission('read_security'), async (req, res) => {
   try {
     res.json({
       success: true,
@@ -246,7 +246,7 @@ router.get('/threat-patterns', authenticateToken, checkRole(['admin', 'super_adm
  * @desc Get security alerts
  * @access Private (Admin only)
  */
-router.get('/alerts', authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.get('/alerts', authenticateToken, requirePermission('read_security'), async (req, res) => {
   try {
     const { severity, status } = req.query;
     
@@ -282,7 +282,7 @@ router.get('/alerts', authenticateToken, checkRole(['admin', 'super_admin']), as
  * @desc Get security metrics
  * @access Private (Admin only)
  */
-router.get('/metrics', authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.get('/metrics', authenticateToken, requirePermission('read_security'), async (req, res) => {
   try {
     const { category, timeRange } = req.query;
     
@@ -314,7 +314,7 @@ router.get('/metrics', authenticateToken, checkRole(['admin', 'super_admin']), a
  * @desc Get security audit logs
  * @access Private (Admin only)
  */
-router.get('/audit-logs', authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.get('/audit-logs', authenticateToken, requirePermission('read_security'), async (req, res) => {
   try {
     const { userId, action, success, timeRange } = req.query;
     
@@ -354,7 +354,7 @@ router.get('/audit-logs', authenticateToken, checkRole(['admin', 'super_admin'])
  * @desc Get compliance status
  * @access Private (Admin only)
  */
-router.get('/compliance', authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.get('/compliance', authenticateToken, requirePermission('read_security'), async (req, res) => {
   try {
     res.json({
       success: true,
@@ -378,7 +378,7 @@ router.get('/compliance', authenticateToken, checkRole(['admin', 'super_admin'])
  * @desc Resolve a security alert
  * @access Private (Admin only)
  */
-router.post('/alerts/:id/resolve', authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.post('/alerts/:id/resolve', authenticateToken, requirePermission('read_security'), async (req, res) => {
   try {
     const { id } = req.params;
     const { resolution } = req.body;
@@ -421,7 +421,7 @@ router.post('/alerts/:id/resolve', authenticateToken, checkRole(['admin', 'super
  * @desc Block an IP address
  * @access Private (Admin only)
  */
-router.post('/block-ip', authenticateToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+router.post('/block-ip', authenticateToken, requirePermission('read_security'), async (req, res) => {
   try {
     const { ipAddress, reason, duration } = req.body;
     

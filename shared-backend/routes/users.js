@@ -7,7 +7,7 @@ const logger = require('../utils/logger');
 const { getCollection } = require('../config/optimized-database');
 
 // GET /segments - Get user segments
-router.get('/segments', authenticateToken, checkRole(['head_administrator', 'analytics_manager']), async (req, res) => {
+router.get('/segments', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const segmentsCollection = await getCollection('user_segments');
     
@@ -44,7 +44,7 @@ router.get('/segments', authenticateToken, checkRole(['head_administrator', 'ana
 });
 
 // GET /segments/analytics - Get user segment analytics
-router.get('/segments/analytics', authenticateToken, checkRole(['head_administrator', 'analytics_manager']), async (req, res) => {
+router.get('/segments/analytics', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const segmentsCollection = await getCollection('user_segments');
     const usersCollection = await getCollection('users');
@@ -95,7 +95,7 @@ router.get('/segments/analytics', authenticateToken, checkRole(['head_administra
 });
 
 // GET /users - Get all users
-router.get('/', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const usersCollection = await getCollection('users');
     
@@ -138,7 +138,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator']), async (req
 });
 
 // GET /users/:id - Get user by ID
-router.get('/:id', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.get('/:id', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { id } = req.params;
     const usersCollection = await getCollection('users');
@@ -157,7 +157,7 @@ router.get('/:id', authenticateToken, checkRole(['head_administrator']), async (
 });
 
 // POST /users - Create new user
-router.post('/', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.post('/', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { name, email, role, status = 'active' } = req.body;
     
@@ -198,7 +198,7 @@ router.post('/', authenticateToken, checkRole(['head_administrator']), async (re
 });
 
 // PUT /users/:id - Update user
-router.put('/:id', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.put('/:id', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, role, status } = req.body;
@@ -246,7 +246,7 @@ router.put('/:id', authenticateToken, checkRole(['head_administrator']), async (
 });
 
 // DELETE /users/:id - Delete user
-router.delete('/:id', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.delete('/:id', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -277,7 +277,7 @@ router.delete('/:id', authenticateToken, checkRole(['head_administrator']), asyn
 });
 
 // DELETE /users/cleanup/test - Delete all test users
-router.delete('/cleanup/test', authenticateToken, checkRole(['head_administrator']), async (req, res) => {
+router.delete('/cleanup/test', authenticateToken, requirePermission('read_user'), async (req, res) => {
   try {
     const usersCollection = await getCollection('users');
     
