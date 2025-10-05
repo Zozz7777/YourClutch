@@ -352,6 +352,10 @@ app.use('/api/v1/procurement/contracts', require('./routes/procurement-contracts
 app.use('/api/v1/procurement/goods-receipts', require('./routes/procurement-goods-receipt'));
 app.use('/api/v1/procurement/analytics', require('./routes/procurement-analytics'));
 
+// Sales and contract management routes
+app.use('/api/v1/sales', require('./routes/sales'));
+app.use('/api/v1/contract-templates', require('./routes/contract-templates'));
+
 // app.use('/api/notifications', notificationsRoutes); // Not defined
 // app.use('/api/export', exportRoutes); // Not defined
 // app.use('/api/settings', settingsRoutes); // Not defined

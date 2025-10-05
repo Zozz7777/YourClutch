@@ -120,6 +120,57 @@ async fn check_for_updates(state: State<'_, AppState>) -> Result<String, String>
 }
 
 #[tauri::command]
+async fn get_sync_status(state: State<'_, AppState>) -> Result<String, String> {
+    log::info!("Getting sync status...");
+    
+    let sync = state.sync.lock().await;
+    match sync.sync_data().await {
+        Ok(status) => {
+            log::info!("✅ Sync status retrieved");
+            Ok(serde_json::to_string(&status).unwrap_or_else(|_| "{}".to_string()))
+        }
+        Err(e) => {
+            log::error!("❌ Failed to get sync status: {}", e);
+            Err(format!("❌ Failed to get sync status: {}", e))
+        }
+    }
+}
+
+#[tauri::command]
+async fn start_websocket(state: State<'_, AppState>) -> Result<String, String> {
+    log::info!("Starting WebSocket connection...");
+    
+    let sync = state.sync.lock().await;
+    match sync.start_websocket_connection().await {
+        Ok(_) => {
+            log::info!("✅ WebSocket started successfully");
+            Ok("WebSocket connection started".to_string())
+        }
+        Err(e) => {
+            log::error!("❌ Failed to start WebSocket: {}", e);
+            Err(format!("❌ Failed to start WebSocket: {}", e))
+        }
+    }
+}
+
+#[tauri::command]
+async fn stop_websocket(state: State<'_, AppState>) -> Result<String, String> {
+    log::info!("Stopping WebSocket connection...");
+    
+    let sync = state.sync.lock().await;
+    match sync.stop_websocket_connection().await {
+        Ok(_) => {
+            log::info!("✅ WebSocket stopped successfully");
+            Ok("WebSocket connection stopped".to_string())
+        }
+        Err(e) => {
+            log::error!("❌ Failed to stop WebSocket: {}", e);
+            Err(format!("❌ Failed to stop WebSocket: {}", e))
+        }
+    }
+}
+
+#[tauri::command]
 async fn get_products(state: State<'_, AppState>) -> Result<String, String> {
     log::info!("Getting products...");
     
@@ -216,6 +267,9 @@ async fn main() {
             login,
             signup,
             check_for_updates,
+            get_sync_status,
+            start_websocket,
+            stop_websocket,
             get_products,
             add_product,
             process_sale

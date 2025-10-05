@@ -127,7 +127,6 @@ fun InventoryScreen(navController: NavController) {
     }
 }
 
-
 @Composable
 fun ProductCard(product: Product) {
     Card(
