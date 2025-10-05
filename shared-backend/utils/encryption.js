@@ -142,7 +142,34 @@ class EncryptionService {
   }
 }
 
-// Create singleton instance
-const encryptionService = new EncryptionService();
+// Create singleton instance with fallback
+let encryptionService = null;
+
+try {
+  encryptionService = new EncryptionService();
+} catch (error) {
+  console.warn('⚠️ Encryption service not available:', error.message);
+  console.warn('⚠️ Using fallback encryption service (not secure for production)');
+  
+  // Fallback service for when ENCRYPTION_KEY is not set
+  encryptionService = {
+    encrypt: (text) => {
+      console.warn('⚠️ Using fallback encryption - data not actually encrypted');
+      return Buffer.from(text).toString('base64');
+    },
+    decrypt: (text) => {
+      console.warn('⚠️ Using fallback decryption - data not actually decrypted');
+      return Buffer.from(text, 'base64').toString();
+    },
+    hash: (text) => {
+      console.warn('⚠️ Using fallback hashing - not cryptographically secure');
+      return require('crypto').createHash('sha256').update(text).digest('hex');
+    },
+    verify: (text, hash) => {
+      const computedHash = encryptionService.hash(text);
+      return computedHash === hash;
+    }
+  };
+}
 
 module.exports = encryptionService;
