@@ -1,0 +1,411 @@
+/* 
+  Localizable.strings
+  ClutchPartners
+
+  Created by Clutch Team on 2024.
+*/
+
+// MARK: - Common
+"common.loading" = "Loading...";
+"common.error" = "Error";
+"common.success" = "Success";
+"common.cancel" = "Cancel";
+"common.save" = "Save";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.add" = "Add";
+"common.search" = "Search";
+"common.filter" = "Filter";
+"common.sort" = "Sort";
+"common.refresh" = "Refresh";
+"common.retry" = "Retry";
+"common.done" = "Done";
+"common.next" = "Next";
+"common.previous" = "Previous";
+"common.close" = "Close";
+"common.back" = "Back";
+"common.continue" = "Continue";
+"common.finish" = "Finish";
+"common.skip" = "Skip";
+"common.yes" = "Yes";
+"common.no" = "No";
+"common.ok" = "OK";
+"common.confirm" = "Confirm";
+
+// MARK: - Authentication
+"auth.sign_in" = "Sign In";
+"auth.sign_up" = "Sign Up";
+"auth.email" = "Email";
+"auth.password" = "Password";
+"auth.confirm_password" = "Confirm Password";
+"auth.phone" = "Phone Number";
+"auth.forgot_password" = "Forgot Password?";
+"auth.remember_me" = "Remember Me";
+"auth.biometric_sign_in" = "Use Biometric Sign In";
+"auth.social_sign_in" = "Sign in with";
+"auth.partner_id" = "Partner ID";
+"auth.request_to_join" = "Request to Join";
+"auth.kyc_verification" = "KYC Verification";
+"auth.upload_documents" = "Upload Documents";
+"auth.document_status" = "Document Status";
+"auth.verification_pending" = "Verification Pending";
+"auth.verification_approved" = "Verification Approved";
+"auth.verification_rejected" = "Verification Rejected";
+
+// MARK: - Onboarding
+"onboarding.welcome" = "Welcome to Clutch Partners";
+"onboarding.get_started" = "Get Started";
+"onboarding.learn_more" = "Learn More";
+"onboarding.tutorial_video" = "Watch Tutorial Video";
+"onboarding.skip_tutorial" = "Skip Tutorial";
+
+// MARK: - Partner Types
+"partner_type.repair_center" = "Repair Center";
+"partner_type.auto_parts" = "Auto Parts";
+"partner_type.accessories" = "Accessories";
+"partner_type.importer" = "Importer";
+"partner_type.manufacturer" = "Manufacturer";
+"partner_type.service_center" = "Service Center";
+
+// MARK: - Main Navigation
+"nav.home" = "Home";
+"nav.dashboard" = "Dashboard";
+"nav.payments" = "Payments";
+"nav.settings" = "Settings";
+"nav.loyalty" = "Loyalty";
+"nav.ratings" = "Ratings";
+"nav.notifications" = "Notifications";
+"nav.support" = "Support";
+"nav.audit" = "Audit";
+"nav.warranty" = "Warranty";
+"nav.export" = "Export";
+
+// MARK: - Home Screen
+"home.orders" = "Orders";
+"home.appointments" = "Appointments";
+"home.today" = "Today";
+"home.pending" = "Pending";
+"home.completed" = "Completed";
+"home.cancelled" = "Cancelled";
+"home.new_order" = "New Order";
+"home.view_all" = "View All";
+
+// MARK: - Dashboard
+"dashboard.revenue" = "Revenue";
+"dashboard.orders" = "Orders";
+"dashboard.customers" = "Customers";
+"dashboard.inventory" = "Inventory";
+"dashboard.performance" = "Performance";
+"dashboard.today" = "Today";
+"dashboard.this_week" = "This Week";
+"dashboard.this_month" = "This Month";
+"dashboard.this_year" = "This Year";
+
+// MARK: - Payments
+"payments.weekly_income" = "Weekly Income";
+"payments.payout_history" = "Payout History";
+"payments.commission" = "Commission";
+"payments.total_earnings" = "Total Earnings";
+"payments.pending_payout" = "Pending Payout";
+"payments.last_payout" = "Last Payout";
+"payments.request_payout" = "Request Payout";
+
+// MARK: - Settings
+"settings.profile" = "Profile";
+"settings.locations" = "Locations";
+"settings.dark_mode" = "Dark Mode";
+"settings.language" = "Language";
+"settings.biometric" = "Biometric Authentication";
+"settings.notifications" = "Notifications";
+"settings.privacy" = "Privacy";
+"settings.about" = "About";
+"settings.logout" = "Logout";
+
+// MARK: - Loyalty & Rewards
+"loyalty.points_balance" = "Points Balance";
+"loyalty.tier_level" = "Tier Level";
+"loyalty.leaderboard" = "Leaderboard";
+"loyalty.redeem" = "Redeem";
+"loyalty.earn_points" = "Earn Points";
+"loyalty.redeem_rewards" = "Redeem Rewards";
+"loyalty.history" = "History";
+
+// MARK: - Ratings & Reviews
+"ratings.partner_rating" = "Partner Rating";
+"ratings.customer_reviews" = "Customer Reviews";
+"ratings.respond_to_feedback" = "Respond to Feedback";
+"ratings.overall_rating" = "Overall Rating";
+"ratings.total_reviews" = "Total Reviews";
+"ratings.recent_reviews" = "Recent Reviews";
+
+// MARK: - Notifications
+"notifications.push" = "Push Notifications";
+"notifications.email" = "Email Notifications";
+"notifications.sms" = "SMS Notifications";
+"notifications.mark_as_read" = "Mark as Read";
+"notifications.mark_all_read" = "Mark All as Read";
+"notifications.filter" = "Filter";
+"notifications.all" = "All";
+"notifications.unread" = "Unread";
+"notifications.important" = "Important";
+
+// MARK: - Support
+"support.submit_ticket" = "Submit Ticket";
+"support.live_chat" = "Live Chat";
+"support.faq" = "FAQ";
+"support.ticket_history" = "Ticket History";
+"support.subject" = "Subject";
+"support.message" = "Message";
+"support.priority" = "Priority";
+"support.category" = "Category";
+
+// MARK: - Audit Log
+"audit.staff_actions" = "Staff Actions";
+"audit.action_log" = "Action Log";
+"audit.user" = "User";
+"audit.action" = "Action";
+"audit.timestamp" = "Timestamp";
+"audit.details" = "Details";
+"audit.export_log" = "Export Log";
+
+// MARK: - Warranty & Disputes
+"warranty.claims" = "Claims";
+"warranty.disputes" = "Disputes";
+"warranty.submit_claim" = "Submit Claim";
+"warranty.submit_dispute" = "Submit Dispute";
+"warranty.claim_status" = "Claim Status";
+"warranty.dispute_status" = "Dispute Status";
+"warranty.escalate" = "Escalate";
+
+// MARK: - Data Export
+"export.select_dataset" = "Select Dataset";
+"export.format" = "Format";
+"export.date_range" = "Date Range";
+"export.scheduled_exports" = "Scheduled Exports";
+"export.csv" = "CSV";
+"export.excel" = "Excel";
+"export.pdf" = "PDF";
+"export.export_now" = "Export Now";
+"export.schedule_export" = "Schedule Export";
+
+// MARK: - POS (Point of Sale)
+"pos.sale" = "Sale";
+"pos.refund" = "Refund";
+"pos.split_payment" = "Split Payment";
+"pos.shift_close" = "Shift Close";
+"pos.offline_sync" = "Offline Sync";
+"pos.add_item" = "Add Item";
+"pos.remove_item" = "Remove Item";
+"pos.total" = "Total";
+"pos.tax" = "Tax";
+"pos.discount" = "Discount";
+"pos.payment_method" = "Payment Method";
+"pos.cash" = "Cash";
+"pos.card" = "Card";
+"pos.digital" = "Digital";
+
+// MARK: - Inventory
+"inventory.products" = "Products";
+"inventory.add_product" = "Add Product";
+"inventory.edit_product" = "Edit Product";
+"inventory.delete_product" = "Delete Product";
+"inventory.stock_level" = "Stock Level";
+"inventory.low_stock" = "Low Stock";
+"inventory.out_of_stock" = "Out of Stock";
+"inventory.stocktake" = "Stocktake";
+"inventory.bulk_import" = "Bulk Import";
+"inventory.variants" = "Variants";
+"inventory.expiry_tracking" = "Expiry Tracking";
+
+// MARK: - Purchase Orders
+"purchase_orders.create_po" = "Create Purchase Order";
+"purchase_orders.receive" = "Receive";
+"purchase_orders.approval_workflow" = "Approval Workflow";
+"purchase_orders.history" = "History";
+"purchase_orders.pending_approval" = "Pending Approval";
+"purchase_orders.approved" = "Approved";
+"purchase_orders.rejected" = "Rejected";
+
+// MARK: - Suppliers
+"suppliers.supplier_list" = "Supplier List";
+"suppliers.add_supplier" = "Add Supplier";
+"suppliers.edit_supplier" = "Edit Supplier";
+"suppliers.delete_supplier" = "Delete Supplier";
+"suppliers.performance_tracking" = "Performance Tracking";
+"suppliers.catalog_integration" = "Catalog Integration";
+"suppliers.contact_info" = "Contact Info";
+"suppliers.payment_terms" = "Payment Terms";
+
+// MARK: - Devices
+"devices.register_device" = "Register Device";
+"devices.pair" = "Pair";
+"devices.status" = "Status";
+"devices.remote_lock" = "Remote Lock";
+"devices.device_name" = "Device Name";
+"devices.device_type" = "Device Type";
+"devices.connection_status" = "Connection Status";
+
+// MARK: - Staff/HR
+"staff.add_staff" = "Add Staff";
+"staff.edit_staff" = "Edit Staff";
+"staff.delete_staff" = "Delete Staff";
+"staff.role_assignment" = "Role Assignment";
+"staff.performance_tracking" = "Performance Tracking";
+"staff.staff_list" = "Staff List";
+"staff.permissions" = "Permissions";
+"staff.role" = "Role";
+
+// MARK: - Contracts
+"contracts.upload" = "Upload Contract";
+"contracts.e_signature" = "E-Signature";
+"contracts.status_tracking" = "Status Tracking";
+"contracts.renewal_reminders" = "Renewal Reminders";
+"contracts.contract_list" = "Contract List";
+"contracts.pending_signature" = "Pending Signature";
+"contracts.signed" = "Signed";
+"contracts.expired" = "Expired";
+
+// MARK: - Reports
+"reports.sales" = "Sales Reports";
+"reports.inventory" = "Inventory Reports";
+"reports.customer" = "Customer Reports";
+"reports.staff" = "Staff Reports";
+"reports.tax" = "Tax Reports";
+"reports.date_range" = "Date Range";
+"reports.generate_report" = "Generate Report";
+"reports.export_report" = "Export Report";
+
+// MARK: - Appointments
+"appointments.calendar" = "Calendar";
+"appointments.booking" = "Booking";
+"appointments.reminders" = "Reminders";
+"appointments.check_in" = "Check In";
+"appointments.check_out" = "Check Out";
+"appointments.scheduled" = "Scheduled";
+"appointments.completed" = "Completed";
+"appointments.cancelled" = "Cancelled";
+
+// MARK: - Vehicles
+"vehicles.customer_vehicles" = "Customer Vehicles";
+"vehicles.vin_tracking" = "VIN Tracking";
+"vehicles.service_history" = "Service History";
+"vehicles.add_vehicle" = "Add Vehicle";
+"vehicles.edit_vehicle" = "Edit Vehicle";
+"vehicles.vehicle_details" = "Vehicle Details";
+"vehicles.make" = "Make";
+"vehicles.model" = "Model";
+"vehicles.year" = "Year";
+"vehicles.color" = "Color";
+"vehicles.mileage" = "Mileage";
+
+// MARK: - Quotes
+"quotes.create_quote" = "Create Quote";
+"quotes.send_sms" = "Send via SMS";
+"quotes.send_email" = "Send via Email";
+"quotes.approve" = "Approve";
+"quotes.reject" = "Reject";
+"quotes.convert_to_order" = "Convert to Order";
+"quotes.quote_list" = "Quote List";
+"quotes.pending" = "Pending";
+"quotes.approved" = "Approved";
+"quotes.rejected" = "Rejected";
+
+// MARK: - Promotions
+"promotions.create_promotion" = "Create Promotion";
+"promotions.promo_codes" = "Promo Codes";
+"promotions.validity_period" = "Validity Period";
+"promotions.redemption_tracking" = "Redemption Tracking";
+"promotions.promotion_list" = "Promotion List";
+"promotions.active" = "Active";
+"promotions.expired" = "Expired";
+"promotions.discount" = "Discount";
+"promotions.free_service" = "Free Service";
+
+// MARK: - Customer Feedback
+"feedback.view_ratings" = "View Ratings";
+"feedback.respond_to_reviews" = "Respond to Reviews";
+"feedback.feedback_list" = "Feedback List";
+"feedback.rating" = "Rating";
+"feedback.review" = "Review";
+"feedback.response" = "Response";
+
+// MARK: - Product Catalog
+"catalog.browse_marketplace" = "Browse Marketplace";
+"catalog.add_to_inventory" = "Add to Inventory";
+"catalog.request_new_products" = "Request New Products";
+"catalog.product_list" = "Product List";
+"catalog.categories" = "Categories";
+"catalog.brands" = "Brands";
+"catalog.price" = "Price";
+"catalog.availability" = "Availability";
+
+// MARK: - Training
+"training.video_courses" = "Video Courses";
+"training.quizzes" = "Quizzes";
+"training.certifications" = "Certifications";
+"training.badges" = "Badges";
+"training.download_certificates" = "Download Certificates";
+"training.course_list" = "Course List";
+"training.enrolled" = "Enrolled";
+"training.completed" = "Completed";
+"training.in_progress" = "In Progress";
+
+// MARK: - Performance
+"performance.optimization" = "Performance Optimization";
+"performance.battery_optimization" = "Battery Optimization";
+"performance.network_optimization" = "Network Optimization";
+"performance.image_optimization" = "Image Optimization";
+"performance.memory_usage" = "Memory Usage";
+"performance.cpu_usage" = "CPU Usage";
+"performance.network_latency" = "Network Latency";
+"performance.recommendations" = "Recommendations";
+
+// MARK: - Errors
+"error.network" = "Network Error";
+"error.server" = "Server Error";
+"error.authentication" = "Authentication Error";
+"error.authorization" = "Authorization Error";
+"error.validation" = "Validation Error";
+"error.not_found" = "Not Found";
+"error.timeout" = "Request Timeout";
+"error.unknown" = "Unknown Error";
+"error.offline" = "You are offline";
+"error.retry" = "Retry";
+
+// MARK: - Success Messages
+"success.saved" = "Saved successfully";
+"success.deleted" = "Deleted successfully";
+"success.updated" = "Updated successfully";
+"success.created" = "Created successfully";
+"success.uploaded" = "Uploaded successfully";
+"success.sent" = "Sent successfully";
+"success.synced" = "Synced successfully";
+
+// MARK: - Validation Messages
+"validation.required" = "This field is required";
+"validation.email" = "Please enter a valid email";
+"validation.phone" = "Please enter a valid phone number";
+"validation.password" = "Password must be at least 8 characters";
+"validation.confirm_password" = "Passwords do not match";
+"validation.partner_id" = "Please enter a valid Partner ID";
+"validation.vin" = "Please enter a valid VIN";
+"validation.license_plate" = "Please enter a valid license plate";
+
+// MARK: - Permissions
+"permission.camera" = "Camera permission is required";
+"permission.storage" = "Storage permission is required";
+"permission.location" = "Location permission is required";
+"permission.notification" = "Notification permission is required";
+"permission.biometric" = "Biometric permission is required";
+
+// MARK: - Deep Links
+"deeplink.order_details" = "Order Details";
+"deeplink.payment_details" = "Payment Details";
+"deeplink.notification_details" = "Notification Details";
+"deeplink.appointment_details" = "Appointment Details";
+"deeplink.vehicle_details" = "Vehicle Details";
+"deeplink.quote_details" = "Quote Details";
+"deeplink.promotion_details" = "Promotion Details";
+"deeplink.training_details" = "Training Details";
+"deeplink.catalog_details" = "Catalog Details";
+"deeplink.supplier_details" = "Supplier Details";

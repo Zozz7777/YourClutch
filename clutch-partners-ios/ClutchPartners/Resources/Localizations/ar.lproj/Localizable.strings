@@ -1,0 +1,411 @@
+/* 
+  Localizable.strings
+  ClutchPartners
+
+  Created by Clutch Team on 2024.
+*/
+
+// MARK: - Common
+"common.loading" = "جاري التحميل...";
+"common.error" = "خطأ";
+"common.success" = "نجح";
+"common.cancel" = "إلغاء";
+"common.save" = "حفظ";
+"common.delete" = "حذف";
+"common.edit" = "تعديل";
+"common.add" = "إضافة";
+"common.search" = "بحث";
+"common.filter" = "تصفية";
+"common.sort" = "ترتيب";
+"common.refresh" = "تحديث";
+"common.retry" = "إعادة المحاولة";
+"common.done" = "تم";
+"common.next" = "التالي";
+"common.previous" = "السابق";
+"common.close" = "إغلاق";
+"common.back" = "رجوع";
+"common.continue" = "متابعة";
+"common.finish" = "إنهاء";
+"common.skip" = "تخطي";
+"common.yes" = "نعم";
+"common.no" = "لا";
+"common.ok" = "موافق";
+"common.confirm" = "تأكيد";
+
+// MARK: - Authentication
+"auth.sign_in" = "تسجيل الدخول";
+"auth.sign_up" = "إنشاء حساب";
+"auth.email" = "البريد الإلكتروني";
+"auth.password" = "كلمة المرور";
+"auth.confirm_password" = "تأكيد كلمة المرور";
+"auth.phone" = "رقم الهاتف";
+"auth.forgot_password" = "نسيت كلمة المرور؟";
+"auth.remember_me" = "تذكرني";
+"auth.biometric_sign_in" = "استخدام تسجيل الدخول البيومتري";
+"auth.social_sign_in" = "تسجيل الدخول باستخدام";
+"auth.partner_id" = "معرف الشريك";
+"auth.request_to_join" = "طلب الانضمام";
+"auth.kyc_verification" = "التحقق من الهوية";
+"auth.upload_documents" = "رفع المستندات";
+"auth.document_status" = "حالة المستند";
+"auth.verification_pending" = "التحقق معلق";
+"auth.verification_approved" = "تم الموافقة على التحقق";
+"auth.verification_rejected" = "تم رفض التحقق";
+
+// MARK: - Onboarding
+"onboarding.welcome" = "مرحباً بك في شركاء كلتش";
+"onboarding.get_started" = "ابدأ الآن";
+"onboarding.learn_more" = "تعلم المزيد";
+"onboarding.tutorial_video" = "شاهد فيديو التعليمات";
+"onboarding.skip_tutorial" = "تخطي التعليمات";
+
+// MARK: - Partner Types
+"partner_type.repair_center" = "مركز إصلاح";
+"partner_type.auto_parts" = "قطع غيار";
+"partner_type.accessories" = "إكسسوارات";
+"partner_type.importer" = "مستورد";
+"partner_type.manufacturer" = "مصنع";
+"partner_type.service_center" = "مركز خدمة";
+
+// MARK: - Main Navigation
+"nav.home" = "الرئيسية";
+"nav.dashboard" = "لوحة التحكم";
+"nav.payments" = "المدفوعات";
+"nav.settings" = "الإعدادات";
+"nav.loyalty" = "الولاء";
+"nav.ratings" = "التقييمات";
+"nav.notifications" = "الإشعارات";
+"nav.support" = "الدعم";
+"nav.audit" = "التدقيق";
+"nav.warranty" = "الضمان";
+"nav.export" = "التصدير";
+
+// MARK: - Home Screen
+"home.orders" = "الطلبات";
+"home.appointments" = "المواعيد";
+"home.today" = "اليوم";
+"home.pending" = "معلق";
+"home.completed" = "مكتمل";
+"home.cancelled" = "ملغي";
+"home.new_order" = "طلب جديد";
+"home.view_all" = "عرض الكل";
+
+// MARK: - Dashboard
+"dashboard.revenue" = "الإيرادات";
+"dashboard.orders" = "الطلبات";
+"dashboard.customers" = "العملاء";
+"dashboard.inventory" = "المخزون";
+"dashboard.performance" = "الأداء";
+"dashboard.today" = "اليوم";
+"dashboard.this_week" = "هذا الأسبوع";
+"dashboard.this_month" = "هذا الشهر";
+"dashboard.this_year" = "هذا العام";
+
+// MARK: - Payments
+"payments.weekly_income" = "الدخل الأسبوعي";
+"payments.payout_history" = "تاريخ المدفوعات";
+"payments.commission" = "العمولة";
+"payments.total_earnings" = "إجمالي الأرباح";
+"payments.pending_payout" = "دفعة معلقة";
+"payments.last_payout" = "آخر دفعة";
+"payments.request_payout" = "طلب دفعة";
+
+// MARK: - Settings
+"settings.profile" = "الملف الشخصي";
+"settings.locations" = "المواقع";
+"settings.dark_mode" = "الوضع المظلم";
+"settings.language" = "اللغة";
+"settings.biometric" = "المصادقة البيومترية";
+"settings.notifications" = "الإشعارات";
+"settings.privacy" = "الخصوصية";
+"settings.about" = "حول";
+"settings.logout" = "تسجيل الخروج";
+
+// MARK: - Loyalty & Rewards
+"loyalty.points_balance" = "رصيد النقاط";
+"loyalty.tier_level" = "مستوى الفئة";
+"loyalty.leaderboard" = "لوحة المتصدرين";
+"loyalty.redeem" = "استرداد";
+"loyalty.earn_points" = "كسب النقاط";
+"loyalty.redeem_rewards" = "استرداد المكافآت";
+"loyalty.history" = "التاريخ";
+
+// MARK: - Ratings & Reviews
+"ratings.partner_rating" = "تقييم الشريك";
+"ratings.customer_reviews" = "تقييمات العملاء";
+"ratings.respond_to_feedback" = "الرد على التعليقات";
+"ratings.overall_rating" = "التقييم العام";
+"ratings.total_reviews" = "إجمالي التقييمات";
+"ratings.recent_reviews" = "التقييمات الأخيرة";
+
+// MARK: - Notifications
+"notifications.push" = "إشعارات الدفع";
+"notifications.email" = "إشعارات البريد الإلكتروني";
+"notifications.sms" = "إشعارات الرسائل النصية";
+"notifications.mark_as_read" = "وضع علامة مقروء";
+"notifications.mark_all_read" = "وضع علامة مقروء للكل";
+"notifications.filter" = "تصفية";
+"notifications.all" = "الكل";
+"notifications.unread" = "غير مقروء";
+"notifications.important" = "مهم";
+
+// MARK: - Support
+"support.submit_ticket" = "إرسال تذكرة";
+"support.live_chat" = "الدردشة المباشرة";
+"support.faq" = "الأسئلة الشائعة";
+"support.ticket_history" = "تاريخ التذاكر";
+"support.subject" = "الموضوع";
+"support.message" = "الرسالة";
+"support.priority" = "الأولوية";
+"support.category" = "الفئة";
+
+// MARK: - Audit Log
+"audit.staff_actions" = "أعمال الموظفين";
+"audit.action_log" = "سجل الأعمال";
+"audit.user" = "المستخدم";
+"audit.action" = "العمل";
+"audit.timestamp" = "الوقت";
+"audit.details" = "التفاصيل";
+"audit.export_log" = "تصدير السجل";
+
+// MARK: - Warranty & Disputes
+"warranty.claims" = "المطالبات";
+"warranty.disputes" = "النزاعات";
+"warranty.submit_claim" = "إرسال مطالبة";
+"warranty.submit_dispute" = "إرسال نزاع";
+"warranty.claim_status" = "حالة المطالبة";
+"warranty.dispute_status" = "حالة النزاع";
+"warranty.escalate" = "تصعيد";
+
+// MARK: - Data Export
+"export.select_dataset" = "اختيار مجموعة البيانات";
+"export.format" = "التنسيق";
+"export.date_range" = "نطاق التاريخ";
+"export.scheduled_exports" = "التصدير المجدول";
+"export.csv" = "CSV";
+"export.excel" = "Excel";
+"export.pdf" = "PDF";
+"export.export_now" = "تصدير الآن";
+"export.schedule_export" = "جدولة التصدير";
+
+// MARK: - POS (Point of Sale)
+"pos.sale" = "بيع";
+"pos.refund" = "استرداد";
+"pos.split_payment" = "دفع مقسم";
+"pos.shift_close" = "إغلاق الوردية";
+"pos.offline_sync" = "مزامنة غير متصل";
+"pos.add_item" = "إضافة عنصر";
+"pos.remove_item" = "إزالة عنصر";
+"pos.total" = "المجموع";
+"pos.tax" = "الضريبة";
+"pos.discount" = "الخصم";
+"pos.payment_method" = "طريقة الدفع";
+"pos.cash" = "نقدي";
+"pos.card" = "بطاقة";
+"pos.digital" = "رقمي";
+
+// MARK: - Inventory
+"inventory.products" = "المنتجات";
+"inventory.add_product" = "إضافة منتج";
+"inventory.edit_product" = "تعديل منتج";
+"inventory.delete_product" = "حذف منتج";
+"inventory.stock_level" = "مستوى المخزون";
+"inventory.low_stock" = "مخزون منخفض";
+"inventory.out_of_stock" = "نفد المخزون";
+"inventory.stocktake" = "جرد المخزون";
+"inventory.bulk_import" = "استيراد مجمع";
+"inventory.variants" = "المتغيرات";
+"inventory.expiry_tracking" = "تتبع انتهاء الصلاحية";
+
+// MARK: - Purchase Orders
+"purchase_orders.create_po" = "إنشاء أمر شراء";
+"purchase_orders.receive" = "استلام";
+"purchase_orders.approval_workflow" = "سير عمل الموافقة";
+"purchase_orders.history" = "التاريخ";
+"purchase_orders.pending_approval" = "في انتظار الموافقة";
+"purchase_orders.approved" = "موافق عليه";
+"purchase_orders.rejected" = "مرفوض";
+
+// MARK: - Suppliers
+"suppliers.supplier_list" = "قائمة الموردين";
+"suppliers.add_supplier" = "إضافة مورد";
+"suppliers.edit_supplier" = "تعديل مورد";
+"suppliers.delete_supplier" = "حذف مورد";
+"suppliers.performance_tracking" = "تتبع الأداء";
+"suppliers.catalog_integration" = "تكامل الكتالوج";
+"suppliers.contact_info" = "معلومات الاتصال";
+"suppliers.payment_terms" = "شروط الدفع";
+
+// MARK: - Devices
+"devices.register_device" = "تسجيل جهاز";
+"devices.pair" = "إقران";
+"devices.status" = "الحالة";
+"devices.remote_lock" = "قفل عن بُعد";
+"devices.device_name" = "اسم الجهاز";
+"devices.device_type" = "نوع الجهاز";
+"devices.connection_status" = "حالة الاتصال";
+
+// MARK: - Staff/HR
+"staff.add_staff" = "إضافة موظف";
+"staff.edit_staff" = "تعديل موظف";
+"staff.delete_staff" = "حذف موظف";
+"staff.role_assignment" = "تعيين الأدوار";
+"staff.performance_tracking" = "تتبع الأداء";
+"staff.staff_list" = "قائمة الموظفين";
+"staff.permissions" = "الأذونات";
+"staff.role" = "الدور";
+
+// MARK: - Contracts
+"contracts.upload" = "رفع عقد";
+"contracts.e_signature" = "التوقيع الإلكتروني";
+"contracts.status_tracking" = "تتبع الحالة";
+"contracts.renewal_reminders" = "تذكيرات التجديد";
+"contracts.contract_list" = "قائمة العقود";
+"contracts.pending_signature" = "في انتظار التوقيع";
+"contracts.signed" = "موقع";
+"contracts.expired" = "منتهي الصلاحية";
+
+// MARK: - Reports
+"reports.sales" = "تقارير المبيعات";
+"reports.inventory" = "تقارير المخزون";
+"reports.customer" = "تقارير العملاء";
+"reports.staff" = "تقارير الموظفين";
+"reports.tax" = "تقارير الضرائب";
+"reports.date_range" = "نطاق التاريخ";
+"reports.generate_report" = "إنشاء تقرير";
+"reports.export_report" = "تصدير تقرير";
+
+// MARK: - Appointments
+"appointments.calendar" = "التقويم";
+"appointments.booking" = "الحجز";
+"appointments.reminders" = "التذكيرات";
+"appointments.check_in" = "تسجيل الوصول";
+"appointments.check_out" = "تسجيل المغادرة";
+"appointments.scheduled" = "مجدول";
+"appointments.completed" = "مكتمل";
+"appointments.cancelled" = "ملغي";
+
+// MARK: - Vehicles
+"vehicles.customer_vehicles" = "مركبات العملاء";
+"vehicles.vin_tracking" = "تتبع رقم الهيكل";
+"vehicles.service_history" = "تاريخ الخدمة";
+"vehicles.add_vehicle" = "إضافة مركبة";
+"vehicles.edit_vehicle" = "تعديل مركبة";
+"vehicles.vehicle_details" = "تفاصيل المركبة";
+"vehicles.make" = "الماركة";
+"vehicles.model" = "الموديل";
+"vehicles.year" = "السنة";
+"vehicles.color" = "اللون";
+"vehicles.mileage" = "المسافة المقطوعة";
+
+// MARK: - Quotes
+"quotes.create_quote" = "إنشاء عرض سعر";
+"quotes.send_sms" = "إرسال عبر الرسائل النصية";
+"quotes.send_email" = "إرسال عبر البريد الإلكتروني";
+"quotes.approve" = "موافقة";
+"quotes.reject" = "رفض";
+"quotes.convert_to_order" = "تحويل إلى طلب";
+"quotes.quote_list" = "قائمة عروض الأسعار";
+"quotes.pending" = "معلق";
+"quotes.approved" = "موافق عليه";
+"quotes.rejected" = "مرفوض";
+
+// MARK: - Promotions
+"promotions.create_promotion" = "إنشاء عرض ترويجي";
+"promotions.promo_codes" = "أكواد الخصم";
+"promotions.validity_period" = "فترة الصلاحية";
+"promotions.redemption_tracking" = "تتبع الاسترداد";
+"promotions.promotion_list" = "قائمة العروض الترويجية";
+"promotions.active" = "نشط";
+"promotions.expired" = "منتهي الصلاحية";
+"promotions.discount" = "خصم";
+"promotions.free_service" = "خدمة مجانية";
+
+// MARK: - Customer Feedback
+"feedback.view_ratings" = "عرض التقييمات";
+"feedback.respond_to_reviews" = "الرد على المراجعات";
+"feedback.feedback_list" = "قائمة التعليقات";
+"feedback.rating" = "التقييم";
+"feedback.review" = "المراجعة";
+"feedback.response" = "الرد";
+
+// MARK: - Product Catalog
+"catalog.browse_marketplace" = "تصفح السوق";
+"catalog.add_to_inventory" = "إضافة إلى المخزون";
+"catalog.request_new_products" = "طلب منتجات جديدة";
+"catalog.product_list" = "قائمة المنتجات";
+"catalog.categories" = "الفئات";
+"catalog.brands" = "العلامات التجارية";
+"catalog.price" = "السعر";
+"catalog.availability" = "التوفر";
+
+// MARK: - Training
+"training.video_courses" = "دورات الفيديو";
+"training.quizzes" = "الاختبارات";
+"training.certifications" = "الشهادات";
+"training.badges" = "الشارات";
+"training.download_certificates" = "تحميل الشهادات";
+"training.course_list" = "قائمة الدورات";
+"training.enrolled" = "مسجل";
+"training.completed" = "مكتمل";
+"training.in_progress" = "قيد التقدم";
+
+// MARK: - Performance
+"performance.optimization" = "تحسين الأداء";
+"performance.battery_optimization" = "تحسين البطارية";
+"performance.network_optimization" = "تحسين الشبكة";
+"performance.image_optimization" = "تحسين الصور";
+"performance.memory_usage" = "استخدام الذاكرة";
+"performance.cpu_usage" = "استخدام المعالج";
+"performance.network_latency" = "زمن استجابة الشبكة";
+"performance.recommendations" = "التوصيات";
+
+// MARK: - Errors
+"error.network" = "خطأ في الشبكة";
+"error.server" = "خطأ في الخادم";
+"error.authentication" = "خطأ في المصادقة";
+"error.authorization" = "خطأ في التفويض";
+"error.validation" = "خطأ في التحقق";
+"error.not_found" = "غير موجود";
+"error.timeout" = "انتهت مهلة الطلب";
+"error.unknown" = "خطأ غير معروف";
+"error.offline" = "أنت غير متصل";
+"error.retry" = "إعادة المحاولة";
+
+// MARK: - Success Messages
+"success.saved" = "تم الحفظ بنجاح";
+"success.deleted" = "تم الحذف بنجاح";
+"success.updated" = "تم التحديث بنجاح";
+"success.created" = "تم الإنشاء بنجاح";
+"success.uploaded" = "تم الرفع بنجاح";
+"success.sent" = "تم الإرسال بنجاح";
+"success.synced" = "تم المزامنة بنجاح";
+
+// MARK: - Validation Messages
+"validation.required" = "هذا الحقل مطلوب";
+"validation.email" = "يرجى إدخال بريد إلكتروني صحيح";
+"validation.phone" = "يرجى إدخال رقم هاتف صحيح";
+"validation.password" = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+"validation.confirm_password" = "كلمات المرور غير متطابقة";
+"validation.partner_id" = "يرجى إدخال معرف شريك صحيح";
+"validation.vin" = "يرجى إدخال رقم هيكل صحيح";
+"validation.license_plate" = "يرجى إدخال لوحة ترخيص صحيحة";
+
+// MARK: - Permissions
+"permission.camera" = "إذن الكاميرا مطلوب";
+"permission.storage" = "إذن التخزين مطلوب";
+"permission.location" = "إذن الموقع مطلوب";
+"permission.notification" = "إذن الإشعارات مطلوب";
+"permission.biometric" = "إذن البيومترية مطلوب";
+
+// MARK: - Deep Links
+"deeplink.order_details" = "تفاصيل الطلب";
+"deeplink.payment_details" = "تفاصيل الدفع";
+"deeplink.notification_details" = "تفاصيل الإشعار";
+"deeplink.appointment_details" = "تفاصيل الموعد";
+"deeplink.vehicle_details" = "تفاصيل المركبة";
+"deeplink.quote_details" = "تفاصيل عرض السعر";
+"deeplink.promotion_details" = "تفاصيل العرض الترويجي";
+"deeplink.training_details" = "تفاصيل التدريب";
+"deeplink.catalog_details" = "تفاصيل الكتالوج";
+"deeplink.supplier_details" = "تفاصيل المورد";

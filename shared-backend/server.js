@@ -341,6 +341,16 @@ app.use('/api/v1/ap', require('./routes/accounts-payable'));
 app.use('/api/v1/ar', require('./routes/accounts-receivable'));
 app.use('/api/v1/banking', require('./routes/banking'));
 
+// Comprehensive procurement management routes
+app.use('/api/v1/procurement', require('./routes/procurement'));
+app.use('/api/v1/procurement/suppliers', require('./routes/procurement-suppliers'));
+app.use('/api/v1/procurement/rfq', require('./routes/procurement-rfq'));
+app.use('/api/v1/procurement/purchase-orders', require('./routes/procurement-purchase-orders'));
+app.use('/api/v1/procurement/budgets', require('./routes/procurement-budgets'));
+app.use('/api/v1/procurement/contracts', require('./routes/procurement-contracts'));
+app.use('/api/v1/procurement/goods-receipts', require('./routes/procurement-goods-receipt'));
+app.use('/api/v1/procurement/analytics', require('./routes/procurement-analytics'));
+
 // app.use('/api/notifications', notificationsRoutes); // Not defined
 // app.use('/api/export', exportRoutes); // Not defined
 // app.use('/api/settings', settingsRoutes); // Not defined

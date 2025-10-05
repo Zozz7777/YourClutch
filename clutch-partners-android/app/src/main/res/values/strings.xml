@@ -9,6 +9,28 @@
     <string name="nav_payments">Payments</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_loyalty">Loyalty</string>
+    <string name="nav_ratings">Ratings</string>
+    <string name="nav_support">Support</string>
+    <string name="nav_audit">Audit Log</string>
+    <string name="nav_warranty">Warranty</string>
+    <string name="nav_export">Export</string>
+    <string name="nav_pos">POS</string>
+    <string name="nav_inventory">Inventory</string>
+    <string name="nav_suppliers">Suppliers</string>
+    <string name="nav_staff">Staff</string>
+    <string name="nav_contracts">Contracts</string>
+    <string name="nav_reports">Reports</string>
+    <string name="nav_appointments">Appointments</string>
+    <string name="nav_vehicles">Vehicles</string>
+    <string name="nav_quotes">Quotes</string>
+    <string name="nav_promotions">Promotions</string>
+    <string name="nav_catalog">Catalog</string>
+    <string name="nav_training">Training</string>
+    <string name="nav_locations">Locations</string>
+    <string name="nav_commission">Commission</string>
+    <string name="nav_taxes">Taxes</string>
+    <string name="nav_feedback">Feedback</string>
     
     <!-- Auth -->
     <string name="sign_in">Sign In</string>
@@ -126,4 +148,275 @@
     <string name="success">Success</string>
     <string name="view_details">View Details</string>
     <string name="working_hours">Working Hours</string>
+    
+    <!-- Loyalty & Rewards -->
+    <string name="loyalty_points">Loyalty Points</string>
+    <string name="current_tier">Current Tier</string>
+    <string name="points_balance">Points Balance</string>
+    <string name="earn_points">Earn Points</string>
+    <string name="redeem_points">Redeem Points</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="tier_benefits">Tier Benefits</string>
+    <string name="points_history">Points History</string>
+    <string name="bronze_tier">Bronze</string>
+    <string name="silver_tier">Silver</string>
+    <string name="gold_tier">Gold</string>
+    <string name="platinum_tier">Platinum</string>
+    
+    <!-- Ratings & Reviews -->
+    <string name="ratings">Ratings</string>
+    <string name="reviews">Reviews</string>
+    <string name="average_rating">Average Rating</string>
+    <string name="total_ratings">Total Ratings</string>
+    <string name="respond_to_review">Respond to Review</string>
+    <string name="flag_inappropriate">Flag Inappropriate</string>
+    <string name="rating_analytics">Rating Analytics</string>
+    <string name="customer_feedback">Customer Feedback</string>
+    
+    <!-- Appointments -->
+    <string name="book_appointment">Book Appointment</string>
+    <string name="appointment_details">Appointment Details</string>
+    <string name="check_in">Check In</string>
+    <string name="check_out">Check Out</string>
+    <string name="service_notes">Service Notes</string>
+    <string name="recommendations">Recommendations</string>
+    <string name="appointment_calendar">Appointment Calendar</string>
+    <string name="no_show">No Show</string>
+    
+    <!-- Vehicles -->
+    <string name="vehicle_info">Vehicle Information</string>
+    <string name="vin_number">VIN Number</string>
+    <string name="license_plate">License Plate</string>
+    <string name="vehicle_make">Make</string>
+    <string name="vehicle_model">Model</string>
+    <string name="vehicle_year">Year</string>
+    <string name="vehicle_color">Color</string>
+    <string name="vehicle_mileage">Mileage</string>
+    <string name="service_history">Service History</string>
+    <string name="add_vehicle">Add Vehicle</string>
+    <string name="edit_vehicle">Edit Vehicle</string>
+    
+    <!-- Quotes -->
+    <string name="create_quote">Create Quote</string>
+    <string name="quote_details">Quote Details</string>
+    <string name="send_quote">Send Quote</string>
+    <string name="quote_status">Quote Status</string>
+    <string name="convert_to_order">Convert to Order</string>
+    <string name="quote_valid_until">Valid Until</string>
+    <string name="quote_items">Quote Items</string>
+    <string name="quote_total">Quote Total</string>
+    
+    <!-- Promotions -->
+    <string name="create_promotion">Create Promotion</string>
+    <string name="promo_code">Promo Code</string>
+    <string name="discount_type">Discount Type</string>
+    <string name="percentage_discount">Percentage Discount</string>
+    <string name="fixed_discount">Fixed Discount</string>
+    <string name="min_order_amount">Minimum Order Amount</string>
+    <string name="max_uses">Maximum Uses</string>
+    <string name="promotion_status">Promotion Status</string>
+    <string name="active_promotions">Active Promotions</string>
+    
+    <!-- Training -->
+    <string name="training_courses">Training Courses</string>
+    <string name="start_course">Start Course</string>
+    <string name="course_progress">Course Progress</string>
+    <string name="certifications">Certifications</string>
+    <string name="download_certificate">Download Certificate</string>
+    <string name="training_analytics">Training Analytics</string>
+    <string name="course_completion">Course Completion</string>
+    <string name="training_badges">Training Badges</string>
+    
+    <!-- Performance -->
+    <string name="performance_metrics">Performance Metrics</string>
+    <string name="completion_rate">Completion Rate</string>
+    <string name="response_time">Response Time</string>
+    <string name="customer_satisfaction">Customer Satisfaction</string>
+    <string name="revenue_growth">Revenue Growth</string>
+    <string name="performance_trends">Performance Trends</string>
+    <string name="kpis">KPIs</string>
+    <string name="performance_comparison">Performance Comparison</string>
+    
+    <!-- Catalog -->
+    <string name="browse_catalog">Browse Catalog</string>
+    <string name="product_catalog">Product Catalog</string>
+    <string name="add_to_inventory">Add to Inventory</string>
+    <string name="request_product">Request Product</string>
+    <string name="featured_products">Featured Products</string>
+    <string name="product_categories">Product Categories</string>
+    <string name="search_products">Search Products</string>
+    <string name="product_recommendations">Product Recommendations</string>
+    
+    <!-- Locations -->
+    <string name="manage_locations">Manage Locations</string>
+    <string name="add_location">Add Location</string>
+    <string name="main_location">Main Location</string>
+    <string name="location_type">Location Type</string>
+    <string name="operating_hours">Operating Hours</string>
+    <string name="location_manager">Location Manager</string>
+    <string name="nearby_locations">Nearby Locations</string>
+    <string name="location_services">Location Services</string>
+    
+    <!-- Commission -->
+    <string name="commission_tracking">Commission Tracking</string>
+    <string name="commission_rates">Commission Rates</string>
+    <string name="commission_history">Commission History</string>
+    <string name="commission_breakdown">Commission Breakdown</string>
+    <string name="commission_summary">Commission Summary</string>
+    <string name="commission_analytics">Commission Analytics</string>
+    <string name="commission_calculator">Commission Calculator</string>
+    
+    <!-- Taxes -->
+    <string name="tax_management">Tax Management</string>
+    <string name="vat_calculation">VAT Calculation</string>
+    <string name="income_tax">Income Tax</string>
+    <string name="tax_reports">Tax Reports</string>
+    <string name="tax_deadlines">Tax Deadlines</string>
+    <string name="tax_rates">Tax Rates</string>
+    <string name="tax_summary">Tax Summary</string>
+    <string name="generate_tax_report">Generate Tax Report</string>
+    
+    <!-- Feedback -->
+    <string name="customer_feedback_management">Customer Feedback Management</string>
+    <string name="feedback_analytics">Feedback Analytics</string>
+    <string name="response_rate">Response Rate</string>
+    <string name="feedback_trends">Feedback Trends</string>
+    <string name="feedback_export">Feedback Export</string>
+    <string name="feedback_statistics">Feedback Statistics</string>
+    <string name="feedback_responses">Feedback Responses</string>
+    
+    <!-- Suppliers -->
+    <string name="supplier_management">Supplier Management</string>
+    <string name="add_supplier">Add Supplier</string>
+    <string name="supplier_performance">Supplier Performance</string>
+    <string name="supplier_rating">Supplier Rating</string>
+    <string name="supplier_analytics">Supplier Analytics</string>
+    <string name="supplier_contacts">Supplier Contacts</string>
+    <string name="supplier_statistics">Supplier Statistics</string>
+    
+    <!-- Contracts -->
+    <string name="contract_management">Contract Management</string>
+    <string name="upload_contract">Upload Contract</string>
+    <string name="contract_status">Contract Status</string>
+    <string name="e_signature">E-Signature</string>
+    <string name="contract_renewal">Contract Renewal</string>
+    <string name="contract_approval">Contract Approval</string>
+    <string name="contract_tracking">Contract Tracking</string>
+    
+    <!-- Staff & HR -->
+    <string name="staff_management">Staff Management</string>
+    <string name="add_staff">Add Staff</string>
+    <string name="role_assignment">Role Assignment</string>
+    <string name="staff_performance">Staff Performance</string>
+    <string name="rbac_management">RBAC Management</string>
+    <string name="staff_analytics">Staff Analytics</string>
+    <string name="staff_statistics">Staff Statistics</string>
+    
+    <!-- Reports -->
+    <string name="sales_reports">Sales Reports</string>
+    <string name="inventory_reports">Inventory Reports</string>
+    <string name="customer_reports">Customer Reports</string>
+    <string name="staff_reports">Staff Reports</string>
+    <string name="generate_report">Generate Report</string>
+    <string name="report_analytics">Report Analytics</string>
+    <string name="export_reports">Export Reports</string>
+    
+    <!-- Support -->
+    <string name="support_tickets">Support Tickets</string>
+    <string name="submit_ticket">Submit Ticket</string>
+    <string name="live_chat">Live Chat</string>
+    <string name="faq">FAQ</string>
+    <string name="ticket_history">Ticket History</string>
+    <string name="support_analytics">Support Analytics</string>
+    <string name="support_statistics">Support Statistics</string>
+    
+    <!-- Audit Log -->
+    <string name="audit_log">Audit Log</string>
+    <string name="staff_actions">Staff Actions</string>
+    <string name="action_log">Action Log</string>
+    <string name="audit_export">Audit Export</string>
+    <string name="audit_analytics">Audit Analytics</string>
+    <string name="audit_statistics">Audit Statistics</string>
+    
+    <!-- Warranty & Disputes -->
+    <string name="warranty_claims">Warranty Claims</string>
+    <string name="dispute_management">Dispute Management</string>
+    <string name="submit_dispute">Submit Dispute</string>
+    <string name="escalate_dispute">Escalate Dispute</string>
+    <string name="warranty_tracking">Warranty Tracking</string>
+    <string name="dispute_resolution">Dispute Resolution</string>
+    
+    <!-- Data Export -->
+    <string name="data_export">Data Export</string>
+    <string name="export_orders">Export Orders</string>
+    <string name="export_invoices">Export Invoices</string>
+    <string name="export_payments">Export Payments</string>
+    <string name="export_staff_actions">Export Staff Actions</string>
+    <string name="scheduled_exports">Scheduled Exports</string>
+    <string name="export_format">Export Format</string>
+    <string name="date_range">Date Range</string>
+    
+    <!-- POS -->
+    <string name="pos_system">POS System</string>
+    <string name="record_sale">Record Sale</string>
+    <string name="process_refund">Process Refund</string>
+    <string name="split_payment">Split Payment</string>
+    <string name="close_shift">Close Shift</string>
+    <string name="offline_sync">Offline Sync</string>
+    <string name="pos_analytics">POS Analytics</string>
+    
+    <!-- Inventory -->
+    <string name="inventory_management">Inventory Management</string>
+    <string name="product_variants">Product Variants</string>
+    <string name="expiry_tracking">Expiry Tracking</string>
+    <string name="stocktake">Stocktake</string>
+    <string name="bulk_import">Bulk Import</string>
+    <string name="inventory_analytics">Inventory Analytics</string>
+    <string name="inventory_statistics">Inventory Statistics</string>
+    
+    <!-- Purchase Orders -->
+    <string name="purchase_orders">Purchase Orders</string>
+    <string name="create_po">Create PO</string>
+    <string name="receive_po">Receive PO</string>
+    <string name="approval_workflow">Approval Workflow</string>
+    <string name="po_history">PO History</string>
+    <string name="po_analytics">PO Analytics</string>
+    
+    <!-- Devices -->
+    <string name="device_management">Device Management</string>
+    <string name="register_device">Register Device</string>
+    <string name="pair_device">Pair Device</string>
+    <string name="device_status">Device Status</string>
+    <string name="remote_lock">Remote Lock</string>
+    <string name="device_analytics">Device Analytics</string>
+    
+    <!-- Common Actions -->
+    <string name="add">Add</string>
+    <string name="remove">Remove</string>
+    <string name="update">Update</string>
+    <string name="view">View</string>
+    <string name="search">Search</string>
+    <string name="filter">Filter</string>
+    <string name="sort">Sort</string>
+    <string name="sync">Sync</string>
+    <string name="upload">Upload</string>
+    <string name="download">Download</string>
+    <string name="share">Share</string>
+    <string name="copy">Copy</string>
+    <string name="paste">Paste</string>
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
+    
+    <!-- Status Messages -->
+    <string name="success_message">Operation completed successfully</string>
+    <string name="error_message">An error occurred</string>
+    <string name="loading_message">Please wait...</string>
+    <string name="no_data">No data available</string>
+    <string name="try_again">Try again</string>
+    <string name="connection_error">Connection error</string>
+    <string name="server_error">Server error</string>
+    <string name="validation_error">Validation error</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="session_expired">Session expired</string>
+    <string name="maintenance_mode">Maintenance mode</string>
 </resources>

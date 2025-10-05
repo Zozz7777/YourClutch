@@ -1,112 +1,371 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App Name -->
-    <string name="app_name">شركاء كلتش</string>
-    
-    <!-- Navigation -->
-    <string name="nav_home">الرئيسية</string>
-    <string name="nav_orders">الطلبات</string>
-    <string name="nav_payments">المدفوعات</string>
-    <string name="nav_settings">الإعدادات</string>
-    <string name="nav_dashboard">لوحة التحكم</string>
+    <!-- Core App -->
+    <string name="app_name">Clutch Partners</string>
+    <string name="welcome">مرحباً</string>
+    <string name="dashboard">لوحة التحكم</string>
+    <string name="profile">الملف الشخصي</string>
+    <string name="settings">الإعدادات</string>
+    <string name="logout">تسجيل الخروج</string>
     
     <!-- Authentication -->
     <string name="sign_in">تسجيل الدخول</string>
     <string name="sign_up">إنشاء حساب</string>
-    <string name="request_to_join">طلب الانضمام</string>
-    <string name="email_or_phone">البريد الإلكتروني أو رقم الهاتف</string>
+    <string name="email">البريد الإلكتروني</string>
     <string name="password">كلمة المرور</string>
     <string name="confirm_password">تأكيد كلمة المرور</string>
     <string name="forgot_password">نسيت كلمة المرور؟</string>
-    <string name="dont_have_account">ليس لديك حساب؟</string>
-    <string name="already_have_account">لديك حساب بالفعل؟</string>
+    <string name="remember_me">تذكرني</string>
+    <string name="partner_id">معرف الشريك</string>
+    <string name="validate_id">التحقق من المعرف</string>
+    <string name="request_to_join">طلب الانضمام</string>
     
-    <!-- Partner Types -->
-    <string name="repair_center">مركز إصلاح</string>
-    <string name="auto_parts_shop">متجر قطع غيار</string>
-    <string name="accessories_shop">متجر إكسسوارات</string>
-    <string name="importer_manufacturer">مستورد/مصنع</string>
-    <string name="service_center">مركز خدمة</string>
+    <!-- KYC -->
+    <string name="kyc_verification">التحقق من الهوية</string>
+    <string name="upload_documents">رفع المستندات</string>
+    <string name="document_verification">التحقق من المستندات</string>
+    <string name="verification_status">حالة التحقق</string>
+    <string name="pending_verification">في انتظار التحقق</string>
+    <string name="verified">تم التحقق</string>
+    <string name="rejected">مرفوض</string>
     
-    <!-- Onboarding -->
-    <string name="onboarding_title_1">إدارة متجرك</string>
-    <string name="onboarding_desc_1">إدارة المخزون وتتبع المبيعات وتحديث معلومات عملك في مكان واحد</string>
-    <string name="onboarding_title_2">معالجة الطلبات والمواعيد</string>
-    <string name="onboarding_desc_2">استقبال وإدارة طلبات العملاء والمواعيد بكفاءة مع الإشعارات الفورية</string>
-    <string name="onboarding_title_3">تتبع الإيرادات</string>
-    <string name="onboarding_desc_3">مراقبة الأرباح الأسبوعية وعرض تاريخ المدفوعات وتتبع أداء عملك</string>
-    <string name="get_started">ابدأ الآن</string>
-    <string name="next">التالي</string>
-    <string name="previous">السابق</string>
+    <!-- Navigation -->
+    <string name="home">الرئيسية</string>
+    <string name="orders">الطلبات</string>
+    <string name="inventory">المخزون</string>
+    <string name="customers">العملاء</string>
+    <string name="payments">المدفوعات</string>
+    <string name="reports">التقارير</string>
+    <string name="support">الدعم</string>
+    <string name="notifications">الإشعارات</string>
     
     <!-- Orders -->
-    <string name="orders_title">الطلبات والمواعيد</string>
     <string name="new_order">طلب جديد</string>
-    <string name="order_status_pending">معلق</string>
-    <string name="order_status_paid">مدفوع</string>
-    <string name="order_status_rejected">مرفوض</string>
-    <string name="order_status_completed">مكتمل</string>
-    <string name="customer">العميل</string>
-    <string name="amount">المبلغ</string>
-    <string name="view_details">عرض التفاصيل</string>
-    <string name="confirm">تأكيد</string>
-    <string name="reject">رفض</string>
-    <string name="no_orders">لا توجد طلبات بعد</string>
-    <string name="no_orders_desc">ستظهر طلبات العملاء والمواعيد هنا بمجرد بدء وصولها</string>
+    <string name="order_details">تفاصيل الطلب</string>
+    <string name="order_status">حالة الطلب</string>
+    <string name="pending">معلق</string>
+    <string name="in_progress">قيد التنفيذ</string>
+    <string name="completed">مكتمل</string>
+    <string name="cancelled">ملغي</string>
+    <string name="order_history">تاريخ الطلبات</string>
+    
+    <!-- Inventory -->
+    <string name="add_product">إضافة منتج</string>
+    <string name="edit_product">تعديل المنتج</string>
+    <string name="product_name">اسم المنتج</string>
+    <string name="product_price">سعر المنتج</string>
+    <string name="product_quantity">الكمية</string>
+    <string name="product_category">الفئة</string>
+    <string name="low_stock">مخزون منخفض</string>
+    <string name="out_of_stock">نفد المخزون</string>
+    <string name="stock_levels">مستويات المخزون</string>
+    
+    <!-- Customers -->
+    <string name="customer_details">تفاصيل العميل</string>
+    <string name="customer_history">تاريخ العميل</string>
+    <string name="add_customer">إضافة عميل</string>
+    <string name="edit_customer">تعديل العميل</string>
+    <string name="customer_name">اسم العميل</string>
+    <string name="phone_number">رقم الهاتف</string>
+    <string name="address">العنوان</string>
+    <string name="loyalty_points">نقاط الولاء</string>
     
     <!-- Payments -->
-    <string name="payments_title">المدفوعات</string>
-    <string name="weekly_income">دخل هذا الأسبوع</string>
-    <string name="next_payout">الدفعة التالية</string>
+    <string name="payment_method">طريقة الدفع</string>
+    <string name="cash">نقدي</string>
+    <string name="card">بطاقة</string>
+    <string name="digital_wallet">محفظة رقمية</string>
+    <string name="payment_status">حالة الدفع</string>
+    <string name="paid">مدفوع</string>
+    <string name="pending_payment">في انتظار الدفع</string>
+    <string name="refund">استرداد</string>
     <string name="payment_history">تاريخ المدفوعات</string>
-    <string name="download_report">تحميل التقرير</string>
-    <string name="refresh">تحديث</string>
-    <string name="no_payments">لا توجد مدفوعات بعد</string>
-    <string name="no_payments_desc">سيظهر تاريخ المدفوعات هنا بمجرد بدء استلام المدفوعات</string>
     
-    <!-- Settings -->
-    <string name="settings_title">إعدادات المتجر</string>
-    <string name="business_name">اسم العمل</string>
-    <string name="business_address">عنوان العمل</string>
-    <string name="phone_number">رقم الهاتف</string>
-    <string name="working_hours">ساعات العمل</string>
-    <string name="save_changes">حفظ التغييرات</string>
-    <string name="logout">تسجيل الخروج</string>
-    <string name="logout_confirm">هل أنت متأكد من تسجيل الخروج؟</string>
-    
-    <!-- Common -->
-    <string name="loading">جاري التحميل...</string>
-    <string name="error">خطأ</string>
-    <string name="success">نجح</string>
-    <string name="cancel">إلغاء</string>
-    <string name="ok">موافق</string>
-    <string name="save">حفظ</string>
-    <string name="edit">تعديل</string>
-    <string name="delete">حذف</string>
-    <string name="back">رجوع</string>
-    <string name="continue_text">متابعة</string>
-    <string name="done">تم</string>
-    
-    <!-- Language -->
-    <string name="language">اللغة</string>
-    <string name="select_language">اختر اللغة</string>
-    <string name="arabic">العربية</string>
-    <string name="english">English</string>
-    
-    <!-- Theme -->
-    <string name="theme">المظهر</string>
-    <string name="light_theme">فاتح</string>
-    <string name="dark_theme">داكن</string>
-    <string name="auto_theme">تلقائي</string>
+    <!-- Reports -->
+    <string name="sales_report">تقرير المبيعات</string>
+    <string name="inventory_report">تقرير المخزون</string>
+    <string name="customer_report">تقرير العملاء</string>
+    <string name="financial_report">التقرير المالي</string>
+    <string name="generate_report">إنشاء تقرير</string>
+    <string name="export_report">تصدير التقرير</string>
+    <string name="date_range">نطاق التاريخ</string>
+    <string name="from_date">من تاريخ</string>
+    <string name="to_date">إلى تاريخ</string>
     
     <!-- Notifications -->
-    <string name="notifications">الإشعارات</string>
     <string name="push_notifications">الإشعارات الفورية</string>
     <string name="email_notifications">إشعارات البريد الإلكتروني</string>
     <string name="sms_notifications">إشعارات الرسائل النصية</string>
+    <string name="notification_settings">إعدادات الإشعارات</string>
+    <string name="mark_as_read">وضع علامة مقروء</string>
+    <string name="mark_all_read">وضع علامة مقروء للكل</string>
     
-    <!-- Permissions -->
-    <string name="access_denied">تم رفض الوصول</string>
-    <string name="insufficient_permissions">صلاحيات غير كافية</string>
-    <string name="permission_required">مطلوب إذن</string>
+    <!-- Common Actions -->
+    <string name="save">حفظ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="delete">حذف</string>
+    <string name="edit">تعديل</string>
+    <string name="add">إضافة</string>
+    <string name="remove">إزالة</string>
+    <string name="update">تحديث</string>
+    <string name="view">عرض</string>
+    <string name="search">بحث</string>
+    <string name="filter">تصفية</string>
+    <string name="sort">ترتيب</string>
+    <string name="refresh">تحديث</string>
+    <string name="sync">مزامنة</string>
+    <string name="upload">رفع</string>
+    <string name="download">تحميل</string>
+    <string name="share">مشاركة</string>
+    <string name="copy">نسخ</string>
+    <string name="paste">لصق</string>
+    
+    <!-- Status Messages -->
+    <string name="success">نجح</string>
+    <string name="error">خطأ</string>
+    <string name="loading">جاري التحميل...</string>
+    <string name="no_data">لا توجد بيانات</string>
+    <string name="try_again">حاول مرة أخرى</string>
+    <string name="server_error">خطأ في الخادم</string>
+    <string name="validation_error">خطأ في التحقق</string>
+    <string name="permission_denied">تم رفض الإذن</string>
+    <string name="session_expired">انتهت صلاحية الجلسة</string>
+    
+    <!-- Loyalty & Rewards -->
+    <string name="loyalty_program">برنامج الولاء</string>
+    <string name="current_tier">المستوى الحالي</string>
+    <string name="points_balance">رصيد النقاط</string>
+    <string name="earn_points">كسب النقاط</string>
+    <string name="redeem_points">استرداد النقاط</string>
+    <string name="leaderboard">لوحة المتصدرين</string>
+    <string name="tier_benefits">مزايا المستوى</string>
+    <string name="points_history">تاريخ النقاط</string>
+    <string name="bronze_tier">برونزي</string>
+    <string name="silver_tier">فضي</string>
+    <string name="gold_tier">ذهبي</string>
+    <string name="platinum_tier">بلاتيني</string>
+    
+    <!-- Ratings & Reviews -->
+    <string name="ratings">التقييمات</string>
+    <string name="reviews">المراجعات</string>
+    <string name="average_rating">متوسط التقييم</string>
+    <string name="total_ratings">إجمالي التقييمات</string>
+    <string name="respond_to_review">الرد على المراجعة</string>
+    <string name="flag_inappropriate">الإبلاغ عن غير مناسب</string>
+    <string name="rating_analytics">تحليلات التقييم</string>
+    <string name="customer_feedback">ملاحظات العملاء</string>
+    
+    <!-- Appointments -->
+    <string name="book_appointment">حجز موعد</string>
+    <string name="appointment_details">تفاصيل الموعد</string>
+    <string name="check_in">تسجيل الوصول</string>
+    <string name="check_out">تسجيل المغادرة</string>
+    <string name="service_notes">ملاحظات الخدمة</string>
+    <string name="recommendations">التوصيات</string>
+    <string name="appointment_calendar">تقويم المواعيد</string>
+    <string name="no_show">عدم الحضور</string>
+    
+    <!-- Vehicles -->
+    <string name="vehicle_info">معلومات المركبة</string>
+    <string name="vin_number">رقم الهيكل</string>
+    <string name="license_plate">رقم اللوحة</string>
+    <string name="vehicle_make">الماركة</string>
+    <string name="vehicle_model">الموديل</string>
+    <string name="vehicle_year">السنة</string>
+    <string name="vehicle_color">اللون</string>
+    <string name="vehicle_mileage">المسافة المقطوعة</string>
+    <string name="service_history">تاريخ الخدمة</string>
+    <string name="add_vehicle">إضافة مركبة</string>
+    <string name="edit_vehicle">تعديل المركبة</string>
+    
+    <!-- Quotes -->
+    <string name="create_quote">إنشاء عرض سعر</string>
+    <string name="quote_details">تفاصيل العرض</string>
+    <string name="send_quote">إرسال العرض</string>
+    <string name="quote_status">حالة العرض</string>
+    <string name="convert_to_order">تحويل إلى طلب</string>
+    <string name="quote_valid_until">صالح حتى</string>
+    <string name="quote_items">عناصر العرض</string>
+    <string name="quote_total">إجمالي العرض</string>
+    
+    <!-- Promotions -->
+    <string name="create_promotion">إنشاء عرض ترويجي</string>
+    <string name="promo_code">كود الخصم</string>
+    <string name="discount_type">نوع الخصم</string>
+    <string name="percentage_discount">خصم نسبة مئوية</string>
+    <string name="fixed_discount">خصم ثابت</string>
+    <string name="min_order_amount">الحد الأدنى للطلب</string>
+    <string name="max_uses">الحد الأقصى للاستخدام</string>
+    <string name="promotion_status">حالة العرض الترويجي</string>
+    <string name="active_promotions">العروض النشطة</string>
+    
+    <!-- Training -->
+    <string name="training_courses">دورات التدريب</string>
+    <string name="start_course">بدء الدورة</string>
+    <string name="course_progress">تقدم الدورة</string>
+    <string name="certifications">الشهادات</string>
+    <string name="download_certificate">تحميل الشهادة</string>
+    <string name="training_analytics">تحليلات التدريب</string>
+    <string name="course_completion">إكمال الدورة</string>
+    <string name="training_badges">شارات التدريب</string>
+    
+    <!-- Performance -->
+    <string name="performance_metrics">مقاييس الأداء</string>
+    <string name="completion_rate">معدل الإكمال</string>
+    <string name="response_time">وقت الاستجابة</string>
+    <string name="customer_satisfaction">رضا العملاء</string>
+    <string name="revenue_growth">نمو الإيرادات</string>
+    <string name="performance_trends">اتجاهات الأداء</string>
+    <string name="kpis">مؤشرات الأداء الرئيسية</string>
+    <string name="performance_comparison">مقارنة الأداء</string>
+    
+    <!-- Catalog -->
+    <string name="browse_catalog">تصفح الكتالوج</string>
+    <string name="product_catalog">كتالوج المنتجات</string>
+    <string name="add_to_inventory">إضافة إلى المخزون</string>
+    <string name="request_product">طلب منتج</string>
+    <string name="featured_products">المنتجات المميزة</string>
+    <string name="product_categories">فئات المنتجات</string>
+    <string name="search_products">البحث في المنتجات</string>
+    <string name="product_recommendations">توصيات المنتجات</string>
+    
+    <!-- Locations -->
+    <string name="manage_locations">إدارة المواقع</string>
+    <string name="add_location">إضافة موقع</string>
+    <string name="main_location">الموقع الرئيسي</string>
+    <string name="location_type">نوع الموقع</string>
+    <string name="operating_hours">ساعات العمل</string>
+    <string name="location_manager">مدير الموقع</string>
+    <string name="nearby_locations">المواقع القريبة</string>
+    <string name="location_services">خدمات الموقع</string>
+    
+    <!-- Commission -->
+    <string name="commission_tracking">تتبع العمولة</string>
+    <string name="commission_rates">أسعار العمولة</string>
+    <string name="commission_history">تاريخ العمولة</string>
+    <string name="commission_breakdown">تفصيل العمولة</string>
+    <string name="commission_summary">ملخص العمولة</string>
+    <string name="commission_analytics">تحليلات العمولة</string>
+    <string name="commission_calculator">حاسبة العمولة</string>
+    
+    <!-- Taxes -->
+    <string name="tax_management">إدارة الضرائب</string>
+    <string name="vat_calculation">حساب ضريبة القيمة المضافة</string>
+    <string name="income_tax">ضريبة الدخل</string>
+    <string name="tax_reports">تقارير الضرائب</string>
+    <string name="tax_deadlines">مواعيد الضرائب</string>
+    <string name="tax_rates">أسعار الضرائب</string>
+    <string name="tax_summary">ملخص الضرائب</string>
+    <string name="generate_tax_report">إنشاء تقرير ضريبي</string>
+    
+    <!-- Feedback -->
+    <string name="customer_feedback_management">إدارة ملاحظات العملاء</string>
+    <string name="feedback_analytics">تحليلات الملاحظات</string>
+    <string name="response_rate">معدل الاستجابة</string>
+    <string name="feedback_trends">اتجاهات الملاحظات</string>
+    <string name="feedback_export">تصدير الملاحظات</string>
+    <string name="feedback_statistics">إحصائيات الملاحظات</string>
+    <string name="feedback_responses">ردود الملاحظات</string>
+    
+    <!-- Suppliers -->
+    <string name="supplier_management">إدارة الموردين</string>
+    <string name="add_supplier">إضافة مورد</string>
+    <string name="supplier_performance">أداء المورد</string>
+    <string name="supplier_rating">تقييم المورد</string>
+    <string name="supplier_analytics">تحليلات الموردين</string>
+    <string name="supplier_contacts">جهات اتصال الموردين</string>
+    <string name="supplier_statistics">إحصائيات الموردين</string>
+    
+    <!-- Contracts -->
+    <string name="contract_management">إدارة العقود</string>
+    <string name="upload_contract">رفع عقد</string>
+    <string name="contract_status">حالة العقد</string>
+    <string name="e_signature">التوقيع الإلكتروني</string>
+    <string name="contract_renewal">تجديد العقد</string>
+    <string name="contract_approval">موافقة العقد</string>
+    <string name="contract_tracking">تتبع العقد</string>
+    
+    <!-- Staff & HR -->
+    <string name="staff_management">إدارة الموظفين</string>
+    <string name="add_staff">إضافة موظف</string>
+    <string name="role_assignment">تعيين الأدوار</string>
+    <string name="staff_performance">أداء الموظفين</string>
+    <string name="rbac_management">إدارة الصلاحيات</string>
+    <string name="staff_analytics">تحليلات الموظفين</string>
+    <string name="staff_statistics">إحصائيات الموظفين</string>
+    
+    <!-- Support -->
+    <string name="support_tickets">تذاكر الدعم</string>
+    <string name="submit_ticket">إرسال تذكرة</string>
+    <string name="live_chat">الدردشة المباشرة</string>
+    <string name="faq">الأسئلة الشائعة</string>
+    <string name="ticket_history">تاريخ التذاكر</string>
+    <string name="support_analytics">تحليلات الدعم</string>
+    <string name="support_statistics">إحصائيات الدعم</string>
+    
+    <!-- Audit Log -->
+    <string name="audit_log">سجل التدقيق</string>
+    <string name="staff_actions">أعمال الموظفين</string>
+    <string name="action_log">سجل الأعمال</string>
+    <string name="audit_export">تصدير التدقيق</string>
+    <string name="audit_analytics">تحليلات التدقيق</string>
+    <string name="audit_statistics">إحصائيات التدقيق</string>
+    
+    <!-- Warranty & Disputes -->
+    <string name="warranty_claims">مطالبات الضمان</string>
+    <string name="dispute_management">إدارة النزاعات</string>
+    <string name="submit_dispute">إرسال نزاع</string>
+    <string name="escalate_dispute">تصعيد النزاع</string>
+    <string name="warranty_tracking">تتبع الضمان</string>
+    <string name="dispute_resolution">حل النزاعات</string>
+    
+    <!-- Data Export -->
+    <string name="data_export">تصدير البيانات</string>
+    <string name="export_orders">تصدير الطلبات</string>
+    <string name="export_invoices">تصدير الفواتير</string>
+    <string name="export_payments">تصدير المدفوعات</string>
+    <string name="export_staff_actions">تصدير أعمال الموظفين</string>
+    <string name="scheduled_exports">التصدير المجدول</string>
+    <string name="export_format">تنسيق التصدير</string>
+    
+    <!-- POS -->
+    <string name="pos_system">نظام نقاط البيع</string>
+    <string name="record_sale">تسجيل بيع</string>
+    <string name="process_refund">معالجة استرداد</string>
+    <string name="split_payment">تقسيم الدفع</string>
+    <string name="close_shift">إغلاق الوردية</string>
+    <string name="offline_sync">مزامنة غير متصلة</string>
+    <string name="pos_analytics">تحليلات نقاط البيع</string>
+    
+    <!-- Inventory -->
+    <string name="inventory_management">إدارة المخزون</string>
+    <string name="product_variants">متغيرات المنتج</string>
+    <string name="expiry_tracking">تتبع انتهاء الصلاحية</string>
+    <string name="stocktake">جرد المخزون</string>
+    <string name="bulk_import">استيراد مجمع</string>
+    <string name="inventory_analytics">تحليلات المخزون</string>
+    <string name="inventory_statistics">إحصائيات المخزون</string>
+    
+    <!-- Purchase Orders -->
+    <string name="purchase_orders">أوامر الشراء</string>
+    <string name="create_po">إنشاء أمر شراء</string>
+    <string name="receive_po">استلام أمر الشراء</string>
+    <string name="approval_workflow">سير عمل الموافقة</string>
+    <string name="po_history">تاريخ أوامر الشراء</string>
+    <string name="po_analytics">تحليلات أوامر الشراء</string>
+    
+    <!-- Devices -->
+    <string name="device_management">إدارة الأجهزة</string>
+    <string name="register_device">تسجيل جهاز</string>
+    <string name="pair_device">ربط جهاز</string>
+    <string name="device_status">حالة الجهاز</string>
+    <string name="remote_lock">قفل عن بُعد</string>
+    <string name="device_analytics">تحليلات الأجهزة</string>
+    
+    <!-- Status Messages -->
+    <string name="success_message">تمت العملية بنجاح</string>
+    <string name="error_message">حدث خطأ</string>
+    <string name="loading_message">يرجى الانتظار...</string>
+    <string name="connection_error">خطأ في الاتصال</string>
+    <string name="maintenance_mode">وضع الصيانة</string>
 </resources>

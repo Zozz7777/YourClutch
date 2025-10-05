@@ -1,18 +1,39 @@
 package com.clutch.partners.data.model
 
+import java.util.Date
+
 data class Order(
     val id: String,
+    val customerId: String,
     val customerName: String,
-    val customerPhone: String,
+    val items: List<OrderItem>,
     val totalAmount: Double,
-    val status: String,
-    val createdAt: Long,
-    val items: List<OrderItem> = emptyList()
-) : com.clutch.partners.offline.SyncableData
+    val status: OrderStatus,
+    val paymentStatus: PaymentStatus,
+    val createdAt: Date,
+    val updatedAt: Date,
+    val notes: String?
+)
 
 data class OrderItem(
-    val id: String,
-    val name: String,
+    val productId: String,
+    val productName: String,
     val quantity: Int,
-    val price: Double
+    val unitPrice: Double,
+    val totalPrice: Double
 )
+
+enum class OrderStatus {
+    PENDING,
+    CONFIRMED,
+    IN_PROGRESS,
+    COMPLETED,
+    CANCELLED
+}
+
+enum class PaymentStatus {
+    PENDING,
+    PAID,
+    PARTIALLY_PAID,
+    REFUNDED
+}
