@@ -4,16 +4,19 @@ const Employee = require('../models/Employee');
 const Role = require('../models/Role');
 const Permission = require('../models/Permission');
 const { 
-  checkPermission, 
-  checkRole, 
-  checkAnyPermission,
-  getUserPermissions 
+  requirePermission, 
+  requireAnyPermission,
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+  ROLES,
+  ROLE_PERMISSIONS
 } = require('../middleware/rbac');
 
 // ==================== PERMISSION MANAGEMENT ====================
 
 // GET /api/v1/rbac/permissions - List all permissions
-router.get('/permissions', checkPermission('view_settings'), async (req, res) => {
+router.get('/permissions', requirePermission('read_settings'), async (req, res) => {
   try {
     const permissions = await Permission.find({ isActive: true })
       .sort({ groupName: 1, name: 1 })
@@ -43,7 +46,7 @@ router.get('/permissions', checkPermission('view_settings'), async (req, res) =>
 });
 
 // GET /api/v1/rbac/permissions/groups - List permission groups
-router.get('/permissions/groups', checkPermission('view_settings'), async (req, res) => {
+router.get('/permissions/groups', requirePermission('read_settings'), async (req, res) => {
   try {
     const groups = await Permission.distinct('groupName', { isActive: true });
     
@@ -77,7 +80,7 @@ router.get('/permissions/groups', checkPermission('view_settings'), async (req, 
 });
 
 // GET /api/v1/rbac/permissions/group/:groupName - Get permissions by group
-router.get('/permissions/group/:groupName', checkPermission('view_settings'), async (req, res) => {
+router.get('/permissions/group/:groupName', requirePermission('read_settings'), async (req, res) => {
   try {
     const { groupName } = req.params;
     const permissions = await Permission.find({ 
@@ -100,7 +103,7 @@ router.get('/permissions/group/:groupName', checkPermission('view_settings'), as
 });
 
 // POST /api/v1/rbac/permissions - Create new permission
-router.post('/permissions', checkPermission('manage_settings'), async (req, res) => {
+router.post('/permissions', requirePermission('update_settings'), async (req, res) => {
   try {
     const { name, groupName, description } = req.body;
 
@@ -144,7 +147,7 @@ router.post('/permissions', checkPermission('manage_settings'), async (req, res)
 // ==================== ROLE MANAGEMENT ====================
 
 // GET /api/v1/rbac/roles - List all roles
-router.get('/roles', checkPermission('view_settings'), async (req, res) => {
+router.get('/roles', requirePermission('read_settings'), async (req, res) => {
   try {
     const roles = await Role.find({ isActive: true })
       .populate('permissions', 'name groupName description')
@@ -165,7 +168,7 @@ router.get('/roles', checkPermission('view_settings'), async (req, res) => {
 });
 
 // GET /api/v1/rbac/roles/:id - Get role details
-router.get('/roles/:id', checkPermission('view_settings'), async (req, res) => {
+router.get('/roles/:id', requirePermission('read_settings'), async (req, res) => {
   try {
     const role = await Role.findById(req.params.id)
       .populate('permissions', 'name groupName description')
@@ -193,7 +196,7 @@ router.get('/roles/:id', checkPermission('view_settings'), async (req, res) => {
 });
 
 // POST /api/v1/rbac/roles - Create new role
-router.post('/roles', checkPermission('manage_settings'), async (req, res) => {
+router.post('/roles', requirePermission('update_settings'), async (req, res) => {
   try {
     const { name, displayName, description, permissions, priority } = req.body;
 
@@ -238,7 +241,7 @@ router.post('/roles', checkPermission('manage_settings'), async (req, res) => {
 });
 
 // PUT /api/v1/rbac/roles/:id - Update role
-router.put('/roles/:id', checkPermission('manage_settings'), async (req, res) => {
+router.put('/roles/:id', requirePermission('update_settings'), async (req, res) => {
   try {
     const { displayName, description, permissions, priority, isActive } = req.body;
 
@@ -283,7 +286,7 @@ router.put('/roles/:id', checkPermission('manage_settings'), async (req, res) =>
 });
 
 // DELETE /api/v1/rbac/roles/:id - Delete role
-router.delete('/roles/:id', checkPermission('manage_settings'), async (req, res) => {
+router.delete('/roles/:id', requirePermission('update_settings'), async (req, res) => {
   try {
     const role = await Role.findById(req.params.id);
     if (!role) {
@@ -333,7 +336,7 @@ router.delete('/roles/:id', checkPermission('manage_settings'), async (req, res)
 });
 
 // GET /api/v1/rbac/roles/templates - Get role templates
-router.get('/roles/templates', checkPermission('view_settings'), async (req, res) => {
+router.get('/roles/templates', requirePermission('read_settings'), async (req, res) => {
   try {
     const templates = {
       CORE_SYSTEM_ADMIN: {
@@ -387,7 +390,7 @@ router.get('/roles/templates', checkPermission('view_settings'), async (req, res
 });
 
 // POST /api/v1/rbac/roles/:id/permissions - Assign permissions to role
-router.post('/roles/:id/permissions', checkPermission('manage_settings'), async (req, res) => {
+router.post('/roles/:id/permissions', requirePermission('update_settings'), async (req, res) => {
   try {
     const { permissionIds } = req.body;
 
@@ -447,7 +450,7 @@ router.post('/roles/:id/permissions', checkPermission('manage_settings'), async 
 });
 
 // DELETE /api/v1/rbac/roles/:id/permissions/:permissionId - Remove permission from role
-router.delete('/roles/:id/permissions/:permissionId', checkPermission('manage_settings'), async (req, res) => {
+router.delete('/roles/:id/permissions/:permissionId', requirePermission('update_settings'), async (req, res) => {
   try {
     const role = await Role.findById(req.params.id);
     if (!role) {
@@ -489,7 +492,7 @@ router.delete('/roles/:id/permissions/:permissionId', checkPermission('manage_se
 // ==================== USER ROLE MANAGEMENT ====================
 
 // GET /api/v1/rbac/users/:id/roles - Get user roles
-router.get('/users/:id/roles', checkPermission('view_users'), async (req, res) => {
+router.get('/users/:id/roles', requirePermission('read_user'), async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id)
       .populate('roles', 'name displayName description permissions')
@@ -517,7 +520,7 @@ router.get('/users/:id/roles', checkPermission('view_users'), async (req, res) =
 });
 
 // POST /api/v1/rbac/users/:id/roles - Assign role to user
-router.post('/users/:id/roles', checkPermission('edit_users'), async (req, res) => {
+router.post('/users/:id/roles', requirePermission('update_user'), async (req, res) => {
   try {
     const { roleId } = req.body;
 
@@ -574,7 +577,7 @@ router.post('/users/:id/roles', checkPermission('edit_users'), async (req, res) 
 });
 
 // DELETE /api/v1/rbac/users/:id/roles/:roleId - Remove role from user
-router.delete('/users/:id/roles/:roleId', checkPermission('edit_users'), async (req, res) => {
+router.delete('/users/:id/roles/:roleId', requirePermission('update_user'), async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id);
     if (!employee) {
@@ -608,7 +611,7 @@ router.delete('/users/:id/roles/:roleId', checkPermission('edit_users'), async (
 });
 
 // GET /api/v1/rbac/users/:id/permissions - Get user permissions (flattened)
-router.get('/users/:id/permissions', checkPermission('view_users'), async (req, res) => {
+router.get('/users/:id/permissions', requirePermission('read_user'), async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id);
     if (!employee) {
@@ -647,6 +650,24 @@ router.get('/users/:id/permissions', checkPermission('view_users'), async (req, 
 });
 
 // GET /api/v1/rbac/my-permissions - Get current user's permissions
-router.get('/my-permissions', getUserPermissions);
+router.get('/my-permissions', requirePermission('read_user'), async (req, res) => {
+  try {
+    // Get user's permissions from their roles
+    const userRole = req.user?.role || 'customer';
+    const userPermissions = ROLE_PERMISSIONS[userRole] || [];
+    
+    res.json({
+      success: true,
+      permissions: userPermissions,
+      role: userRole
+    });
+  } catch (error) {
+    console.error('Get user permissions error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to get user permissions' 
+    });
+  }
+});
 
 module.exports = router;
