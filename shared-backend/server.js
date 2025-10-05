@@ -114,15 +114,7 @@ app.use(performanceMonitoring);
 // Apply burst protection (most restrictive)
 app.use(burstProtection);
 
-// Apply specific rate limits to different route groups
-app.use(`${apiPrefix}/auth`, rateLimits.auth);
-app.use(`${apiPrefix}/auth/reset-password`, rateLimits.passwordReset);
-app.use(`${apiPrefix}/cars`, rateLimits.cars);
-app.use(`${apiPrefix}/admin`, rateLimits.admin);
-app.use('/health', rateLimits.health);
-
-// Apply general API rate limiting to all other routes
-app.use(apiPrefix, rateLimits.api);
+// Rate limiting will be applied when routes are loaded dynamically
 
 // Add performance analytics endpoint (admin only)
 app.get(`${apiPrefix}/analytics/performance`, authenticateToken, async (req, res) => {
@@ -258,28 +250,9 @@ app.get('/ping', (req, res) => {
 
 // All routes will be loaded dynamically - no mountings needed
 
-// Updates routes
-app.use('/api/v1/updates', require('./routes/updates'));
+// All routes will be loaded dynamically - no mountings needed
 
-// Careers routes
-app.use('/api/v1/careers', require('./routes/careers'));
-
-// Employee invitations routes
-app.use('/api/v1/employees', require('./routes/employee-invitations'));
-
-app.use('/api/v1', clutchAppRoutes);
-app.use('/api/v1/admin/onboarding', onboardingRoutes);
-app.use('/api/v1/admin/roles', rolesRoutes);
-app.use('/api/v1', carsRoutes);
-app.use('/api/v1/maintenance', maintenanceRoutes);
-app.use('/api/v1/operations', operationsRoutes);
-app.use('/api/v1/security', securityRoutes);
-app.use('/api/v1/partners/refunds', partnersRefundsRoutes);
-
-// New routes for integrations, financial, and shipping
-app.use('/api/v1/integrations', require('./routes/integrations'));
-app.use('/api/v1/financial', require('./routes/financial'));
-app.use('/api/v1/shipping', require('./routes/shipping'));
+// All routes will be loaded dynamically - no mountings needed
 
 // Note: Authentication is handled by individual routes using authenticateToken middleware
 // No global authentication middleware needed as each route handles its own auth
