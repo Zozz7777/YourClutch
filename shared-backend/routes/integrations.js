@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkRole } = require('../middleware/rbac');
+const { requirePermission } = require('../middleware/rbac');
 const { getCollection } = require('../config/database');
 const PaymentGateway = require('../models/PaymentGateway');
 const Integration = require('../models/Integration');
@@ -17,7 +17,7 @@ const integrationRateLimit = require('express-rate-limit')({
 });
 
 // GET /api/v1/integrations - List all integrations with filters
-router.get('/', authenticateToken, checkRole(['head_administrator', 'platform_admin', 'system_admin']), integrationRateLimit, async (req, res) => {
+router.get('/', authenticateToken, requirePermission('read_integrations'), integrationRateLimit, async (req, res) => {
   try {
     const {
       type = '',
@@ -82,7 +82,7 @@ router.get('/', authenticateToken, checkRole(['head_administrator', 'platform_ad
 });
 
 // GET /api/v1/integrations/payment-gateways - Get all payment gateways
-router.get('/payment-gateways', authenticateToken, checkRole(['head_administrator', 'platform_admin', 'system_admin']), integrationRateLimit, async (req, res) => {
+router.get('/payment-gateways', authenticateToken, requirePermission('read_integrations'), integrationRateLimit, async (req, res) => {
   try {
     const { isActive = '', environment = '' } = req.query;
     
@@ -137,7 +137,7 @@ router.get('/payment-gateways/active', async (req, res) => {
 });
 
 // POST /api/v1/integrations/payment-gateway - Add new payment gateway
-router.post('/payment-gateway', authenticateToken, checkRole(['head_administrator', 'platform_admin']), integrationRateLimit, async (req, res) => {
+router.post('/payment-gateway', authenticateToken, requirePermission('create_integrations'), integrationRateLimit, async (req, res) => {
   try {
     const {
       name,
@@ -208,7 +208,7 @@ router.post('/payment-gateway', authenticateToken, checkRole(['head_administrato
 });
 
 // PUT /api/v1/integrations/payment-gateway/:id - Update gateway config
-router.put('/payment-gateway/:id', authenticateToken, checkRole(['head_administrator', 'platform_admin']), integrationRateLimit, async (req, res) => {
+router.put('/payment-gateway/:id', authenticateToken, requirePermission('update_integrations'), integrationRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -252,7 +252,7 @@ router.put('/payment-gateway/:id', authenticateToken, checkRole(['head_administr
 });
 
 // DELETE /api/v1/integrations/payment-gateway/:id - Remove gateway
-router.delete('/payment-gateway/:id', authenticateToken, checkRole(['head_administrator']), integrationRateLimit, async (req, res) => {
+router.delete('/payment-gateway/:id', authenticateToken, requirePermission('delete_integrations'), integrationRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -281,7 +281,7 @@ router.delete('/payment-gateway/:id', authenticateToken, checkRole(['head_admini
 });
 
 // POST /api/v1/integrations/payment-gateway/:id/test - Test gateway connection
-router.post('/payment-gateway/:id/test', authenticateToken, checkRole(['head_administrator', 'platform_admin']), integrationRateLimit, async (req, res) => {
+router.post('/payment-gateway/:id/test', authenticateToken, requirePermission('update_integrations'), integrationRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -331,7 +331,7 @@ router.post('/payment-gateway/:id/test', authenticateToken, checkRole(['head_adm
 });
 
 // POST /api/v1/integrations/payment-gateway/:id/toggle - Enable/disable gateway
-router.post('/payment-gateway/:id/toggle', authenticateToken, checkRole(['head_administrator', 'platform_admin']), integrationRateLimit, async (req, res) => {
+router.post('/payment-gateway/:id/toggle', authenticateToken, requirePermission('update_integrations'), integrationRateLimit, async (req, res) => {
   try {
     const { id } = req.params;
     const { isActive } = req.body;
@@ -366,7 +366,7 @@ router.post('/payment-gateway/:id/toggle', authenticateToken, checkRole(['head_a
 });
 
 // POST /api/v1/integrations/upload-logo - Upload gateway logo to S3
-router.post('/upload-logo', authenticateToken, checkRole(['head_administrator', 'platform_admin']), integrationRateLimit, async (req, res) => {
+router.post('/upload-logo', authenticateToken, requirePermission('update_integrations'), integrationRateLimit, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
