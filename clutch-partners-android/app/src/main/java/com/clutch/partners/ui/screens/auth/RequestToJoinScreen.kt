@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import com.clutch.partners.ClutchPartnersTheme
 import com.clutch.partners.R
 import com.clutch.partners.navigation.Screen
+import com.clutch.partners.ui.components.ErrorHandler
 import com.clutch.partners.utils.LanguageManager
 import com.clutch.partners.viewmodel.AuthViewModel
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +53,9 @@ fun RequestToJoinScreen(
     var address by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
     
     val businessTypes = if (currentLanguage == "ar") {
         listOf("ورشة إصلاح", "وكالة سيارات", "متجر قطع غيار", "خدمات صيانة", "أخرى")
@@ -335,8 +339,16 @@ fun RequestToJoinScreen(
                 Button(
                     onClick = {
                         isLoading = true
-                        // TODO: Implement actual request to join logic
-                        navController.navigate(Screen.Main.route)
+                        // Call request to join API
+                        viewModel.requestToJoin(businessName, businessType, contactName, email, phone, address, description) { success ->
+                            isLoading = false
+                            if (success) {
+                                showSuccessDialog = true
+                            } else {
+                                errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في إرسال الطلب" else "Failed to submit request"
+                                showErrorDialog = true
+                            }
+                        }
                     },
                     enabled = businessName.isNotEmpty() && businessType.isNotEmpty() && contactName.isNotEmpty() && email.isNotEmpty() && phone.isNotEmpty() && address.isNotEmpty() && !isLoading,
                     modifier = Modifier
@@ -385,6 +397,45 @@ fun RequestToJoinScreen(
             }
             
             Spacer(modifier = Modifier.height(40.dp))
+        }
+        
+        // Comprehensive Error Handler
+        ErrorHandler(
+            error = if (showErrorDialog) errorMessage else null,
+            currentLanguage = currentLanguage,
+            onDismiss = { showErrorDialog = false }
+        )
+        
+        // Success Dialog
+        if (showSuccessDialog) {
+            AlertDialog(
+                onDismissRequest = { showSuccessDialog = false },
+                title = {
+                    Text(
+                        text = if (currentLanguage == "ar") "تم إرسال الطلب بنجاح" else "Request Submitted Successfully",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                text = {
+                    Text(
+                        text = if (currentLanguage == "ar") "تم إرسال طلب الانضمام بنجاح. سيتواصل معك أحد أعضاء فريقنا قريباً." else "You have requested to join successfully. One of our team members will contact you shortly.",
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = { 
+                            showSuccessDialog = false
+                            navController.navigate(Screen.Auth.route)
+                        }
+                    ) {
+                        Text(
+                            text = if (currentLanguage == "ar") "حسناً" else "OK",
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            )
         }
     }
 }

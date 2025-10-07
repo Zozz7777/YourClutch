@@ -12,6 +12,10 @@ sealed class Screen(val route: String) {
     object ForgotPassword : Screen("forgot_password")
     object KYC : Screen("kyc")
     
+    // Approval Screens
+    object PendingApprovals : Screen("pending_approvals")
+    object MyApprovalRequests : Screen("my_approval_requests")
+    
     // Main Screens
     object Main : Screen("main")
     object Home : Screen("home")

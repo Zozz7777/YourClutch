@@ -73,20 +73,13 @@ class AuthViewModel @Inject constructor(
         email: String,
         phone: String,
         password: String,
-        businessName: String,
-        ownerName: String,
-        businessType: String,
-        street: String,
-        city: String,
-        state: String,
-        zipCode: String,
         onResult: (Boolean) -> Unit = {}
     ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
-            // Call real backend API for sign up
-            authRepository.signUp(partnerId, email, phone, password, businessName, ownerName, businessType, street, city, state, zipCode)
+            // Call real backend API for sign up (streamlined)
+            authRepository.signUp(partnerId, email, phone, password)
                 .onSuccess { user ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,

@@ -60,6 +60,19 @@ const {
   healthCheck
 } = require('./middleware/request-optimization');
 
+// Import performance optimization middleware
+const {
+  requestTiming,
+  databaseOptimization: dbOptimization,
+  externalServiceProtection,
+  requestCaching: reqCaching,
+  memoryOptimization,
+  connectionPoolOptimization,
+  responseCompression,
+  getPerformanceMetrics: getPerfMetrics,
+  performanceHealthCheck
+} = require('./middleware/performance-optimization');
+
 // Import WebSocket server
 const webSocketServer = require('./services/websocket-server');
 const PartnerWebSocketService = require('./services/partner-websocket');
@@ -189,6 +202,14 @@ const { performanceMonitoring } = require('./middleware/performance-monitoring')
 // Apply performance monitoring first
 app.use(performanceMonitoring);
 
+// Apply comprehensive performance optimization middleware
+app.use(requestTiming);
+app.use(dbOptimization);
+app.use(externalServiceProtection);
+app.use(memoryOptimization);
+app.use(connectionPoolOptimization);
+app.use(responseCompression);
+
 // Apply request optimization middleware
 app.use(performanceMonitor);
 app.use(databaseOptimization);
@@ -196,6 +217,7 @@ app.use(requestCompression);
 
 // Apply request caching for GET requests (5 minutes TTL)
 app.use(requestCaching(300));
+app.use(reqCaching(300)); // Additional caching layer
 
 // Apply request timeouts
 app.use(requestTimeout(20000)); // 20 seconds default timeout
@@ -276,6 +298,38 @@ app.get(`${apiPrefix}/analytics/request-optimization`, authenticateToken, async 
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve request optimization metrics'
+    });
+  }
+});
+
+// Add comprehensive performance metrics endpoint
+app.get(`${apiPrefix}/analytics/performance-detailed`, authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    const metrics = getPerfMetrics();
+    const health = performanceHealthCheck();
+    
+    res.json({
+      success: true,
+      data: {
+        metrics,
+        health,
+        timestamp: new Date().toISOString(),
+        recommendations: health.recommendations
+      }
+    });
+  } catch (error) {
+    console.error('Error getting detailed performance metrics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve detailed performance metrics'
     });
   }
 });

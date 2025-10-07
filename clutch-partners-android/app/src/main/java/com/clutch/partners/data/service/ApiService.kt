@@ -1,6 +1,8 @@
 package com.clutch.partners.data.service
 
 import com.clutch.partners.data.model.*
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
@@ -158,33 +160,24 @@ class ApiService @Inject constructor() {
         partnerId: String,
         email: String,
         phone: String,
-        password: String,
-        businessName: String,
-        ownerName: String,
-        businessType: String,
-        street: String,
-        city: String,
-        state: String,
-        zipCode: String
+        password: String
     ): Result<User> = withContext(Dispatchers.IO) {
         try {
-            println("🔐 API: Attempting sign up for email: $email")
+            println("🔐 API: Attempting sign up for email: $email, phone: $phone")
             
             val json = JSONObject().apply {
                 put("partnerId", partnerId)
-                put("email", email)
-                put("phone", phone)
                 put("password", password)
-                put("businessName", businessName)
-                put("ownerName", ownerName)
-                put("partnerType", mapBusinessTypeToBackend(businessType))
-                put("businessAddress", JSONObject().apply {
-                    put("street", street)
-                    put("city", city)
-                    put("state", state)
-                    put("zipCode", zipCode)
-                })
+                // Only include email or phone, not both - avoid sending undefined/null
+                if (email.isNotEmpty() && email != "undefined" && email != "null") {
+                    put("email", email)
+                }
+                if (phone.isNotEmpty() && phone != "undefined" && phone != "null") {
+                    put("phone", phone)
+                }
             }
+            
+            println("📤 API: Sending signup request with JSON: ${json.toString()}")
             
             val requestBody = json.toString().toRequestBody("application/json".toMediaType())
             val request = Request.Builder()
@@ -204,9 +197,18 @@ class ApiService @Inject constructor() {
                         val success = jsonResponse.optBoolean("success", false)
                         if (success) {
                             val data = jsonResponse.getJSONObject("data")
-                            val partner = data.getJSONObject("partner")
-                            val user = parsePartnerFromJson(partner)
-                            Result.success(user)
+                            val status = data.optString("status", "")
+                            
+                            if (status == "pending_approval") {
+                                // Handle approval flow
+                                val message = jsonResponse.optString("message", "Registration request submitted for approval")
+                                Result.failure(Exception("APPROVAL_PENDING: $message"))
+                            } else {
+                                // Normal signup success
+                                val partner = data.getJSONObject("partner")
+                                val user = parsePartnerFromJson(partner)
+                                Result.success(user)
+                            }
                         } else {
                             val message = jsonResponse.optString("message", "Registration failed")
                             Result.failure(Exception(message))
@@ -655,6 +657,225 @@ class ApiService @Inject constructor() {
             details = json.getString("details"),
             timestamp = java.util.Date(),
             ipAddress = json.getString("ipAddress")
+        )
+    }
+
+    // ============================================================================
+    // APPROVAL MANAGEMENT API METHODS
+    // ============================================================================
+
+    suspend fun getPendingApprovals(token: String): List<ApprovalRequest> = withContext(Dispatchers.IO) {
+        try {
+            println("🌐 API: Getting pending approvals...")
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partner-approvals/pending")
+                .get()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            println("📡 API: Pending approvals response code: ${response.code}")
+
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string() ?: ""
+                println("📡 API: Pending approvals response: $responseBody")
+                
+                val json = JSONObject(responseBody)
+                if (json.getBoolean("success")) {
+                    val dataArray = json.getJSONArray("data")
+                    val approvals = mutableListOf<ApprovalRequest>()
+                    
+                    for (i in 0 until dataArray.length()) {
+                        val approvalJson = dataArray.getJSONObject(i)
+                        approvals.add(parseApprovalRequestFromJson(approvalJson))
+                    }
+                    
+                    println("✅ API: Successfully loaded ${approvals.size} pending approvals")
+                    return@withContext approvals
+                } else {
+                    throw Exception("Failed to load pending approvals: ${json.getString("message")}")
+                }
+            } else {
+                throw Exception("Failed to load pending approvals: HTTP ${response.code}")
+            }
+        } catch (e: Exception) {
+            println("❌ API: Error getting pending approvals: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun getMyApprovalRequests(token: String): List<ApprovalRequest> = withContext(Dispatchers.IO) {
+        try {
+            println("🌐 API: Getting my approval requests...")
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partner-approvals/my-requests")
+                .get()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            println("📡 API: My requests response code: ${response.code}")
+
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string() ?: ""
+                println("📡 API: My requests response: $responseBody")
+                
+                val json = JSONObject(responseBody)
+                if (json.getBoolean("success")) {
+                    val dataArray = json.getJSONArray("data")
+                    val requests = mutableListOf<ApprovalRequest>()
+                    
+                    for (i in 0 until dataArray.length()) {
+                        val requestJson = dataArray.getJSONObject(i)
+                        requests.add(parseApprovalRequestFromJson(requestJson))
+                    }
+                    
+                    println("✅ API: Successfully loaded ${requests.size} my approval requests")
+                    return@withContext requests
+                } else {
+                    throw Exception("Failed to load my approval requests: ${json.getString("message")}")
+                }
+            } else {
+                throw Exception("Failed to load my approval requests: HTTP ${response.code}")
+            }
+        } catch (e: Exception) {
+            println("❌ API: Error getting my approval requests: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun approveRequest(approvalId: String, token: String): Unit = withContext(Dispatchers.IO) {
+        try {
+            println("🌐 API: Approving request $approvalId...")
+            
+            val requestBody = JSONObject().apply {
+                put("approvedRole", "partner_employee") // Default role, can be customized
+            }.toString().toRequestBody("application/json".toMediaType())
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partner-approvals/$approvalId/approve")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            println("📡 API: Approve response code: ${response.code}")
+
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string() ?: ""
+                println("📡 API: Approve response: $responseBody")
+                
+                val json = JSONObject(responseBody)
+                if (json.getBoolean("success")) {
+                    println("✅ API: Successfully approved request")
+                } else {
+                    throw Exception("Failed to approve request: ${json.getString("message")}")
+                }
+            } else {
+                throw Exception("Failed to approve request: HTTP ${response.code}")
+            }
+        } catch (e: Exception) {
+            println("❌ API: Error approving request: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun rejectRequest(approvalId: String, reason: String, token: String): Unit = withContext(Dispatchers.IO) {
+        try {
+            println("🌐 API: Rejecting request $approvalId with reason: $reason...")
+            
+            val requestBody = JSONObject().apply {
+                put("rejectionReason", reason)
+            }.toString().toRequestBody("application/json".toMediaType())
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partner-approvals/$approvalId/reject")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            println("📡 API: Reject response code: ${response.code}")
+
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string() ?: ""
+                println("📡 API: Reject response: $responseBody")
+                
+                val json = JSONObject(responseBody)
+                if (json.getBoolean("success")) {
+                    println("✅ API: Successfully rejected request")
+                } else {
+                    throw Exception("Failed to reject request: ${json.getString("message")}")
+                }
+            } else {
+                throw Exception("Failed to reject request: HTTP ${response.code}")
+            }
+        } catch (e: Exception) {
+            println("❌ API: Error rejecting request: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun getApprovalRequestDetails(approvalId: String, token: String): ApprovalRequest = withContext(Dispatchers.IO) {
+        try {
+            println("🌐 API: Getting approval request details for $approvalId...")
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partner-approvals/$approvalId")
+                .get()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            println("📡 API: Approval details response code: ${response.code}")
+
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string() ?: ""
+                println("📡 API: Approval details response: $responseBody")
+                
+                val json = JSONObject(responseBody)
+                if (json.getBoolean("success")) {
+                    val data = json.getJSONObject("data")
+                    println("✅ API: Successfully loaded approval request details")
+                    return@withContext parseApprovalRequestFromJson(data)
+                } else {
+                    throw Exception("Failed to load approval request details: ${json.getString("message")}")
+                }
+            } else {
+                throw Exception("Failed to load approval request details: HTTP ${response.code}")
+            }
+        } catch (e: Exception) {
+            println("❌ API: Error getting approval request details: ${e.message}")
+            throw e
+        }
+    }
+
+    private fun parseApprovalRequestFromJson(json: JSONObject): ApprovalRequest {
+        return ApprovalRequest(
+            id = json.getString("_id"),
+            partnerId = json.getString("partnerId"),
+            requesterEmail = json.getString("requesterEmail"),
+            requesterPhone = json.getString("requesterPhone"),
+            requesterName = json.getString("requesterName"),
+            requestedRole = json.getString("requestedRole"),
+            requestedPermissions = json.optJSONArray("requestedPermissions")?.let { array ->
+                (0 until array.length()).map { array.getString(it) }
+            } ?: emptyList(),
+            status = json.getString("status"),
+            approvedBy = json.optString("approvedBy").takeIf { it.isNotEmpty() },
+            approvedAt = json.optString("approvedAt").takeIf { it.isNotEmpty() },
+            rejectionReason = json.optString("rejectionReason").takeIf { it.isNotEmpty() },
+            approvedRole = json.optString("approvedRole").takeIf { it.isNotEmpty() },
+            approvedPermissions = json.optJSONArray("approvedPermissions")?.let { array ->
+                (0 until array.length()).map { array.getString(it) }
+            } ?: emptyList(),
+            businessJustification = json.optString("businessJustification"),
+            notes = json.optString("notes"),
+            createdAt = json.getString("createdAt"),
+            updatedAt = json.getString("updatedAt"),
+            expiresAt = json.getString("expiresAt")
         )
     }
     

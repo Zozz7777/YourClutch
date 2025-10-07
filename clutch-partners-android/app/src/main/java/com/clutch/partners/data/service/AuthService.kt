@@ -16,26 +16,16 @@ class AuthService @Inject constructor(
     }
     
     suspend fun signUp(
-        businessName: String,
-        ownerName: String,
+        partnerId: String,
         email: String,
         phone: String,
-        password: String,
-        partnerType: com.clutch.partners.data.model.PartnerType,
-        address: String
+        password: String
     ): Result<User> {
         return apiService.signUp(
-            partnerId = "PARTNER_${System.currentTimeMillis()}",
+            partnerId = partnerId,
             email = email,
             phone = phone,
-            password = password,
-            businessName = businessName,
-            ownerName = ownerName,
-            businessType = partnerType.name,
-            street = address,
-            city = "Default City",
-            state = "Default State",
-            zipCode = "00000"
+            password = password
         )
     }
     
@@ -46,6 +36,10 @@ class AuthService @Inject constructor(
     
     suspend fun getCurrentUser(): User? {
         return localStorageService.getUser()
+    }
+    
+    suspend fun getAuthToken(): String? {
+        return localStorageService.getAuthToken()
     }
     
     fun logout() {

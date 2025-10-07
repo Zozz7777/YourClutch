@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import com.clutch.partners.ClutchPartnersTheme
 import com.clutch.partners.R
 import com.clutch.partners.navigation.Screen
+import com.clutch.partners.ui.components.ErrorHandler
 import com.clutch.partners.utils.LanguageManager
 import com.clutch.partners.viewmodel.AuthViewModel
 
@@ -50,6 +51,7 @@ fun SignInScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
     
     ClutchPartnersTheme {
         Column(
@@ -192,7 +194,8 @@ fun SignInScreen(
                                             navController.navigate(Screen.Main.route)
                                         } else {
                                             println("🔐 SignInScreen: Authentication failed, showing error")
-                                            errorMessage = if (currentLanguage == "ar") "فشل في تسجيل الدخول. تحقق من بياناتك" else "Login failed. Please check your credentials"
+                                            errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في تسجيل الدخول. تحقق من بياناتك" else "Login failed. Please check your credentials"
+                                            showErrorDialog = true
                                         }
                                     }
                                 } else {
@@ -307,7 +310,8 @@ fun SignInScreen(
                                         navController.navigate(Screen.Main.route)
                                     } else {
                                         println("🔐 SignInScreen: Button click - Authentication failed, showing error")
-                                        errorMessage = if (currentLanguage == "ar") "فشل في تسجيل الدخول. تحقق من بياناتك" else "Login failed. Please check your credentials"
+                                        errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في تسجيل الدخول. تحقق من بياناتك" else "Login failed. Please check your credentials"
+                                        showErrorDialog = true
                                     }
                                 }
                             } else {
@@ -365,5 +369,12 @@ fun SignInScreen(
             
             Spacer(modifier = Modifier.weight(1f))
         }
+        
+        // Comprehensive Error Handler
+        ErrorHandler(
+            error = if (showErrorDialog) errorMessage else null,
+            currentLanguage = currentLanguage,
+            onDismiss = { showErrorDialog = false }
+        )
     }
 }

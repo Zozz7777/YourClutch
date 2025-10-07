@@ -84,19 +84,12 @@ class AuthRepository @Inject constructor(
         partnerId: String, 
         email: String, 
         phone: String, 
-        password: String, 
-        businessName: String, 
-        ownerName: String, 
-        businessType: String, 
-        street: String, 
-        city: String, 
-        state: String, 
-        zipCode: String
+        password: String
     ): Result<User> {
-        println("🔐 AuthRepository: signUp called with partnerId: $partnerId, email: $email")
+        println("🔐 AuthRepository: signUp called with partnerId: $partnerId, email: $email, phone: $phone")
         return try {
-            // Call real backend API for sign up
-            val result = apiService.signUp(partnerId, email, phone, password, businessName, ownerName, businessType, street, city, state, zipCode)
+            // Call real backend API for sign up (streamlined)
+            val result = apiService.signUp(partnerId, email, phone, password)
             println("🔐 AuthRepository: signUp API result: ${result.isSuccess}")
             result.onSuccess { user ->
                 setCurrentUser(user)

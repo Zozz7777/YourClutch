@@ -35,6 +35,10 @@ class LocalStorageService @Inject constructor() {
         return null
     }
     
+    fun getAuthToken(): String? {
+        return getToken()
+    }
+    
     fun clearToken() {
         // TODO: Implement actual token clearing
     }

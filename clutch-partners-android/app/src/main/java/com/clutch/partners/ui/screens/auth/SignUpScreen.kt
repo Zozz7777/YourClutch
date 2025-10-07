@@ -30,8 +30,12 @@ import androidx.navigation.NavController
 import com.clutch.partners.ClutchPartnersTheme
 import com.clutch.partners.R
 import com.clutch.partners.navigation.Screen
+import com.clutch.partners.ui.components.ErrorHandler
 import com.clutch.partners.utils.LanguageManager
 import com.clutch.partners.viewmodel.AuthViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(
@@ -49,17 +53,13 @@ fun SignUpScreen(
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var businessName by remember { mutableStateOf("") }
-    var ownerName by remember { mutableStateOf("") }
-    var businessType by remember { mutableStateOf("") }
-    var street by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-    var state by remember { mutableStateOf("") }
-    var zipCode by remember { mutableStateOf("") }
+    var useEmail by remember { mutableStateOf(true) } // Toggle between email and phone
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
     
     ClutchPartnersTheme {
         Column(
@@ -236,8 +236,8 @@ fun SignUpScreen(
                                 errorMessage = if (currentLanguage == "ar") "معرف الشريك مطلوب" else "Partner ID is required"
                                 return@KeyboardActions
                             }
-                            if (email.isEmpty()) {
-                                errorMessage = if (currentLanguage == "ar") "البريد الإلكتروني مطلوب" else "Email is required"
+                            if (email.isEmpty() && phone.isEmpty()) {
+                                errorMessage = if (currentLanguage == "ar") "البريد الإلكتروني أو رقم الهاتف مطلوب" else "Email or phone is required"
                                 return@KeyboardActions
                             }
                             if (password.isEmpty()) {
@@ -259,7 +259,7 @@ fun SignUpScreen(
                             
                             isLoading = true
                             // Connect to backend for registration
-                            viewModel.signUp(partnerId, email, phone, password, "Default Business", "Default Owner", "REPAIR_CENTER", "Default Street", "Default City", "Default State", "00000") { success ->
+                            viewModel.signUp(partnerId, email, phone, password) { success ->
                                 isLoading = false
                                 if (success) {
                                     navController.navigate(Screen.Main.route)
@@ -302,41 +302,67 @@ fun SignUpScreen(
                         // Validate all fields
                         if (partnerId.isEmpty()) {
                             errorMessage = if (currentLanguage == "ar") "معرف الشريك مطلوب" else "Partner ID is required"
+                            showErrorDialog = true
                             return@Button
                         }
-                        if (email.isEmpty()) {
-                            errorMessage = if (currentLanguage == "ar") "البريد الإلكتروني مطلوب" else "Email is required"
+                        if (email.isEmpty() && phone.isEmpty()) {
+                            errorMessage = if (currentLanguage == "ar") "البريد الإلكتروني أو رقم الهاتف مطلوب" else "Email or phone is required"
+                            showErrorDialog = true
                             return@Button
                         }
                         if (password.isEmpty()) {
                             errorMessage = if (currentLanguage == "ar") "كلمة المرور مطلوبة" else "Password is required"
+                            showErrorDialog = true
                             return@Button
                         }
                         if (password.length < 6) {
                             errorMessage = if (currentLanguage == "ar") "كلمة المرور يجب أن تكون 6 أحرف على الأقل" else "Password must be at least 6 characters"
+                            showErrorDialog = true
                             return@Button
                         }
                         if (confirmPassword.isEmpty()) {
                             errorMessage = if (currentLanguage == "ar") "تأكيد كلمة المرور مطلوب" else "Confirm password is required"
+                            showErrorDialog = true
                             return@Button
                         }
                         if (password != confirmPassword) {
                             errorMessage = if (currentLanguage == "ar") "كلمات المرور غير متطابقة" else "Passwords do not match"
+                            showErrorDialog = true
                             return@Button
                         }
                         
                         isLoading = true
-                        // Connect to backend for registration
-                        viewModel.signUp(partnerId, email, phone, password, "Default Business", "Default Owner", "REPAIR_CENTER", "Default Street", "Default City", "Default State", "00000") { success ->
+                        // Connect to backend for registration (streamlined - only essential fields)
+                        viewModel.signUp(partnerId, email, phone, password) { success ->
                             isLoading = false
                             if (success) {
-                                navController.navigate(Screen.Main.route)
+                                // Auto-login after successful signup
+                                // The user is already logged in via the signup response
+                                // Show success message briefly, then navigate to main app
+                                showSuccessDialog = true
+                                
+                                // Navigate to main app after a short delay to show success message
+                                kotlinx.coroutines.GlobalScope.launch {
+                                    delay(1500)
+                                    navController.navigate(Screen.Dashboard.route) {
+                                        // Clear the back stack so user can't go back to auth screens
+                                        popUpTo(Screen.SignUp.route) { inclusive = true }
+                                    }
+                                }
                             } else {
-                                errorMessage = if (currentLanguage == "ar") "فشل في التسجيل. تحقق من بياناتك" else "Registration failed. Please check your information"
+                                val error = viewModel.uiState.value.error ?: ""
+                                if (error.startsWith("APPROVAL_PENDING:")) {
+                                    // Handle approval pending case
+                                    errorMessage = error.removePrefix("APPROVAL_PENDING: ")
+                                    showErrorDialog = true
+                                } else {
+                                    errorMessage = error.ifEmpty { if (currentLanguage == "ar") "فشل في التسجيل. تحقق من بياناتك" else "Registration failed. Please check your information" }
+                                    showErrorDialog = true
+                                }
                             }
                         }
                     },
-                    enabled = partnerId.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && password == confirmPassword && !isLoading,
+                    enabled = partnerId.isNotEmpty() && (email.isNotEmpty() || phone.isNotEmpty()) && password.isNotEmpty() && confirmPassword.isNotEmpty() && password == confirmPassword && !isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -383,6 +409,45 @@ fun SignUpScreen(
             }
             
             Spacer(modifier = Modifier.weight(1f))
+        }
+        
+        // Comprehensive Error Handler
+        ErrorHandler(
+            error = if (showErrorDialog) errorMessage else null,
+            currentLanguage = currentLanguage,
+            onDismiss = { showErrorDialog = false }
+        )
+        
+        // Success Dialog
+        if (showSuccessDialog) {
+            AlertDialog(
+                onDismissRequest = { showSuccessDialog = false },
+                title = {
+                    Text(
+                        text = if (currentLanguage == "ar") "تم إنشاء الحساب بنجاح" else "Account Created Successfully",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                text = {
+                    Text(
+                        text = if (currentLanguage == "ar") "تم إنشاء حسابك بنجاح. يمكنك الآن تسجيل الدخول." else "Your account has been created successfully. You can now sign in.",
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = { 
+                            showSuccessDialog = false
+                            navController.navigate(Screen.SignIn.route)
+                        }
+                    ) {
+                        Text(
+                            text = if (currentLanguage == "ar") "تسجيل الدخول" else "Sign In",
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            )
         }
     }
 }
