@@ -770,27 +770,6 @@ const corsOptions = {
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Initialize performance tracking objects (CRITICAL - must be before ALL other middleware)
-app.use((req, res, next) => {
-  // Initialize performance tracking objects
-  req.performance = req.performance || {
-    startTime: Date.now(),
-    queries: [],
-    totalTime: 0,
-    memoryUsage: process.memoryUsage()
-  };
-  
-  req.queryMetrics = req.queryMetrics || {
-    queries: [],
-    totalTime: 0,
-    slowQueries: [],
-    cacheHits: 0,
-    cacheMisses: 0
-  };
-  
-  next();
-});
-
 // OPTIONS handler - Express v5 compatible (handled by CORS middleware)
 
 // Enhanced error handling middleware with production logging
