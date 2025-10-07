@@ -76,7 +76,7 @@ const {
 // Import cost optimization middleware
 const {
   costOptimization,
-  memoryOptimization,
+  memoryOptimization: costMemoryOptimization,
   databaseCostOptimization,
   bandwidthOptimization,
   cacheOptimization,
@@ -250,7 +250,7 @@ app.use(responseCompression);
 
 // Apply cost optimization middleware (CRITICAL for cost reduction)
 app.use(costOptimization);
-app.use(memoryOptimization);
+app.use(costMemoryOptimization);
 app.use(databaseCostOptimization);
 app.use(bandwidthOptimization);
 app.use(cacheOptimization);
