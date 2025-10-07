@@ -189,6 +189,17 @@ const { performanceMonitoring } = require('./middleware/performance-monitoring')
 // Apply performance monitoring first
 app.use(performanceMonitoring);
 
+// Apply request optimization middleware
+app.use(performanceMonitor);
+app.use(databaseOptimization);
+app.use(requestCompression);
+
+// Apply request caching for GET requests (5 minutes TTL)
+app.use(requestCaching(300));
+
+// Apply request timeouts
+app.use(requestTimeout(20000)); // 20 seconds default timeout
+
 // Apply burst protection (most restrictive)
 app.use(burstProtection);
 
@@ -234,6 +245,37 @@ app.get(`${apiPrefix}/analytics/performance`, authenticateToken, async (req, res
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve performance statistics'
+    });
+  }
+});
+
+// Add request optimization metrics endpoint
+app.get(`${apiPrefix}/analytics/request-optimization`, authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    const metrics = getPerformanceMetrics();
+    const health = healthCheck();
+    
+    res.json({
+      success: true,
+      data: {
+        metrics,
+        health,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Error getting request optimization metrics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve request optimization metrics'
     });
   }
 });
