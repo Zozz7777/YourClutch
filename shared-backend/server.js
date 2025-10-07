@@ -242,9 +242,9 @@ app.use(performanceMonitoring);
 
 // Apply comprehensive performance optimization middleware
 app.use(requestTiming);
-app.use(dbOptimization);
+// dbOptimization removed - using reqDbOptimization instead to avoid conflicts
 app.use(externalServiceProtection);
-app.use(memoryOptimization);
+// memoryOptimization removed - using costMemoryOptimization instead
 app.use(connectionPoolOptimization);
 app.use(responseCompression);
 
@@ -269,7 +269,7 @@ app.use(reqCompression);
 
 // Apply request caching for GET requests (5 minutes TTL)
 app.use(reqCaching2(300));
-app.use(reqCaching(300)); // Additional caching layer
+// reqCaching removed - using reqCaching2 instead to avoid conflicts
 
 // Apply request timeouts
 app.use(requestTimeout(20000)); // 20 seconds default timeout
