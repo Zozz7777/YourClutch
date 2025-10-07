@@ -97,7 +97,7 @@ function overrideDatabaseOperations(req) {
     };
     
     // Optimized findOne method
-    collection.findOne = async function(query = {}, options = {}) => {
+    collection.findOne = async function(query = {}, options = {}) {
       const queryId = generateQueryId();
       const startTime = Date.now();
       
