@@ -237,14 +237,10 @@ app.use(compression({
 const { rateLimits, burstProtection } = require('./middleware/rate-limiting');
 const { performanceMonitoring } = require('./middleware/performance-monitoring');
 
-// Apply performance monitoring first
+// Apply essential middleware only (simplified to prevent conflicts)
 app.use(performanceMonitoring);
-
-// Apply comprehensive performance optimization middleware
 app.use(requestTiming);
-// dbOptimization removed - using reqDbOptimization instead to avoid conflicts
 app.use(externalServiceProtection);
-// memoryOptimization removed - using costMemoryOptimization instead
 app.use(connectionPoolOptimization);
 app.use(responseCompression);
 
@@ -269,7 +265,6 @@ app.use(reqCompression);
 
 // Apply request caching for GET requests (5 minutes TTL)
 app.use(reqCaching2(300));
-// reqCaching removed - using reqCaching2 instead to avoid conflicts
 
 // Apply request timeouts
 app.use(requestTimeout(20000)); // 20 seconds default timeout
