@@ -847,4 +847,879 @@ router.get('/dashboard/revenue', auth, async (req, res) => {
   }
 });
 
+// ============================================================================
+// APPOINTMENTS ENDPOINTS
+// ============================================================================
+
+// @route   GET /partners/appointments
+// @desc    Get partner appointments
+// @access  Private
+router.get('/appointments', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { status, date, page = 1, limit = 20 } = req.query;
+
+    // Build query
+    const query = { partnerId };
+    if (status) {
+      query.status = status;
+    }
+    if (date) {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.scheduledDate = { $gte: startOfDay, $lte: endOfDay };
+    }
+
+    // Get appointments with pagination
+    const appointments = await PartnerOrder.find(query)
+      .sort({ scheduledDate: 1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .populate('customerId', 'name phone email')
+      .lean();
+
+    const total = await PartnerOrder.countDocuments(query);
+
+    // Format appointments for mobile display
+    const formattedAppointments = appointments.map(appointment => ({
+      id: appointment._id,
+      appointmentId: appointment.orderId,
+      customer: {
+        name: appointment.customerName || appointment.customerId?.name,
+        phone: appointment.customerPhone || appointment.customerId?.phone,
+        email: appointment.customerEmail || appointment.customerId?.email
+      },
+      vehicle: {
+        make: appointment.vehicleMake,
+        model: appointment.vehicleModel,
+        year: appointment.vehicleYear,
+        plate: appointment.vehiclePlate
+      },
+      service: appointment.serviceName,
+      description: appointment.description,
+      scheduledDate: appointment.scheduledDate,
+      estimatedTime: appointment.estimatedTime,
+      status: appointment.status,
+      priority: appointment.priority,
+      notes: appointment.notes,
+      createdAt: appointment.createdAt,
+      isUrgent: appointment.priority === 'high'
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        appointments: formattedAppointments,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get partner appointments error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   GET /partners/appointments/:id
+// @desc    Get appointment details
+// @access  Private
+router.get('/appointments/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const partnerId = req.user.partnerId;
+
+    const appointment = await PartnerOrder.findOne({ _id: id, partnerId })
+      .populate('customerId', 'name phone email')
+      .lean();
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Appointment not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: appointment._id,
+        appointmentId: appointment.orderId,
+        customer: {
+          name: appointment.customerName || appointment.customerId?.name,
+          phone: appointment.customerPhone || appointment.customerId?.phone,
+          email: appointment.customerEmail || appointment.customerId?.email
+        },
+        vehicle: {
+          make: appointment.vehicleMake,
+          model: appointment.vehicleModel,
+          year: appointment.vehicleYear,
+          plate: appointment.vehiclePlate
+        },
+        service: appointment.serviceName,
+        description: appointment.description,
+        scheduledDate: appointment.scheduledDate,
+        estimatedTime: appointment.estimatedTime,
+        status: appointment.status,
+        priority: appointment.priority,
+        notes: appointment.notes,
+        createdAt: appointment.createdAt,
+        updatedAt: appointment.updatedAt
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get appointment details error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /partners/appointments
+// @desc    Create appointment (for walk-ins)
+// @access  Private
+router.post('/appointments', auth, [
+  body('customerName').notEmpty().withMessage('Customer name is required'),
+  body('customerPhone').isMobilePhone().withMessage('Valid phone number is required'),
+  body('serviceName').notEmpty().withMessage('Service name is required'),
+  body('scheduledDate').isISO8601().withMessage('Valid scheduled date is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const {
+      customerName,
+      customerPhone,
+      customerEmail,
+      serviceName,
+      description,
+      scheduledDate,
+      estimatedTime,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehiclePlate,
+      priority = 'normal'
+    } = req.body;
+
+    // Create appointment
+    const appointment = new PartnerOrder({
+      partnerId,
+      orderId: `APT-${Date.now()}`,
+      customerName,
+      customerPhone,
+      customerEmail,
+      serviceName,
+      description,
+      scheduledDate: new Date(scheduledDate),
+      estimatedTime,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehiclePlate,
+      priority,
+      status: 'scheduled',
+      paymentStatus: 'pending',
+      total: 0 // Will be updated when invoice is created
+    });
+
+    await appointment.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Appointment created successfully',
+      data: {
+        id: appointment._id,
+        appointmentId: appointment.orderId,
+        customer: {
+          name: appointment.customerName,
+          phone: appointment.customerPhone,
+          email: appointment.customerEmail
+        },
+        service: appointment.serviceName,
+        scheduledDate: appointment.scheduledDate,
+        status: appointment.status
+      }
+    });
+
+  } catch (error) {
+    logger.error('Create appointment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PATCH /partners/appointments/:id/status
+// @desc    Update appointment status
+// @access  Private
+router.patch('/appointments/:id/status', auth, [
+  body('status').isIn(['scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled']).withMessage('Valid status is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { id } = req.params;
+    const { status, notes, estimatedTime } = req.body;
+    const partnerId = req.user.partnerId;
+
+    const appointment = await PartnerOrder.findOne({ _id: id, partnerId });
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Appointment not found'
+      });
+    }
+
+    // Update appointment status
+    appointment.status = status;
+    if (notes) appointment.notes = notes;
+    if (estimatedTime) appointment.estimatedTime = estimatedTime;
+    
+    // Set timestamps based on status
+    switch (status) {
+      case 'confirmed':
+        appointment.confirmedAt = new Date();
+        break;
+      case 'in_progress':
+        appointment.startedAt = new Date();
+        break;
+      case 'completed':
+        appointment.completedAt = new Date();
+        break;
+      case 'cancelled':
+        appointment.cancelledAt = new Date();
+        break;
+    }
+
+    await appointment.save();
+
+    // Send notification to customer
+    await sendCustomerNotification(appointment, 'appointment_status_update', {
+      appointmentId: appointment.orderId,
+      status,
+      partnerName: appointment.partnerName,
+      scheduledDate: appointment.scheduledDate
+    });
+
+    res.json({
+      success: true,
+      message: 'Appointment status updated successfully',
+      data: {
+        id: appointment._id,
+        appointmentId: appointment.orderId,
+        status: appointment.status,
+        updatedAt: appointment.updatedAt
+      }
+    });
+
+  } catch (error) {
+    logger.error('Update appointment status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ============================================================================
+// QUOTATIONS ENDPOINTS
+// ============================================================================
+
+// @route   GET /partners/quotations
+// @desc    Get partner quotations
+// @access  Private
+router.get('/quotations', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { status, page = 1, limit = 20 } = req.query;
+
+    // Build query
+    const query = { partnerId, type: 'quotation' };
+    if (status) {
+      query.status = status;
+    }
+
+    // Get quotations with pagination
+    const quotations = await PartnerOrder.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .populate('customerId', 'name phone email')
+      .lean();
+
+    const total = await PartnerOrder.countDocuments(query);
+
+    // Format quotations for mobile display
+    const formattedQuotations = quotations.map(quotation => ({
+      id: quotation._id,
+      quotationId: quotation.orderId,
+      customer: {
+        name: quotation.customerName || quotation.customerId?.name,
+        phone: quotation.customerPhone || quotation.customerId?.phone,
+        email: quotation.customerEmail || quotation.customerId?.email
+      },
+      service: quotation.serviceName,
+      description: quotation.description,
+      total: quotation.total,
+      status: quotation.status,
+      validUntil: quotation.validUntil,
+      createdAt: quotation.createdAt,
+      isExpired: quotation.validUntil && new Date(quotation.validUntil) < new Date()
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        quotations: formattedQuotations,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get partner quotations error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /partners/quotations
+// @desc    Create quotation
+// @access  Private
+router.post('/quotations', auth, [
+  body('customerName').notEmpty().withMessage('Customer name is required'),
+  body('customerPhone').isMobilePhone().withMessage('Valid phone number is required'),
+  body('serviceName').notEmpty().withMessage('Service name is required'),
+  body('total').isNumeric().withMessage('Valid total amount is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const {
+      customerName,
+      customerPhone,
+      customerEmail,
+      serviceName,
+      description,
+      total,
+      validUntil,
+      items = []
+    } = req.body;
+
+    // Create quotation
+    const quotation = new PartnerOrder({
+      partnerId,
+      orderId: `QUO-${Date.now()}`,
+      type: 'quotation',
+      customerName,
+      customerPhone,
+      customerEmail,
+      serviceName,
+      description,
+      total: parseFloat(total),
+      validUntil: validUntil ? new Date(validUntil) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days default
+      items,
+      status: 'pending',
+      paymentStatus: 'pending'
+    });
+
+    await quotation.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Quotation created successfully',
+      data: {
+        id: quotation._id,
+        quotationId: quotation.orderId,
+        customer: {
+          name: quotation.customerName,
+          phone: quotation.customerPhone,
+          email: quotation.customerEmail
+        },
+        service: quotation.serviceName,
+        total: quotation.total,
+        validUntil: quotation.validUntil,
+        status: quotation.status
+      }
+    });
+
+  } catch (error) {
+    logger.error('Create quotation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ============================================================================
+// INVENTORY ENDPOINTS
+// ============================================================================
+
+// @route   GET /partners/inventory
+// @desc    Get partner inventory
+// @access  Private
+router.get('/inventory', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { category, status, page = 1, limit = 20, search } = req.query;
+
+    // Build query
+    const query = { partnerId };
+    if (category) {
+      query.category = category;
+    }
+    if (status) {
+      query.status = status;
+    }
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { sku: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Get inventory with pagination
+    const inventory = await PartnerOrder.find(query)
+      .sort({ name: 1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .lean();
+
+    const total = await PartnerOrder.countDocuments(query);
+
+    // Format inventory for mobile display
+    const formattedInventory = inventory.map(item => ({
+      id: item._id,
+      sku: item.sku,
+      name: item.name,
+      description: item.description,
+      category: item.category,
+      price: item.price,
+      cost: item.cost,
+      stock: item.stock,
+      minStock: item.minStock,
+      maxStock: item.maxStock,
+      status: item.status,
+      isLowStock: item.stock <= item.minStock,
+      isOutOfStock: item.stock === 0,
+      lastUpdated: item.updatedAt,
+      image: item.image
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        inventory: formattedInventory,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get partner inventory error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /partners/inventory
+// @desc    Add inventory item
+// @access  Private
+router.post('/inventory', auth, [
+  body('name').notEmpty().withMessage('Item name is required'),
+  body('category').notEmpty().withMessage('Category is required'),
+  body('price').isNumeric().withMessage('Valid price is required'),
+  body('stock').isInt({ min: 0 }).withMessage('Valid stock quantity is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const {
+      name,
+      sku,
+      description,
+      category,
+      price,
+      cost,
+      stock,
+      minStock = 5,
+      maxStock,
+      image
+    } = req.body;
+
+    // Generate SKU if not provided
+    const itemSku = sku || `SKU-${Date.now()}`;
+
+    // Create inventory item
+    const item = new PartnerOrder({
+      partnerId,
+      sku: itemSku,
+      name,
+      description,
+      category,
+      price: parseFloat(price),
+      cost: cost ? parseFloat(cost) : 0,
+      stock: parseInt(stock),
+      minStock: parseInt(minStock),
+      maxStock: maxStock ? parseInt(maxStock) : null,
+      image,
+      status: 'active',
+      type: 'inventory'
+    });
+
+    await item.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Inventory item added successfully',
+      data: {
+        id: item._id,
+        sku: item.sku,
+        name: item.name,
+        category: item.category,
+        price: item.price,
+        stock: item.stock,
+        status: item.status
+      }
+    });
+
+  } catch (error) {
+    logger.error('Add inventory item error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PATCH /partners/inventory/:id
+// @desc    Update inventory item
+// @access  Private
+router.patch('/inventory/:id', auth, [
+  body('price').optional().isNumeric().withMessage('Valid price is required'),
+  body('stock').optional().isInt({ min: 0 }).withMessage('Valid stock quantity is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { id } = req.params;
+    const partnerId = req.user.partnerId;
+    const updateData = req.body;
+
+    const item = await PartnerOrder.findOne({ _id: id, partnerId, type: 'inventory' });
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventory item not found'
+      });
+    }
+
+    // Update allowed fields
+    const allowedFields = ['name', 'description', 'category', 'price', 'cost', 'stock', 'minStock', 'maxStock', 'status', 'image'];
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        item[field] = updateData[field];
+      }
+    });
+
+    await item.save();
+
+    res.json({
+      success: true,
+      message: 'Inventory item updated successfully',
+      data: {
+        id: item._id,
+        sku: item.sku,
+        name: item.name,
+        price: item.price,
+        stock: item.stock,
+        status: item.status
+      }
+    });
+
+  } catch (error) {
+    logger.error('Update inventory item error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ============================================================================
+// ENHANCED PROFILE & WORKING HOURS ENDPOINTS
+// ============================================================================
+
+// @route   GET /partners/profile
+// @desc    Get partner profile
+// @access  Private
+router.get('/profile', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+
+    const partner = await PartnerUser.findOne({ partnerId });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        businessName: partner.businessName,
+        ownerName: partner.ownerName,
+        email: partner.email,
+        phone: partner.phone,
+        partnerType: partner.partnerType,
+        businessAddress: partner.businessAddress,
+        workingHours: partner.workingHours,
+        businessSettings: partner.businessSettings,
+        services: partner.services || [],
+        isConnectedToPOS: partner.isConnectedToPOS || false,
+        isVerified: partner.isVerified,
+        status: partner.status,
+        createdAt: partner.createdAt
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get partner profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PATCH /partners/profile
+// @desc    Update partner profile
+// @access  Private
+router.patch('/profile', auth, [
+  body('businessName').optional().notEmpty().withMessage('Business name cannot be empty'),
+  body('ownerName').optional().notEmpty().withMessage('Owner name cannot be empty'),
+  body('phone').optional().isMobilePhone().withMessage('Valid phone number is required'),
+  body('email').optional().isEmail().withMessage('Valid email is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const updateData = req.body;
+
+    const partner = await PartnerUser.findOne({ partnerId });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found'
+      });
+    }
+
+    // Update allowed fields
+    const allowedFields = [
+      'businessName', 'ownerName', 'phone', 'email',
+      'businessAddress', 'workingHours', 'businessSettings',
+      'services', 'isConnectedToPOS'
+    ];
+
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        partner[field] = updateData[field];
+      }
+    });
+
+    await partner.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        businessName: partner.businessName,
+        ownerName: partner.ownerName,
+        email: partner.email,
+        phone: partner.phone,
+        businessAddress: partner.businessAddress,
+        workingHours: partner.workingHours,
+        businessSettings: partner.businessSettings,
+        services: partner.services,
+        isConnectedToPOS: partner.isConnectedToPOS
+      }
+    });
+
+  } catch (error) {
+    logger.error('Update partner profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PATCH /partners/working-hours
+// @desc    Update working hours
+// @access  Private
+router.patch('/working-hours', auth, [
+  body('workingHours').isObject().withMessage('Working hours object is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const { workingHours } = req.body;
+
+    const partner = await PartnerUser.findOne({ partnerId });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found'
+      });
+    }
+
+    partner.workingHours = workingHours;
+    await partner.save();
+
+    res.json({
+      success: true,
+      message: 'Working hours updated successfully',
+      data: {
+        workingHours: partner.workingHours
+      }
+    });
+
+  } catch (error) {
+    logger.error('Update working hours error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PATCH /partners/services
+// @desc    Update services offered
+// @access  Private
+router.patch('/services', auth, [
+  body('services').isArray().withMessage('Services array is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const { services } = req.body;
+
+    const partner = await PartnerUser.findOne({ partnerId });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found'
+      });
+    }
+
+    partner.services = services;
+    await partner.save();
+
+    res.json({
+      success: true,
+      message: 'Services updated successfully',
+      data: {
+        services: partner.services
+      }
+    });
+
+  } catch (error) {
+    logger.error('Update services error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 module.exports = router;

@@ -500,6 +500,8 @@ app.get('/ping', (req, res) => {
 
 // Mount routes
 
+// Mount simple test route first
+app.use('/test', require('./routes/test-simple'));
 
 // Mount ALL routes that the app needs
 app.use(`${apiPrefix}/auth`, authRoutes);
