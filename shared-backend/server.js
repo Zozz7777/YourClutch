@@ -770,7 +770,7 @@ const corsOptions = {
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Initialize performance tracking objects (CRITICAL - must be before other middleware)
+// Initialize performance tracking objects (CRITICAL - must be before ALL other middleware)
 app.use((req, res, next) => {
   // Initialize performance tracking objects
   req.performance = req.performance || {
