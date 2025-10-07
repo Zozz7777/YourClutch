@@ -12,8 +12,34 @@ const router = express.Router();
 // Helper functions
 const sendAdminNotification = async (type, data) => {
   try {
-    logger.info(`Sending admin notification: ${type}`, data);
-    // In production, this would send actual notifications to admin team
+    logger.info(`📧 Sending admin notification: ${type}`, data);
+    
+    // Send notification to Clutch admin sales team
+    const notificationData = {
+      type: 'new_partner_request',
+      title: 'New Partner Request',
+      message: `New partner request from ${data.businessName} (${data.ownerName})`,
+      data: {
+        requestId: data.requestId,
+        businessName: data.businessName,
+        ownerName: data.ownerName,
+        partnerType: data.partnerType,
+        email: data.email,
+        phone: data.phone,
+        timestamp: new Date().toISOString()
+      },
+      priority: 'high',
+      recipients: ['sales@clutch.com', 'admin@clutch.com']
+    };
+    
+    // Log the notification (in production, this would send to actual notification service)
+    console.log('📧 Admin Notification:', JSON.stringify(notificationData, null, 2));
+    
+    // TODO: Integrate with actual notification service (email, SMS, push notifications)
+    // await emailService.sendEmail(recipients, title, message);
+    // await smsService.sendSMS(phone, message);
+    // await pushService.sendPush(adminTokens, notification);
+    
     return true;
   } catch (error) {
     logger.error('Error sending admin notification:', error);
