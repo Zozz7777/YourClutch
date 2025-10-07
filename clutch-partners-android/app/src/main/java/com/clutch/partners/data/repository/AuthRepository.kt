@@ -109,16 +109,13 @@ class AuthRepository @Inject constructor(
         phone: String,
         address: String,
         description: String
-    ): Result<User> {
+    ): Result<Boolean> {
         println("🔐 AuthRepository: requestToJoin called with email: $email")
         return try {
-            // Call real backend API
+            // Call real backend API (this is NOT authentication)
             println("🔐 AuthRepository: Calling apiService.requestToJoin")
             val result = apiService.requestToJoin(businessName, businessType, contactName, email, phone, address, description)
             println("🔐 AuthRepository: API result: ${result.isSuccess}")
-            result.onSuccess { user ->
-                setCurrentUser(user)
-            }
             result
         } catch (e: Exception) {
             Result.failure(e)

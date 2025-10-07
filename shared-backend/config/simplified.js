@@ -16,9 +16,9 @@ module.exports = {
     mongodb: {
       uri: process.env.MONGODB_URI,
       options: {
-        maxPoolSize: 10,
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000
+        maxPoolSize: 300,
+        serverSelectionTimeoutMS: 10000,
+        socketTimeoutMS: 30000
       }
     }
   },

@@ -74,16 +74,11 @@ router.post('/auth/request-to-join', [
   body('partnerType').isIn(['repair_center', 'auto_parts_shop', 'accessories_shop', 'importer_manufacturer', 'service_center']).withMessage('Valid partner type is required')
 ], async (req, res) => {
   try {
-    console.log('📝 BACKEND: ===== REQUEST TO JOIN RECEIVED =====');
-    console.log('📝 BACKEND: Request body:', JSON.stringify(req.body, null, 2));
-    console.log('📝 BACKEND: Request headers:', req.headers);
-    console.log('📝 BACKEND: Request IP:', req.ip);
-    console.log('📝 BACKEND: Request method:', req.method);
-    console.log('📝 BACKEND: Request URL:', req.url);
+    // Request to join received - debug logging removed for performance
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('❌ BACKEND: Validation errors:', errors.array());
+      // Validation errors logged via proper logger
       return res.status(400).json({
         success: false,
         message: 'Validation errors',

@@ -322,7 +322,10 @@ fun RequestToJoinScreen(
                                 viewModel.requestToJoin(businessName, businessType, contactName, email, phone, address, description) { success ->
                                     isLoading = false
                                     if (success) {
-                                        navController.navigate(Screen.Main.route)
+                                        showSuccessDialog = true
+                                    } else {
+                                        errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في إرسال الطلب" else "Failed to submit request"
+                                        showErrorDialog = true
                                     }
                                 }
                             }
@@ -406,32 +409,63 @@ fun RequestToJoinScreen(
             onDismiss = { showErrorDialog = false }
         )
         
-        // Success Dialog
+        // Success Dialog with Illustration
         if (showSuccessDialog) {
             AlertDialog(
                 onDismissRequest = { showSuccessDialog = false },
                 title = {
-                    Text(
-                        text = if (currentLanguage == "ar") "تم إرسال الطلب بنجاح" else "Request Submitted Successfully",
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // Illustration
+                        Image(
+                            painter = painterResource(id = R.drawable.night_calls_illustration),
+                            contentDescription = "Success Illustration",
+                            modifier = Modifier
+                                .size(120.dp)
+                                .padding(bottom = 16.dp)
+                        )
+                        Text(
+                            text = if (currentLanguage == "ar") "تم إرسال الطلب بنجاح" else "Request Submitted Successfully",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 },
                 text = {
-                    Text(
-                        text = if (currentLanguage == "ar") "تم إرسال طلب الانضمام بنجاح. سيتواصل معك أحد أعضاء فريقنا قريباً." else "You have requested to join successfully. One of our team members will contact you shortly.",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = if (currentLanguage == "ar") "تم إرسال طلب الانضمام بنجاح. سيتواصل معك أحد أعضاء فريقنا قريباً." else "You have requested to join successfully. One of our team members will contact you shortly.",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = if (currentLanguage == "ar") "سيتم الرد عليك خلال 24-48 ساعة" else "We will respond within 24-48 hours",
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 },
                 confirmButton = {
-                    TextButton(
+                    Button(
                         onClick = { 
                             showSuccessDialog = false
                             navController.navigate(Screen.Auth.route)
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = if (currentLanguage == "ar") "حسناً" else "OK",
-                            color = MaterialTheme.colorScheme.primary
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }

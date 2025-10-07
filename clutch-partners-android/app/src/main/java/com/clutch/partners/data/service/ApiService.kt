@@ -70,8 +70,14 @@ class ApiService @Inject constructor() {
                 .build()
             
             println("🌐 API: Test request URL: ${request.url}")
+            println("🌐 API: About to execute backend test...")
+            val startTime = System.currentTimeMillis()
             val response = client.newCall(request).execute()
+            val endTime = System.currentTimeMillis()
+            println("📡 API: Backend test completed in ${endTime - startTime}ms")
             println("📡 API: Test response code: ${response.code}")
+            println("📡 API: Test response message: ${response.message}")
+            println("📡 API: Test response headers: ${response.headers}")
             
             if (response.isSuccessful) {
                 val responseBody = response.body?.string()
@@ -84,6 +90,7 @@ class ApiService @Inject constructor() {
             }
         } catch (e: Exception) {
             println("❌ API: Connection test error: ${e.message}")
+            println("❌ API: Error type: ${e.javaClass.simpleName}")
             e.printStackTrace()
             Result.failure(e)
         }
@@ -116,12 +123,17 @@ class ApiService @Inject constructor() {
             
             println("🌐 API: Making request to: ${request.url}")
             println("🌐 API: Request headers: ${request.headers}")
+            println("🌐 API: Request method: ${request.method}")
             
             println("🌐 API: About to execute request...")
+            val startTime = System.currentTimeMillis()
             val response = client.newCall(request).execute()
+            val endTime = System.currentTimeMillis()
+            println("📡 API: Request completed in ${endTime - startTime}ms")
             println("📡 API: Response code: ${response.code}")
             println("📡 API: Response headers: ${response.headers}")
             println("📡 API: Response message: ${response.message}")
+            println("📡 API: Response successful: ${response.isSuccessful}")
             
             if (response.isSuccessful) {
                 val responseBody = response.body?.string()
@@ -152,6 +164,9 @@ class ApiService @Inject constructor() {
                 Result.failure(Exception("Authentication failed: ${response.code} - $errorBody"))
             }
         } catch (e: Exception) {
+            println("❌ API: Sign in error: ${e.message}")
+            println("❌ API: Error type: ${e.javaClass.simpleName}")
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -238,7 +253,7 @@ class ApiService @Inject constructor() {
         phone: String,
         address: String,
         description: String
-    ): Result<User> = withContext(Dispatchers.IO) {
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             println("🔐 API: Attempting request to join for email: $email")
             
@@ -269,10 +284,8 @@ class ApiService @Inject constructor() {
                         val jsonResponse = JSONObject(responseBody)
                         val success = jsonResponse.optBoolean("success", false)
                         if (success) {
-                            val data = jsonResponse.getJSONObject("data")
-                            val partner = data.getJSONObject("partner")
-                            val user = parsePartnerFromJson(partner)
-                            Result.success(user)
+                            // Request to join successful - no user data needed
+                            Result.success(true)
                         } else {
                             val message = jsonResponse.optString("message", "Request to join failed")
                             Result.failure(Exception(message))
@@ -566,13 +579,12 @@ class ApiService @Inject constructor() {
     }
     
     private fun mapBusinessTypeToBackend(businessType: String): String {
-        return when (businessType.uppercase()) {
-            "REPAIR_CENTER" -> "repair_center"
-            "AUTO_PARTS" -> "auto_parts_shop"
-            "ACCESSORIES" -> "accessories_shop"
-            "IMPORTER" -> "importer_manufacturer"
-            "MANUFACTURER" -> "importer_manufacturer"
-            "SERVICE_CENTER" -> "service_center"
+        return when (businessType.lowercase()) {
+            "ورشة إصلاح", "repair shop" -> "repair_center"
+            "وكالة سيارات", "car dealership" -> "service_center"
+            "متجر قطع غيار", "parts store" -> "auto_parts_shop"
+            "خدمات صيانة", "maintenance services" -> "service_center"
+            "أخرى", "other" -> "repair_center"
             else -> "repair_center" // Default fallback
         }
     }

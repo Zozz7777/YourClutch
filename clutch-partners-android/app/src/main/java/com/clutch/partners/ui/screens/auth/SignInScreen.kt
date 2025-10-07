@@ -165,43 +165,34 @@ fun SignInScreen(
                             // Validate inputs first
                             if (emailOrPhone.isEmpty()) {
                                 errorMessage = if (currentLanguage == "ar") "البريد الإلكتروني أو رقم الهاتف مطلوب" else "Email or phone is required"
+                                showErrorDialog = true
                                 return@KeyboardActions
                             }
                             if (password.isEmpty()) {
                                 errorMessage = if (currentLanguage == "ar") "كلمة المرور مطلوبة" else "Password is required"
+                                showErrorDialog = true
                                 return@KeyboardActions
                             }
                             if (password.length < 6) {
                                 errorMessage = if (currentLanguage == "ar") "كلمة المرور يجب أن تكون 6 أحرف على الأقل" else "Password must be at least 6 characters"
+                                showErrorDialog = true
                                 return@KeyboardActions
                             }
                             
                             println("🔐 SignInScreen: Starting authentication for email: $emailOrPhone")
                             isLoading = true
                             
-                            // First test connection
-                            println("🔐 SignInScreen: About to test connection...")
-                            viewModel.testConnection { connectionSuccess ->
-                                println("🔐 SignInScreen: Connection test result: $connectionSuccess")
-                                if (connectionSuccess) {
-                                    println("🔐 SignInScreen: Connection test successful, proceeding with authentication")
-                                    // Connect to backend for authentication
-                                    viewModel.signIn(emailOrPhone, password) { success ->
-                                        println("🔐 SignInScreen: Authentication result: $success")
-                                        isLoading = false
-                                        if (success) {
-                                            println("🔐 SignInScreen: Navigating to main screen")
-                                            navController.navigate(Screen.Main.route)
-                                        } else {
-                                            println("🔐 SignInScreen: Authentication failed, showing error")
-                                            errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في تسجيل الدخول. تحقق من بياناتك" else "Login failed. Please check your credentials"
-                                            showErrorDialog = true
-                                        }
-                                    }
+                            // Direct authentication without connection test
+                            viewModel.signIn(emailOrPhone, password) { success ->
+                                println("🔐 SignInScreen: Authentication result: $success")
+                                isLoading = false
+                                if (success) {
+                                    println("🔐 SignInScreen: Navigating to main screen")
+                                    navController.navigate(Screen.Main.route)
                                 } else {
-                                    println("🔐 SignInScreen: Connection test failed")
-                                    isLoading = false
-                                    errorMessage = if (currentLanguage == "ar") "فشل في الاتصال بالخادم" else "Failed to connect to server"
+                                    println("🔐 SignInScreen: Authentication failed, showing error")
+                                    errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في تسجيل الدخول. تحقق من بياناتك" else "Login failed. Please check your credentials"
+                                    showErrorDialog = true
                                 }
                             }
                         }
@@ -225,48 +216,6 @@ fun SignInScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Error Message
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        style = androidx.compose.ui.text.TextStyle(
-                            textDirection = if (isRTL) TextDirection.Rtl else TextDirection.Ltr
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-                
-                // Test Connection Button
-                Button(
-                    onClick = {
-                        println("🧪 SignInScreen: Test connection button clicked")
-                        viewModel.testConnection { success ->
-                            println("🧪 SignInScreen: Test connection result: $success")
-                            if (success) {
-                                errorMessage = "Connection test successful!"
-                            } else {
-                                errorMessage = "Connection test failed!"
-                            }
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Gray
-                    )
-                ) {
-                    Text(
-                        text = "Test Connection",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 // Sign In Button
@@ -281,43 +230,34 @@ fun SignInScreen(
                         // Validate inputs first
                         if (emailOrPhone.isEmpty()) {
                             errorMessage = if (currentLanguage == "ar") "البريد الإلكتروني أو رقم الهاتف مطلوب" else "Email or phone is required"
+                            showErrorDialog = true
                             return@Button
                         }
                         if (password.isEmpty()) {
                             errorMessage = if (currentLanguage == "ar") "كلمة المرور مطلوبة" else "Password is required"
+                            showErrorDialog = true
                             return@Button
                         }
                         if (password.length < 6) {
                             errorMessage = if (currentLanguage == "ar") "كلمة المرور يجب أن تكون 6 أحرف على الأقل" else "Password must be at least 6 characters"
+                            showErrorDialog = true
                             return@Button
                         }
                         
                         println("🔐 SignInScreen: Button click - Starting authentication for email: $emailOrPhone")
                         isLoading = true
                         
-                        // First test connection
-                        println("🔐 SignInScreen: Button click - About to test connection...")
-                        viewModel.testConnection { connectionSuccess ->
-                            println("🔐 SignInScreen: Button click - Connection test result: $connectionSuccess")
-                            if (connectionSuccess) {
-                                println("🔐 SignInScreen: Button click - Connection test successful, proceeding with authentication")
-                                // Connect to backend for authentication
-                                viewModel.signIn(emailOrPhone, password) { success ->
-                                    println("🔐 SignInScreen: Button click - Authentication result: $success")
-                                    isLoading = false
-                                    if (success) {
-                                        println("🔐 SignInScreen: Button click - Navigating to main screen")
-                                        navController.navigate(Screen.Main.route)
-                                    } else {
-                                        println("🔐 SignInScreen: Button click - Authentication failed, showing error")
-                                        errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في تسجيل الدخول. تحقق من بياناتك" else "Login failed. Please check your credentials"
-                                        showErrorDialog = true
-                                    }
-                                }
+                        // Direct authentication without connection test
+                        viewModel.signIn(emailOrPhone, password) { success ->
+                            println("🔐 SignInScreen: Button click - Authentication result: $success")
+                            isLoading = false
+                            if (success) {
+                                println("🔐 SignInScreen: Button click - Navigating to main screen")
+                                navController.navigate(Screen.Main.route)
                             } else {
-                                println("🔐 SignInScreen: Button click - Connection test failed")
-                                isLoading = false
-                                errorMessage = if (currentLanguage == "ar") "فشل في الاتصال بالخادم" else "Failed to connect to server"
+                                println("🔐 SignInScreen: Button click - Authentication failed, showing error")
+                                errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في تسجيل الدخول. تحقق من بياناتك" else "Login failed. Please check your credentials"
+                                showErrorDialog = true
                             }
                         }
                     },

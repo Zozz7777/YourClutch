@@ -49,22 +49,33 @@ class AuthViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
             println("🔐 AuthViewModel: Calling authRepository.login")
-            authRepository.login(email, password)
-                .onSuccess { user ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        user = user,
-                        isAuthenticated = true
-                    )
-                    onResult(true)
-                }
-                .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = error.message
-                    )
-                    onResult(false)
-                }
+            try {
+                authRepository.login(email, password)
+                    .onSuccess { user ->
+                        println("🔐 AuthViewModel: Login successful for user: ${user.email}")
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            user = user,
+                            isAuthenticated = true
+                        )
+                        onResult(true)
+                    }
+                    .onFailure { error ->
+                        println("🔐 AuthViewModel: Login failed with error: ${error.message}")
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = error.message
+                        )
+                        onResult(false)
+                    }
+            } catch (e: Exception) {
+                println("🔐 AuthViewModel: Exception during login: ${e.message}")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message
+                )
+                onResult(false)
+            }
         }
     }
     
@@ -111,13 +122,12 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
-            // Call real backend API for request to join
+            // Call real backend API for request to join (this is NOT authentication)
             authRepository.requestToJoin(businessName, businessType, contactName, email, phone, address, description)
-                .onSuccess { user ->
+                .onSuccess { 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        user = user,
-                        isAuthenticated = true
+                        error = null
                     )
                     onResult(true)
                 }

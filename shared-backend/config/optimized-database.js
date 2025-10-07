@@ -14,9 +14,9 @@ let client = null;
 
 // Enhanced Database configuration optimized for 100k users/day
 const DB_CONFIG = {
-  // Connection settings - Optimized for high-traffic production
-  maxPoolSize: parseInt(process.env.DB_MAX_POOL_SIZE) || 100, // Increased for 100k users
-  minPoolSize: parseInt(process.env.DB_MIN_POOL_SIZE) || 20,  // Increased for 100k users
+  // Connection settings - Optimized for millions of users
+  maxPoolSize: parseInt(process.env.DB_MAX_POOL_SIZE) || 300, // Increased for millions of users
+  minPoolSize: parseInt(process.env.DB_MIN_POOL_SIZE) || 50,  // Increased for millions of users
   connectTimeoutMS: parseInt(process.env.DB_CONNECT_TIMEOUT_MS) || 10000, // Faster connection
   socketTimeoutMS: parseInt(process.env.DB_SOCKET_TIMEOUT_MS) || 30000, // Faster socket timeout
   serverSelectionTimeoutMS: parseInt(process.env.DB_CONNECT_TIMEOUT_MS) || 10000, // Faster selection
@@ -186,8 +186,8 @@ const connectToDatabase = async () => {
     if (mongoose.connection.readyState === 0) {
       try {
         const mongooseOptions = {
-          maxPoolSize: parseInt(process.env.DB_MAX_POOL_SIZE) || 50,
-          minPoolSize: parseInt(process.env.DB_MIN_POOL_SIZE) || 5,
+          maxPoolSize: parseInt(process.env.DB_MAX_POOL_SIZE) || 300,
+          minPoolSize: parseInt(process.env.DB_MIN_POOL_SIZE) || 50,
           connectTimeoutMS: parseInt(process.env.DB_CONNECT_TIMEOUT_MS) || 30000,
           socketTimeoutMS: parseInt(process.env.DB_SOCKET_TIMEOUT_MS) || 45000,
           serverSelectionTimeoutMS: parseInt(process.env.DB_CONNECT_TIMEOUT_MS) || 30000,

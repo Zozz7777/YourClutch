@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="500"
+    android:viewportHeight="500">
+    
+    <!-- Background elements -->
+    <path
+        android:fillColor="#ebebeb"
+        android:pathData="M72.59,295.92l-13.12.28-6.66.11c-2.23,0-4.47,0-6.7.05h-.44v-.45l-.06-11.19v-.5h.5l13.24.06c4.42,0,8.83.11,13.24.16h.28v.27c0,1.9-.09,3.78-.13,5.65Zm0,0-.14-5.66c0-1.86-.11-3.7-.13-5.53l.27.27c-4.41.05-8.82.16-13.24.16l-13.24.07.5-.5,0,11.19-.45-.45c2.18,0,4.36,0,6.55.06l6.58.11Z" />
+    
+    <!-- Building structure -->
+    <rect
+        android:fillColor="#dbdbdb"
+        android:x="173.63"
+        android:y="85.57"
+        android:width="59.81"
+        android:height="72.55" />
+    
+    <rect
+        android:fillColor="#fff"
+        android:x="180.47"
+        android:y="92.19"
+        android:width="46.14"
+        android:height="59.31" />
+    
+    <!-- Windows -->
+    <rect
+        android:fillColor="#dbdbdb"
+        android:x="195.93"
+        android:y="105.91"
+        android:width="10.88"
+        android:height="32.41" />
+    
+    <!-- Lamp -->
+    <rect
+        android:fillColor="#c7c7c7"
+        android:x="83.46"
+        android:y="127.19"
+        android:width="6.9"
+        android:height="319.38" />
+    
+    <polygon
+        android:fillColor="#263238"
+        android:points="123.4,147.42 50.4,147.42 55.71,129.99 55.9,129.37 71.33,78.64 102.47,78.64 117.92,129.38 117.92,129.39 118.09,129.97 123.4,147.42" />
+    
+    <!-- Lamp base -->
+    <rect
+        android:fillColor="#c7c7c7"
+        android:x="57.81"
+        android:y="446.57"
+        android:width="58.19"
+        android:height="6.61" />
+    
+    <!-- Character -->
+    <polygon
+        android:fillColor="#37474f"
+        android:points="146.76,349.68 104.58,349.68 80.43,229.31 119.06,211.57 146.76,349.68" />
+    
+    <polygon
+        android:fillColor="#455a64"
+        android:points="260.62,349.68 146.76,349.68 119.06,211.57 232.92,211.57 260.62,349.68" />
+    
+    <!-- Phone -->
+    <path
+        android:fillColor="#d3766a"
+        android:pathData="M442.38,252c-1.55,2.24-60.69,46.42-64,46.67-1.26.12-8.2-8.12-16.29-18.32,0,0-52.56-16.69-52.56-16.69l40.64-30.54,50,18.64s30.2-6.79,33.88-6.68S443.93,249.77,442.38,252Z" />
+    
+    <!-- Speech bubble -->
+    <path
+        android:fillColor="#fffefd"
+        android:pathData="M205,148.19a13.54,13.54,0,0,1-2.32-7.5c0-9.51,10.44-17.22,23.31-17.22s23.31,7.71,23.31,17.22S238.86,157.91,226,157.91a28,28,0,0,1-16.08-4.77l-8,2Z" />
+    
+    <!-- Speech bubble dots -->
+    <circle
+        android:fillColor="#263238"
+        android:cx="234.37"
+        android:cy="140.69"
+        android:r="2.42" />
+    
+    <circle
+        android:fillColor="#263238"
+        android:cx="223.57"
+        android:cy="140.69"
+        android:r="2.42" />
+    
+    <circle
+        android:fillColor="#263238"
+        android:cx="212.77"
+        android:cy="140.69"
+        android:r="2.42" />
+    
+    <!-- Stars -->
+    <polygon
+        android:fillColor="#fff"
+        android:points="413.97,96.38 415.21,98.89 417.99,99.3 415.98,101.25 416.45,104.02 413.97,102.71 411.49,104.02 411.96,101.25 409.95,99.3 412.73,98.89 413.97,96.38" />
+    
+    <polygon
+        android:fillColor="#fff"
+        android:points="355.02,134.38 356.26,136.9 359.04,137.3 357.03,139.26 357.5,142.02 355.02,140.72 352.53,142.02 353.01,139.26 351,137.3 353.78,136.9 355.02,134.38" />
+    
+    <!-- Floor -->
+    <polygon
+        android:fillColor="#263238"
+        android:points="39.2,453.33 91.9,453.08 144.6,453 250,452.83 355.4,453 408.1,453.08 460.81,453.33 408.1,453.57 355.4,453.66 250,453.83 144.6,453.66 91.9,453.57 39.2,453.33" />
+</vector>
