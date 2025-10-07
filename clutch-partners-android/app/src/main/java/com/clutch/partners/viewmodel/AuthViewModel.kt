@@ -117,26 +117,26 @@ class AuthViewModel @Inject constructor(
         phone: String,
         address: String,
         description: String,
-        onResult: (Boolean) -> Unit = {}
+        onResult: (Boolean, Boolean) -> Unit = { _, _ -> } // success, isDuplicate
     ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
             // Call real backend API for request to join (this is NOT authentication)
             authRepository.requestToJoin(businessName, businessType, contactName, email, phone, address, description)
-                .onSuccess { 
+                .onSuccess { (success, isDuplicate) -> 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = null
                     )
-                    onResult(true)
+                    onResult(success, isDuplicate)
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = error.message
                     )
-                    onResult(false)
+                    onResult(false, false)
                 }
         }
     }

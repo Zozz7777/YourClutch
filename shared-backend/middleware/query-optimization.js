@@ -276,25 +276,27 @@ function trackQueryPerformance(req, res) {
   const originalJson = res.json;
   
   res.json = function(data) {
-    // Add query performance headers
-    res.set('X-Query-Count', req.queryMetrics.queries.length);
-    res.set('X-Query-Time', req.queryMetrics.totalTime);
-    res.set('X-Slow-Queries', req.queryMetrics.slowQueries.length);
-    res.set('X-Cache-Hits', req.queryMetrics.cacheHits);
-    res.set('X-Cache-Misses', req.queryMetrics.cacheMisses);
-    
-    // Log request performance summary
-    if (req.queryMetrics.queries.length > 0) {
-      optimizedLogger.performance('Request query summary', {
-        totalQueries: req.queryMetrics.queries.length,
-        totalTime: req.queryMetrics.totalTime,
-        averageTime: req.queryMetrics.totalTime / req.queryMetrics.queries.length,
-        slowQueries: req.queryMetrics.slowQueries.length,
-        cacheHits: req.queryMetrics.cacheHits,
-        cacheMisses: req.queryMetrics.cacheMisses,
-        endpoint: `${req.method} ${req.path}`,
-        user: req.user?.email || 'anonymous'
-      });
+    // Add query performance headers with null checks
+    if (req.queryMetrics) {
+      res.set('X-Query-Count', req.queryMetrics.queries?.length || 0);
+      res.set('X-Query-Time', req.queryMetrics.totalTime || 0);
+      res.set('X-Slow-Queries', req.queryMetrics.slowQueries?.length || 0);
+      res.set('X-Cache-Hits', req.queryMetrics.cacheHits || 0);
+      res.set('X-Cache-Misses', req.queryMetrics.cacheMisses || 0);
+      
+      // Log request performance summary
+      if (req.queryMetrics.queries && req.queryMetrics.queries.length > 0) {
+        optimizedLogger.performance('Request query summary', {
+          totalQueries: req.queryMetrics.queries.length,
+          totalTime: req.queryMetrics.totalTime,
+          averageTime: req.queryMetrics.totalTime / req.queryMetrics.queries.length,
+          slowQueries: req.queryMetrics.slowQueries?.length || 0,
+          cacheHits: req.queryMetrics.cacheHits || 0,
+          cacheMisses: req.queryMetrics.cacheMisses || 0,
+          endpoint: `${req.method} ${req.path}`,
+          user: req.user?.email || 'anonymous'
+        });
+      }
     }
     
     return originalJson.call(this, data);

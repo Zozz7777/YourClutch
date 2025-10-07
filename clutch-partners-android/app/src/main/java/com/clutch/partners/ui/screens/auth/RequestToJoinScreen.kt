@@ -56,6 +56,7 @@ fun RequestToJoinScreen(
     var errorMessage by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
+    var isDuplicateRequest by remember { mutableStateOf(false) }
     
     val businessTypes = if (currentLanguage == "ar") {
         listOf("ورشة إصلاح", "وكالة سيارات", "متجر قطع غيار", "خدمات صيانة", "أخرى")
@@ -319,9 +320,10 @@ fun RequestToJoinScreen(
                             if (businessName.isNotEmpty() && businessType.isNotEmpty() && contactName.isNotEmpty() && email.isNotEmpty() && phone.isNotEmpty() && address.isNotEmpty()) {
                                 isLoading = true
                                 // Connect to backend for request to join
-                                viewModel.requestToJoin(businessName, businessType, contactName, email, phone, address, description) { success ->
+                                viewModel.requestToJoin(businessName, businessType, contactName, email, phone, address, description) { success, isDuplicate ->
                                     isLoading = false
                                     if (success) {
+                                        isDuplicateRequest = isDuplicate
                                         showSuccessDialog = true
                                     } else {
                                         errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في إرسال الطلب" else "Failed to submit request"
@@ -384,9 +386,10 @@ fun RequestToJoinScreen(
                         
                         isLoading = true
                         // Call request to join API
-                        viewModel.requestToJoin(businessName, businessType, contactName, email, phone, address, description) { success ->
+                        viewModel.requestToJoin(businessName, businessType, contactName, email, phone, address, description) { success, isDuplicate ->
                             isLoading = false
                             if (success) {
+                                isDuplicateRequest = isDuplicate
                                 showSuccessDialog = true
                             } else {
                                 errorMessage = viewModel.uiState.value.error ?: if (currentLanguage == "ar") "فشل في إرسال الطلب" else "Failed to submit request"
@@ -453,7 +456,10 @@ fun RequestToJoinScreen(
         // Success Dialog with Illustration
         if (showSuccessDialog) {
             AlertDialog(
-                onDismissRequest = { showSuccessDialog = false },
+                onDismissRequest = { 
+                    showSuccessDialog = false
+                    isDuplicateRequest = false // Reset duplicate state
+                },
                 title = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -468,7 +474,11 @@ fun RequestToJoinScreen(
                                 .padding(bottom = 16.dp)
                         )
                         Text(
-                            text = if (currentLanguage == "ar") "تم إرسال الطلب بنجاح" else "Request Submitted Successfully",
+                            text = if (isDuplicateRequest) {
+                                if (currentLanguage == "ar") "طلبك قيد المعالجة" else "Your Request is Being Processed"
+                            } else {
+                                if (currentLanguage == "ar") "تم إرسال الطلب بنجاح" else "Request Submitted Successfully"
+                            },
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
@@ -481,7 +491,11 @@ fun RequestToJoinScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = if (currentLanguage == "ar") "تم إرسال طلب الانضمام بنجاح. سيتواصل معك أحد أعضاء فريقنا قريباً." else "You have requested to join successfully. One of our team members will contact you shortly.",
+                            text = if (isDuplicateRequest) {
+                                if (currentLanguage == "ar") "طلبك موجود بالفعل ويتم معالجته. سيتواصل معك أحد أعضاء فريق المبيعات قريباً." else "Your request already exists and is being processed. One of our sales team members will contact you shortly."
+                            } else {
+                                if (currentLanguage == "ar") "تم إرسال طلب الانضمام بنجاح. سيتواصل معك أحد أعضاء فريقنا قريباً." else "You have requested to join successfully. One of our team members will contact you shortly."
+                            },
                             color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyLarge

@@ -80,11 +80,14 @@ const brotliCompression = (req, res, next) => {
       res.set('Content-Length', compressed.length);
       res.set('Vary', 'Accept-Encoding');
       
-      optimizedLogger.performance('Brotli compression applied', {
-        originalSize: jsonString.length,
-        compressedSize: compressed.length,
-        compressionRatio: ((jsonString.length - compressed.length) / jsonString.length * 100).toFixed(2) + '%'
-      });
+      // Safe performance logging with null checks
+      if (req.performance) {
+        optimizedLogger.performance('Brotli compression applied', {
+          originalSize: jsonString.length,
+          compressedSize: compressed.length,
+          compressionRatio: ((jsonString.length - compressed.length) / jsonString.length * 100).toFixed(2) + '%'
+        });
+      }
       
       return res.send(compressed);
     };

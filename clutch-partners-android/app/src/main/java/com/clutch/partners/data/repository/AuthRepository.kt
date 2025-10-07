@@ -109,7 +109,7 @@ class AuthRepository @Inject constructor(
         phone: String,
         address: String,
         description: String
-    ): Result<Boolean> {
+    ): Result<Pair<Boolean, Boolean>> {
         println("🔐 AuthRepository: requestToJoin called with email: $email")
         return try {
             // Call real backend API (this is NOT authentication)

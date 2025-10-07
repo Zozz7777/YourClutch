@@ -138,13 +138,16 @@ const errorOptimization = (err, req, res, next) => {
   // Don't leak error details in production
   const isDevelopment = process.env.NODE_ENV === 'development';
   
-  res.status(err.status || 500).json({
-    success: false,
-    error: err.name || 'INTERNAL_SERVER_ERROR',
-    message: isDevelopment ? err.message : 'An error occurred',
-    timestamp: new Date().toISOString(),
-    ...(isDevelopment && { stack: err.stack })
-  });
+  // Safe error response with null checks
+  if (!res.headersSent) {
+    res.status(err.status || 500).json({
+      success: false,
+      error: err.name || 'INTERNAL_SERVER_ERROR',
+      message: isDevelopment ? err.message : 'An error occurred',
+      timestamp: new Date().toISOString(),
+      ...(isDevelopment && { stack: err.stack })
+    });
+  }
 };
 
 // Health check optimization

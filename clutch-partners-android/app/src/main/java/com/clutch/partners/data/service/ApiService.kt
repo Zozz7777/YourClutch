@@ -253,7 +253,7 @@ class ApiService @Inject constructor() {
         phone: String,
         address: String,
         description: String
-    ): Result<Boolean> = withContext(Dispatchers.IO) {
+    ): Result<Pair<Boolean, Boolean>> = withContext(Dispatchers.IO) { // success, isDuplicate
         try {
             println("🔐 API: Attempting request to join for email: $email")
             
@@ -284,8 +284,13 @@ class ApiService @Inject constructor() {
                         val jsonResponse = JSONObject(responseBody)
                         val success = jsonResponse.optBoolean("success", false)
                         if (success) {
-                            // Request to join successful - no user data needed
-                            Result.success(true)
+                            // Check if this is a duplicate request by looking at the message
+                            val message = jsonResponse.optString("message", "")
+                            val isDuplicate = message.contains("already being processed", ignoreCase = true) || 
+                                             message.contains("already exists", ignoreCase = true)
+                            
+                            // Request to join successful - return success and duplicate status
+                            Result.success(Pair(true, isDuplicate))
                         } else {
                             val message = jsonResponse.optString("message", "Request to join failed")
                             Result.failure(Exception(message))
