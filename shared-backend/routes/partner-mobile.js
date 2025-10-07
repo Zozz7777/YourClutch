@@ -115,22 +115,38 @@ router.post('/auth/request-to-join', [
     
     console.log('📝 BACKEND: Processing request to join for:', businessName, 'by', ownerName);
 
-    // Check if request already exists
+    // Check if request already exists - optimized query
     console.log('📝 BACKEND: Checking for existing request...');
-    const existingRequest = await PartnerRequest.findOne({
-      $or: [
-        { email: email.toLowerCase() },
-        { phone }
-      ]
-    });
+    const startTime = Date.now();
     
+    // Check by email first (faster with index)
+    const existingByEmail = await PartnerRequest.findOne({ email: email.toLowerCase() });
+    console.log(`📝 BACKEND: Email check took: ${Date.now() - startTime}ms`);
+    
+    let existingRequest = existingByEmail;
+    
+    // Only check by phone if email not found
+    if (!existingRequest) {
+      const phoneCheckStart = Date.now();
+      const existingByPhone = await PartnerRequest.findOne({ phone });
+      console.log(`📝 BACKEND: Phone check took: ${Date.now() - phoneCheckStart}ms`);
+      existingRequest = existingByPhone;
+    }
+    
+    console.log(`📝 BACKEND: Total duplicate check took: ${Date.now() - startTime}ms`);
     console.log('📝 BACKEND: Existing request found:', existingRequest ? 'YES' : 'NO');
 
     if (existingRequest) {
-      console.log('❌ BACKEND: Request already exists for:', email, 'or', phone);
-      return res.status(400).json({
-        success: false,
-        message: 'Request already exists with this email or phone'
+      console.log('ℹ️ BACKEND: Request already exists for:', email, 'or', phone);
+      return res.status(200).json({
+        success: true,
+        message: 'Your request is already being processed. Our sales team will contact you shortly.',
+        data: {
+          requestId: existingRequest._id,
+          status: existingRequest.status,
+          submittedAt: existingRequest.submittedAt,
+          estimatedResponseTime: '24-48 hours'
+        }
       });
     }
 
@@ -151,12 +167,14 @@ router.post('/auth/request-to-join', [
     };
 
     console.log('📝 BACKEND: Creating new partner request...');
+    const saveStartTime = Date.now();
     const partnerRequest = new PartnerRequest(requestData);
     await partnerRequest.save();
-    console.log('📝 BACKEND: Partner request saved with ID:', partnerRequest._id);
+    console.log(`📝 BACKEND: Partner request saved in ${Date.now() - saveStartTime}ms with ID:`, partnerRequest._id);
 
     // Notify admin team
     console.log('📝 BACKEND: Sending admin notification...');
+    const notificationStartTime = Date.now();
     await sendAdminNotification('new_partner_request', {
       requestId: partnerRequest._id,
       businessName,
@@ -165,7 +183,7 @@ router.post('/auth/request-to-join', [
       email,
       phone
     });
-    console.log('📝 BACKEND: Admin notification sent successfully');
+    console.log(`📝 BACKEND: Admin notification sent in ${Date.now() - notificationStartTime}ms`);
 
     console.log('✅ BACKEND: Request to join completed successfully');
     res.status(201).json({
