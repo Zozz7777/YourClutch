@@ -271,10 +271,15 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
 
     // Check if there are existing users for this partner
     const existingUsers = await PartnerUser.find({ partnerId });
-    const hasOwner = existingUsers.some(user => user.role === 'partner_owner');
+    console.log('🔍 Existing users found:', existingUsers.length, 'users');
+    console.log('🔍 Existing users:', existingUsers);
+    
+    // Ensure existingUsers is an array
+    const usersArray = Array.isArray(existingUsers) ? existingUsers : [];
+    const hasOwner = usersArray.some(user => user.role === 'partner_owner');
 
     // If there are existing users and we have an owner, create approval request
-    if (existingUsers.length > 0 && hasOwner) {
+    if (usersArray.length > 0 && hasOwner) {
       const PartnerUserApproval = require('../models/PartnerUserApproval');
       
       // Create approval request
