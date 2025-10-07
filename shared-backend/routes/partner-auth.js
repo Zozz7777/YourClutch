@@ -588,10 +588,11 @@ router.post('/auth/partner-login', validatePartnerLogin, async (req, res) => {
     }
 
     // Reset login attempts and update last login
-    partner.loginAttempts = 0;
-    partner.lockUntil = undefined;
-    partner.lastLogin = new Date();
-    await partner.save();
+    await PartnerUser.findByIdAndUpdate(partner._id, {
+      loginAttempts: 0,
+      lockUntil: undefined,
+      lastLogin: new Date()
+    });
 
     // Generate token
     const token = generateToken(partner.partnerId, deviceId);
