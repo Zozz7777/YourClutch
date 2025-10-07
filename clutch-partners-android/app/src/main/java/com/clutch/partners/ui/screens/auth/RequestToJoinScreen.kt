@@ -341,6 +341,47 @@ fun RequestToJoinScreen(
                 // Submit Button
                 Button(
                     onClick = {
+                        // Validate inputs
+                        if (businessName.isEmpty()) {
+                            errorMessage = if (currentLanguage == "ar") "اسم العمل مطلوب" else "Business name is required"
+                            showErrorDialog = true
+                            return@Button
+                        }
+                        if (contactName.isEmpty()) {
+                            errorMessage = if (currentLanguage == "ar") "اسم جهة الاتصال مطلوب" else "Contact name is required"
+                            showErrorDialog = true
+                            return@Button
+                        }
+                        if (email.isEmpty()) {
+                            errorMessage = if (currentLanguage == "ar") "البريد الإلكتروني مطلوب" else "Email is required"
+                            showErrorDialog = true
+                            return@Button
+                        }
+                        // Email validation
+                        val emailRegex = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+                        if (!emailRegex.matches(email)) {
+                            errorMessage = if (currentLanguage == "ar") "يرجى إدخال بريد إلكتروني صحيح مع نطاق صحيح" else "Please enter a valid email address with proper domain"
+                            showErrorDialog = true
+                            return@Button
+                        }
+                        if (phone.isEmpty()) {
+                            errorMessage = if (currentLanguage == "ar") "رقم الهاتف مطلوب" else "Phone number is required"
+                            showErrorDialog = true
+                            return@Button
+                        }
+                        // Egyptian phone validation (11 digits starting with 01)
+                        val phoneRegex = Regex("^01[0-9]{9}$")
+                        if (!phoneRegex.matches(phone)) {
+                            errorMessage = if (currentLanguage == "ar") "يرجى إدخال رقم هاتف مصري صحيح (11 رقم يبدأ بـ 01)" else "Please enter a valid Egyptian phone number (11 digits starting with 01)"
+                            showErrorDialog = true
+                            return@Button
+                        }
+                        if (address.isEmpty()) {
+                            errorMessage = if (currentLanguage == "ar") "العنوان مطلوب" else "Address is required"
+                            showErrorDialog = true
+                            return@Button
+                        }
+                        
                         isLoading = true
                         // Call request to join API
                         viewModel.requestToJoin(businessName, businessType, contactName, email, phone, address, description) { success ->

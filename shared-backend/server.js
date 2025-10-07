@@ -73,6 +73,26 @@ const {
   healthCheck
 } = require('./middleware/request-optimization');
 
+// Import cost optimization middleware
+const {
+  costOptimization,
+  memoryOptimization,
+  databaseCostOptimization,
+  bandwidthOptimization,
+  cacheOptimization,
+  getCostStatistics
+} = require('./middleware/cost-optimization');
+
+// Import aggressive compression
+const {
+  aggressiveCompression,
+  brotliCompression,
+  responseSizeOptimization,
+  assetOptimization,
+  trackCompressionStats,
+  getCompressionStats
+} = require('./middleware/aggressive-compression');
+
 // Import WebSocket server
 const webSocketServer = require('./services/websocket-server');
 const PartnerWebSocketService = require('./services/partner-websocket');
@@ -210,6 +230,20 @@ app.use(memoryOptimization);
 app.use(connectionPoolOptimization);
 app.use(responseCompression);
 
+// Apply cost optimization middleware (CRITICAL for cost reduction)
+app.use(costOptimization);
+app.use(memoryOptimization);
+app.use(databaseCostOptimization);
+app.use(bandwidthOptimization);
+app.use(cacheOptimization);
+
+// Apply aggressive compression (70-85% bandwidth cost reduction)
+app.use(aggressiveCompression);
+app.use(brotliCompression);
+app.use(responseSizeOptimization);
+app.use(assetOptimization);
+app.use(trackCompressionStats);
+
 // Apply request optimization middleware
 app.use(perfMonitor);
 app.use(reqDbOptimization);
@@ -298,6 +332,37 @@ app.get(`${apiPrefix}/analytics/request-optimization`, authenticateToken, async 
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve request optimization metrics'
+    });
+  }
+});
+
+// Cost optimization analytics endpoint
+app.get(`${apiPrefix}/analytics/cost-optimization`, authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    const costStats = getCostStatistics();
+    const compressionStats = getCompressionStats();
+    
+    res.json({
+      success: true,
+      data: {
+        costOptimization: costStats,
+        compression: compressionStats,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Error getting cost optimization metrics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve cost optimization metrics'
     });
   }
 });
