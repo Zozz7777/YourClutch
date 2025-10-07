@@ -142,10 +142,11 @@ router.post('/auth/request-to-join', [
 
     res.status(201).json({
       success: true,
-      message: 'Request submitted successfully. Our team will review and contact you soon.',
+      message: 'Request submitted successfully. Our sales team will review your application and contact you within 24-48 hours.',
       data: {
         requestId: partnerRequest._id,
-        status: partnerRequest.status
+        status: partnerRequest.status,
+        estimatedResponseTime: '24-48 hours'
       }
     });
 
