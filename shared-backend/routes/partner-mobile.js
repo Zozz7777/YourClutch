@@ -74,8 +74,16 @@ router.post('/auth/request-to-join', [
   body('partnerType').isIn(['repair_center', 'auto_parts_shop', 'accessories_shop', 'importer_manufacturer', 'service_center']).withMessage('Valid partner type is required')
 ], async (req, res) => {
   try {
+    console.log('📝 BACKEND: ===== REQUEST TO JOIN RECEIVED =====');
+    console.log('📝 BACKEND: Request body:', JSON.stringify(req.body, null, 2));
+    console.log('📝 BACKEND: Request headers:', req.headers);
+    console.log('📝 BACKEND: Request IP:', req.ip);
+    console.log('📝 BACKEND: Request method:', req.method);
+    console.log('📝 BACKEND: Request URL:', req.url);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ BACKEND: Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation errors',
@@ -95,16 +103,22 @@ router.post('/auth/request-to-join', [
       website,
       socialMedia
     } = req.body;
+    
+    console.log('📝 BACKEND: Processing request to join for:', businessName, 'by', ownerName);
 
     // Check if request already exists
+    console.log('📝 BACKEND: Checking for existing request...');
     const existingRequest = await PartnerRequest.findOne({
       $or: [
         { email: email.toLowerCase() },
         { phone }
       ]
     });
+    
+    console.log('📝 BACKEND: Existing request found:', existingRequest ? 'YES' : 'NO');
 
     if (existingRequest) {
+      console.log('❌ BACKEND: Request already exists for:', email, 'or', phone);
       return res.status(400).json({
         success: false,
         message: 'Request already exists with this email or phone'
@@ -127,10 +141,13 @@ router.post('/auth/request-to-join', [
       submittedAt: new Date()
     };
 
+    console.log('📝 BACKEND: Creating new partner request...');
     const partnerRequest = new PartnerRequest(requestData);
     await partnerRequest.save();
+    console.log('📝 BACKEND: Partner request saved with ID:', partnerRequest._id);
 
     // Notify admin team
+    console.log('📝 BACKEND: Sending admin notification...');
     await sendAdminNotification('new_partner_request', {
       requestId: partnerRequest._id,
       businessName,
@@ -139,7 +156,9 @@ router.post('/auth/request-to-join', [
       email,
       phone
     });
+    console.log('📝 BACKEND: Admin notification sent successfully');
 
+    console.log('✅ BACKEND: Request to join completed successfully');
     res.status(201).json({
       success: true,
       message: 'Request submitted successfully. Our sales team will review your application and contact you within 24-48 hours.',
@@ -151,6 +170,8 @@ router.post('/auth/request-to-join', [
     });
 
   } catch (error) {
+    console.log('❌ BACKEND: Request to join error:', error.message);
+    console.log('❌ BACKEND: Error stack:', error.stack);
     logger.error('Request to join error:', error);
     res.status(500).json({
       success: false,

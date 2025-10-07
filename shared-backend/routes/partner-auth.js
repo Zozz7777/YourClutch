@@ -629,6 +629,8 @@ router.post('/auth/partner-login', validatePartnerLogin, async (req, res) => {
     });
 
   } catch (error) {
+    console.log('❌ BACKEND: Partner login error:', error.message);
+    console.log('❌ BACKEND: Error stack:', error.stack);
     logger.error('Partner login error:', error);
     res.status(500).json({
       success: false,
