@@ -63,18 +63,17 @@ const validateOTP = [
 
 const validatePartnerSignup = [
   body('partnerId').notEmpty().withMessage('Partner ID is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('phone').notEmpty().withMessage('Phone is required'),
+  body('email').optional().isEmail().withMessage('Valid email is required if provided'),
+  body('phone').optional().isMobilePhone().withMessage('Valid phone is required if provided'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('businessName').notEmpty().withMessage('Business name is required'),
-  body('ownerName').notEmpty().withMessage('Owner name is required'),
-  body('partnerType').notEmpty().withMessage('Partner type is required'),
-  body('businessAddress').isObject().withMessage('Business address is required'),
-  body('businessAddress.street').notEmpty().withMessage('Street is required'),
-  body('businessAddress.city').notEmpty().withMessage('City is required'),
-  body('businessAddress.state').notEmpty().withMessage('State is required'),
-  body('businessAddress.zipCode').notEmpty().withMessage('Zip code is required'),
-  body('role').optional().isIn(['partner_owner', 'partner_manager', 'partner_employee']).withMessage('Invalid role')
+  body('role').optional().isIn(['partner_owner', 'partner_manager', 'partner_employee']).withMessage('Invalid role'),
+  // Custom validation to ensure either email or phone is provided
+  body().custom((value) => {
+    if (!value.email && !value.phone) {
+      throw new Error('Either email or phone is required');
+    }
+    return true;
+  })
 ];
 
 // Helper function to generate JWT token
@@ -214,16 +213,10 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       email,
       phone,
       password,
-      businessName,
-      ownerName,
-      partnerType,
-      businessAddress,
-      workingHours,
-      businessSettings,
       role = 'partner_owner' // Default to owner for first user
     } = req.body;
 
-    console.log('🔐 Partner signup attempt:', { partnerId, email, businessName });
+    console.log('🔐 Partner signup attempt:', { partnerId, email, phone });
 
     // First, verify that the partner exists in the main partners collection
     const { getCollection } = require('../config/database');
@@ -243,15 +236,18 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       });
     }
 
-    // Check if this specific email already exists (allow multiple users per partner)
+    // Check if this specific email or phone already exists (allow multiple users per partner)
     const existingPartnerUser = await PartnerUser.findOne({
-      email: email.toLowerCase()
+      $or: [
+        ...(email ? [{ email: email.toLowerCase() }] : []),
+        ...(phone ? [{ phone }] : [])
+      ]
     });
 
     if (existingPartnerUser) {
       return res.status(409).json({
         success: false,
-        message: 'User account with this email already exists. Please use the sign in option.'
+        message: 'User account with this email or phone already exists. Please use the sign in option.'
       });
     }
 
@@ -266,12 +262,12 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       // Create approval request
       const approvalRequest = new PartnerUserApproval({
         partnerId,
-        requesterEmail: email.toLowerCase(),
-        requesterPhone: phone,
-        requesterName: ownerName,
+        requesterEmail: email?.toLowerCase() || '',
+        requesterPhone: phone || '',
+        requesterName: email || phone, // Use email or phone as identifier
         requestedRole: role,
         requestedPermissions: [], // Will be set based on role
-        businessJustification: `New team member request for ${businessName}`,
+        businessJustification: `New team member request for ${existingPartnerRecord.name}`,
         status: 'pending'
       });
 
@@ -294,24 +290,24 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create partner user account
+    // Create partner user account using data from partners collection
     const newPartnerUser = new PartnerUser({
       partnerId,
-      email: email.toLowerCase(),
-      phone,
+      email: email?.toLowerCase() || '',
+      phone: phone || '',
       password: hashedPassword,
-      businessName: existingPartnerRecord.name || businessName,
-      ownerName: existingPartnerRecord.primaryContact?.name || ownerName,
-      partnerType: existingPartnerRecord.type || partnerType,
+      businessName: existingPartnerRecord.name,
+      ownerName: existingPartnerRecord.primaryContact?.name || 'Partner User',
+      partnerType: existingPartnerRecord.type,
       role: role, // Include the role field
-      businessAddress: businessAddress || {
+      businessAddress: {
         street: existingPartnerRecord.addresses?.[0]?.line1 || '',
         city: existingPartnerRecord.addresses?.[0]?.city || '',
         state: existingPartnerRecord.addresses?.[0]?.state || '',
         zipCode: existingPartnerRecord.addresses?.[0]?.zipCode || ''
       },
-      workingHours: workingHours || {},
-      businessSettings: businessSettings || {},
+      workingHours: existingPartnerRecord.workingHours || {},
+      businessSettings: existingPartnerRecord.settings || {},
       status: 'active',
       isVerified: false,
       isLocked: false,
