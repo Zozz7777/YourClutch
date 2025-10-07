@@ -35,7 +35,7 @@ class GDPRCompliance @Inject constructor(
         return consent.timestamp > 0
     }
     
-    fun requestDataDeletion(userId: String): Boolean {
+    fun requestDataDeletion(_userId: String): Boolean {
         return try {
             // Implement data deletion logic
             // This would typically involve:

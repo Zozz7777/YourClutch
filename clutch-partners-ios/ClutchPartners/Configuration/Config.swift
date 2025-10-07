@@ -5,7 +5,7 @@ struct Config {
         #if DEBUG
         return "http://localhost:3000/api/v1" // Development API URL
         #else
-        return "https://api.clutch.com/v1" // Production API URL
+        return "https://clutch-main-nk7x.onrender.com/api/v1" // Production API URL
         #endif
     }
     

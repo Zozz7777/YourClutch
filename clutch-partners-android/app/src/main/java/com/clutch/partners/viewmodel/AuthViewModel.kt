@@ -20,10 +20,35 @@ class AuthViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
     
-    fun signIn(email: String, password: String) {
+    fun testConnection(onResult: (Boolean) -> Unit = {}) {
+        println("🔐 AuthViewModel: testConnection called")
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
+            println("🔐 AuthViewModel: Calling authRepository.testConnection")
+            authRepository.testConnection()
+                .onSuccess { 
+                    println("🔐 AuthViewModel: Connection test successful")
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    onResult(true)
+                }
+                .onFailure { error ->
+                    println("🔐 AuthViewModel: Connection test failed: ${error.message}")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message
+                    )
+                    onResult(false)
+                }
+        }
+    }
+    
+    fun signIn(email: String, password: String, onResult: (Boolean) -> Unit = {}) {
+        println("🔐 AuthViewModel: signIn called with email: $email")
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            
+            println("🔐 AuthViewModel: Calling authRepository.login")
             authRepository.login(email, password)
                 .onSuccess { user ->
                     _uiState.value = _uiState.value.copy(
@@ -31,12 +56,14 @@ class AuthViewModel @Inject constructor(
                         user = user,
                         isAuthenticated = true
                     )
+                    onResult(true)
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = error.message
                     )
+                    onResult(false)
                 }
         }
     }
@@ -47,24 +74,66 @@ class AuthViewModel @Inject constructor(
         phone: String,
         password: String,
         businessName: String,
-        businessType: com.clutch.partners.data.model.PartnerType
+        ownerName: String,
+        businessType: String,
+        street: String,
+        city: String,
+        state: String,
+        zipCode: String,
+        onResult: (Boolean) -> Unit = {}
     ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
-            authRepository.login(email, password) // Using login for now
+            // Call real backend API for sign up
+            authRepository.signUp(partnerId, email, phone, password, businessName, ownerName, businessType, street, city, state, zipCode)
                 .onSuccess { user ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         user = user,
                         isAuthenticated = true
                     )
+                    onResult(true)
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = error.message
                     )
+                    onResult(false)
+                }
+        }
+    }
+    
+    fun requestToJoin(
+        businessName: String,
+        businessType: String,
+        contactName: String,
+        email: String,
+        phone: String,
+        address: String,
+        description: String,
+        onResult: (Boolean) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            
+            // Call real backend API for request to join
+            authRepository.requestToJoin(businessName, businessType, contactName, email, phone, address, description)
+                .onSuccess { user ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        user = user,
+                        isAuthenticated = true
+                    )
+                    onResult(true)
+                }
+                .onFailure { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message
+                    )
+                    onResult(false)
                 }
         }
     }

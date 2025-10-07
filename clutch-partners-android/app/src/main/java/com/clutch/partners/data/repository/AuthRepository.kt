@@ -4,6 +4,7 @@ import com.clutch.partners.data.model.User
 import com.clutch.partners.data.model.UserRole
 import com.clutch.partners.data.model.Permission
 import com.clutch.partners.data.model.PartnerType
+import com.clutch.partners.data.service.ApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.util.Date
@@ -11,7 +12,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthRepository @Inject constructor() {
+class AuthRepository @Inject constructor(
+    private val apiService: ApiService
+) {
     
     private var currentUser: User? = null
     
@@ -47,96 +50,83 @@ class AuthRepository @Inject constructor() {
     fun isAccountant(): Boolean = currentUser?.role == UserRole.ACCOUNTANT
     fun isHR(): Boolean = currentUser?.role == UserRole.HR
     
-    // Mock login for testing
-    suspend fun login(email: String, password: String): Result<User> {
+    // Test connectivity first
+    suspend fun testConnection(): Result<String> {
+        println("🔐 AuthRepository: Testing connection...")
         return try {
-            // Mock authentication - in real app, this would call API
-            val user = when (email) {
-                "owner@clutch.com" -> User(
-                    id = "1",
-                    email = email,
-                    phone = "+201234567890",
-                    partnerId = "PARTNER001",
-                    businessName = "Business Owner",
-                    businessType = PartnerType.REPAIR_CENTER,
-                    role = UserRole.OWNER,
-                    permissions = UserRole.OWNER.permissions,
-                    isVerified = true,
-                    createdAt = Date(),
-                    lastLoginAt = Date(),
-                    profileImage = null,
-                    address = "Cairo, Egypt",
-                    taxId = "123456789"
-                )
-                "manager@clutch.com" -> User(
-                    id = "2",
-                    email = email,
-                    phone = "+201234567891",
-                    partnerId = "PARTNER002",
-                    businessName = "Store Manager",
-                    businessType = PartnerType.AUTO_PARTS,
-                    role = UserRole.MANAGER,
-                    permissions = UserRole.MANAGER.permissions,
-                    isVerified = true,
-                    createdAt = Date(),
-                    lastLoginAt = Date(),
-                    profileImage = null,
-                    address = "Alexandria, Egypt",
-                    taxId = "123456790"
-                )
-                "staff@clutch.com" -> User(
-                    id = "3",
-                    email = email,
-                    phone = "+201234567892",
-                    partnerId = "PARTNER003",
-                    businessName = "Store Staff",
-                    businessType = PartnerType.SERVICE_CENTER,
-                    role = UserRole.STAFF,
-                    permissions = UserRole.STAFF.permissions,
-                    isVerified = true,
-                    createdAt = Date(),
-                    lastLoginAt = Date(),
-                    profileImage = null,
-                    address = "Giza, Egypt",
-                    taxId = "123456791"
-                )
-                "accountant@clutch.com" -> User(
-                    id = "4",
-                    email = email,
-                    phone = "+201234567893",
-                    partnerId = "PARTNER004",
-                    businessName = "Accountant",
-                    businessType = PartnerType.REPAIR_CENTER,
-                    role = UserRole.ACCOUNTANT,
-                    permissions = UserRole.ACCOUNTANT.permissions,
-                    isVerified = true,
-                    createdAt = Date(),
-                    lastLoginAt = Date(),
-                    profileImage = null,
-                    address = "Cairo, Egypt",
-                    taxId = "123456792"
-                )
-                "hr@clutch.com" -> User(
-                    id = "5",
-                    email = email,
-                    phone = "+201234567894",
-                    partnerId = "PARTNER005",
-                    businessName = "HR Manager",
-                    businessType = PartnerType.REPAIR_CENTER,
-                    role = UserRole.HR,
-                    permissions = UserRole.HR.permissions,
-                    isVerified = true,
-                    createdAt = Date(),
-                    lastLoginAt = Date(),
-                    profileImage = null,
-                    address = "Cairo, Egypt",
-                    taxId = "123456793"
-                )
-                else -> throw Exception("Invalid credentials")
+            val result = apiService.testConnection()
+            println("🔐 AuthRepository: Connection test result: ${result.isSuccess}")
+            result
+        } catch (e: Exception) {
+            println("🔐 AuthRepository: Connection test error: ${e.message}")
+            Result.failure(e)
+        }
+    }
+    
+    // Real backend authentication
+    suspend fun login(email: String, password: String): Result<User> {
+        println("🔐 AuthRepository: login called with email: $email")
+        return try {
+            // Call real backend API
+            println("🔐 AuthRepository: Calling apiService.signIn")
+            val result = apiService.signIn(email, password)
+            println("🔐 AuthRepository: API result: ${result.isSuccess}")
+            result.onSuccess { user ->
+                setCurrentUser(user)
             }
-            
-            setCurrentUser(user)
-            Result.success(user)
+            result
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun signUp(
+        partnerId: String, 
+        email: String, 
+        phone: String, 
+        password: String, 
+        businessName: String, 
+        ownerName: String, 
+        businessType: String, 
+        street: String, 
+        city: String, 
+        state: String, 
+        zipCode: String
+    ): Result<User> {
+        println("🔐 AuthRepository: signUp called with partnerId: $partnerId, email: $email")
+        return try {
+            // Call real backend API for sign up
+            val result = apiService.signUp(partnerId, email, phone, password, businessName, ownerName, businessType, street, city, state, zipCode)
+            println("🔐 AuthRepository: signUp API result: ${result.isSuccess}")
+            result.onSuccess { user ->
+                setCurrentUser(user)
+            }
+            result
+        } catch (e: Exception) {
+            println("🔐 AuthRepository: signUp error: ${e.message}")
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun requestToJoin(
+        businessName: String,
+        businessType: String,
+        contactName: String,
+        email: String,
+        phone: String,
+        address: String,
+        description: String
+    ): Result<User> {
+        println("🔐 AuthRepository: requestToJoin called with email: $email")
+        return try {
+            // Call real backend API
+            println("🔐 AuthRepository: Calling apiService.requestToJoin")
+            val result = apiService.requestToJoin(businessName, businessType, contactName, email, phone, address, description)
+            println("🔐 AuthRepository: API result: ${result.isSuccess}")
+            result.onSuccess { user ->
+                setCurrentUser(user)
+            }
+            result
         } catch (e: Exception) {
             Result.failure(e)
         }

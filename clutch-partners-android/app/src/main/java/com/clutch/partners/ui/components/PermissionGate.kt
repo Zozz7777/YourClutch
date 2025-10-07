@@ -9,15 +9,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.clutch.partners.data.model.Permission
 import com.clutch.partners.data.model.UserRole
 import com.clutch.partners.data.repository.AuthRepository
+import com.clutch.partners.data.service.ApiService
 import com.clutch.partners.viewmodel.MainViewModel
+import javax.inject.Inject
 
 @Composable
 fun PermissionGate(
     permission: Permission,
-    modifier: Modifier = Modifier,
+    _modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val authRepository = remember { AuthRepository() }
+    val apiService = remember { ApiService() }
+    val authRepository = remember { AuthRepository(apiService) }
     val hasPermission by remember { 
         mutableStateOf(authRepository.hasPermission(permission)) 
     }
@@ -31,10 +34,11 @@ fun PermissionGate(
 fun PermissionGate(
     permissions: List<Permission>,
     requireAll: Boolean = false,
-    modifier: Modifier = Modifier,
+    _modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val authRepository = remember { AuthRepository() }
+    val apiService = remember { ApiService() }
+    val authRepository = remember { AuthRepository(apiService) }
     val hasPermission by remember {
         mutableStateOf(
             if (requireAll) {
@@ -53,10 +57,11 @@ fun PermissionGate(
 @Composable
 fun RoleGate(
     allowedRoles: List<UserRole>,
-    modifier: Modifier = Modifier,
+    _modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val authRepository = remember { AuthRepository() }
+    val apiService = remember { ApiService() }
+    val authRepository = remember { AuthRepository(apiService) }
     val userRole by remember { mutableStateOf(authRepository.getUserRole()) }
     val hasAccess by remember { mutableStateOf(userRole in allowedRoles) }
     

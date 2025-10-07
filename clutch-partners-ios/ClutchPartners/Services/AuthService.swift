@@ -34,7 +34,7 @@ class AuthService: ObservableObject {
         }
         
         return networkService.request(
-            endpoint: "/partners/auth/signin",
+            endpoint: "/partner-auth/auth/partner-login",
             method: .POST,
             body: requestData,
             responseType: AuthResponse.self
@@ -53,7 +53,7 @@ class AuthService: ObservableObject {
         }
         
         return networkService.request(
-            endpoint: "/partners/auth/signup",
+            endpoint: "/partner-auth/auth/signup",
             method: .POST,
             body: requestData,
             responseType: AuthResponse.self

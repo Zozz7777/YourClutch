@@ -11,7 +11,7 @@ class LocalStorageService @Inject constructor() {
     // Note: In a real app, you would inject Context here
     // For now, we'll use a simplified approach without SharedPreferences
     
-    fun saveUser(user: User) {
+    fun saveUser(_user: User) {
         // TODO: Implement actual storage
         // For now, this is a placeholder
     }
@@ -26,7 +26,7 @@ class LocalStorageService @Inject constructor() {
         // TODO: Implement actual storage clearing
     }
     
-    fun saveToken(token: String) {
+    fun saveToken(_token: String) {
         // TODO: Implement actual token storage
     }
     

@@ -3,6 +3,7 @@ package com.clutch.partners.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.clutch.partners.data.model.*
+import com.clutch.partners.data.service.POSService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class POSViewModel @Inject constructor() : ViewModel() {
+class POSViewModel @Inject constructor(
+    private val posService: POSService
+) : ViewModel() {
     
     private val _cart = MutableStateFlow<List<CartItem>>(emptyList())
     val cart: StateFlow<List<CartItem>> = _cart.asStateFlow()
@@ -153,7 +156,7 @@ class POSViewModel @Inject constructor() : ViewModel() {
     
     private fun loadProducts() {
         viewModelScope.launch {
-            // In real app, this would call API
+            // For now, use mock data - implement API call later
             _products.value = listOf(
                 Product(
                     id = "1",
@@ -166,33 +169,11 @@ class POSViewModel @Inject constructor() : ViewModel() {
                     stock = 25,
                     minStock = 5,
                     maxStock = 100,
-                    barcode = "1234567890123"
-                ),
-                Product(
-                    id = "2",
-                    sku = "ENG001",
-                    name = "Engine Oil 5W-30",
-                    description = "Synthetic engine oil 5W-30 grade",
-                    category = "engine",
-                    price = 80.0,
-                    cost = 50.0,
-                    stock = 50,
-                    minStock = 10,
-                    maxStock = 200,
-                    barcode = "1234567890124"
-                ),
-                Product(
-                    id = "3",
-                    sku = "ELC001",
-                    name = "Spark Plugs Set",
-                    description = "Set of 4 spark plugs",
-                    category = "electrical",
-                    price = 120.0,
-                    cost = 80.0,
-                    stock = 3,
-                    minStock = 5,
-                    maxStock = 50,
-                    barcode = "1234567890125"
+                    barcode = "1234567890123",
+                    imageUrl = null,
+                    isActive = true,
+                    createdAt = System.currentTimeMillis(),
+                    updatedAt = System.currentTimeMillis()
                 )
             )
         }

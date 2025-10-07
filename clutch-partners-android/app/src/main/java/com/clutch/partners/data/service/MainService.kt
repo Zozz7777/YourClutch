@@ -8,7 +8,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MainService @Inject constructor() {
+class MainService @Inject constructor(
+    private val apiService: ApiService
+) {
     
     suspend fun getDashboardData(): Result<DashboardData> {
         // TODO: Implement actual API call
@@ -79,45 +81,10 @@ class MainService @Inject constructor() {
     }
     
     suspend fun getProducts(): Result<List<Product>> {
-        // TODO: Implement actual API call
-        return Result.success(
-            listOf(
-                Product(
-                    id = "1",
-                    sku = "BP001",
-                    name = "Brake Pads",
-                    description = "High quality brake pads",
-                    category = "Brakes",
-                    price = 45.0,
-                    cost = 25.0,
-                    stock = 50,
-                    minStock = 10,
-                    maxStock = 100,
-                    barcode = "1234567890123",
-                    imageUrl = null,
-                    isActive = true,
-                    createdAt = System.currentTimeMillis(),
-                    updatedAt = System.currentTimeMillis()
-                )
-            )
-        )
+        return apiService.getProducts()
     }
     
     suspend fun getNotifications(): Result<List<Notification>> {
-        // TODO: Implement actual API call
-        return Result.success(
-            listOf(
-                Notification(
-                    id = "1",
-                    title = "New Order",
-                    message = "You have a new order from John Doe",
-                    type = com.clutch.partners.data.model.NotificationType.ORDER,
-                    isRead = false,
-                    createdAt = java.util.Date(),
-                    actionUrl = "/orders/1",
-                    metadata = null
-                )
-            )
-        )
+        return apiService.getNotifications()
     }
 }

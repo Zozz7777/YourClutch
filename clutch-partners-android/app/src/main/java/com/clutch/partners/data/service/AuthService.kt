@@ -7,61 +7,39 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthService @Inject constructor(
-    private val localStorageService: LocalStorageService
+    private val localStorageService: LocalStorageService,
+    private val apiService: ApiService
 ) {
     
     suspend fun signIn(email: String, password: String): Result<User> {
-        // TODO: Implement actual API call
-        return Result.success(
-            User(
-                id = "1",
-                email = email,
-                phone = "+1234567890",
-                partnerId = "PARTNER001",
-                businessName = "Test Business",
-                businessType = com.clutch.partners.data.model.PartnerType.REPAIR_CENTER,
-                role = com.clutch.partners.data.model.UserRole.OWNER,
-                permissions = com.clutch.partners.data.model.UserRole.OWNER.permissions,
-                isVerified = true,
-                createdAt = java.util.Date(),
-                lastLoginAt = java.util.Date(),
-                profileImage = null,
-                address = null,
-                taxId = null
-            )
-        )
+        return apiService.signIn(email, password)
     }
     
     suspend fun signUp(
-        partnerId: String,
+        businessName: String,
+        ownerName: String,
         email: String,
         phone: String,
         password: String,
-        businessName: String,
-        businessType: com.clutch.partners.data.model.PartnerType
+        partnerType: com.clutch.partners.data.model.PartnerType,
+        address: String
     ): Result<User> {
-        // TODO: Implement actual API call
-        return Result.success(
-            User(
-                id = "1",
-                email = email,
-                phone = phone,
-                partnerId = partnerId,
-                businessName = businessName,
-                businessType = businessType,
-                role = com.clutch.partners.data.model.UserRole.OWNER,
-                permissions = com.clutch.partners.data.model.UserRole.OWNER.permissions,
-                isVerified = false,
-                createdAt = java.util.Date(),
-                lastLoginAt = null,
-                profileImage = null,
-                address = null,
-                taxId = null
-            )
+        return apiService.signUp(
+            partnerId = "PARTNER_${System.currentTimeMillis()}",
+            email = email,
+            phone = phone,
+            password = password,
+            businessName = businessName,
+            ownerName = ownerName,
+            businessType = partnerType.name,
+            street = address,
+            city = "Default City",
+            state = "Default State",
+            zipCode = "00000"
         )
     }
     
-    suspend fun uploadKYCDocument(document: KYCDocument): Result<Boolean> {
+    suspend fun uploadKYCDocument(_document: KYCDocument): Result<Boolean> {
         // TODO: Implement actual API call
         return Result.success(true)
     }
