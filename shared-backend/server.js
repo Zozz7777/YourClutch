@@ -49,17 +49,6 @@ const {
   analyzeAndTune
 } = require('./middleware/performance-tuning');
 
-// Import request optimization
-const {
-  requestTimeout,
-  performanceMonitor,
-  databaseOptimization,
-  requestCaching,
-  requestCompression,
-  getPerformanceMetrics,
-  healthCheck
-} = require('./middleware/request-optimization');
-
 // Import performance optimization middleware
 const {
   requestTiming,
@@ -72,6 +61,17 @@ const {
   getPerformanceMetrics: getPerfMetrics,
   performanceHealthCheck
 } = require('./middleware/performance-optimization');
+
+// Import request optimization (renamed to avoid conflicts)
+const {
+  requestTimeout,
+  performanceMonitor: perfMonitor,
+  databaseOptimization: reqDbOptimization,
+  requestCaching: reqCaching2,
+  requestCompression: reqCompression,
+  getPerformanceMetrics: getReqMetrics,
+  healthCheck
+} = require('./middleware/request-optimization');
 
 // Import WebSocket server
 const webSocketServer = require('./services/websocket-server');
@@ -211,12 +211,12 @@ app.use(connectionPoolOptimization);
 app.use(responseCompression);
 
 // Apply request optimization middleware
-app.use(performanceMonitor);
-app.use(databaseOptimization);
-app.use(requestCompression);
+app.use(perfMonitor);
+app.use(reqDbOptimization);
+app.use(reqCompression);
 
 // Apply request caching for GET requests (5 minutes TTL)
-app.use(requestCaching(300));
+app.use(reqCaching2(300));
 app.use(reqCaching(300)); // Additional caching layer
 
 // Apply request timeouts
@@ -282,7 +282,7 @@ app.get(`${apiPrefix}/analytics/request-optimization`, authenticateToken, async 
       });
     }
     
-    const metrics = getPerformanceMetrics();
+    const metrics = getReqMetrics();
     const health = healthCheck();
     
     res.json({
