@@ -161,7 +161,8 @@ partnerRequestSchema.virtual('isOverdue').get(function() {
 // Pre-save middleware
 partnerRequestSchema.pre('save', function(next) {
   // Update last contacted date if contact history is modified
-  if (this.isModified('contactHistory') && this.contactHistory.length > 0) {
+  // Check if contactHistory exists and has items (safer approach)
+  if (this.contactHistory && this.contactHistory.length > 0) {
     this.lastContactedAt = new Date();
   }
   

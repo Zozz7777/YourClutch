@@ -252,26 +252,26 @@ partnerUserSchema.methods.canAccess = function(feature) {
 partnerUserSchema.methods.incLoginAttempts = function() {
   // If we have a previous lock that has expired, restart at 1
   if (this.lockUntil && this.lockUntil < Date.now()) {
-    return this.updateOne({
-      $unset: { lockUntil: 1 },
-      $set: { loginAttempts: 1 }
-    });
+    this.lockUntil = undefined;
+    this.loginAttempts = 1;
+    return this.save();
   }
   
-  const updates = { $inc: { loginAttempts: 1 } };
+  this.loginAttempts = (this.loginAttempts || 0) + 1;
   
   // Lock account after 5 failed attempts
-  if (this.loginAttempts + 1 >= 5 && !this.isLocked) {
-    updates.$set = { lockUntil: new Date(Date.now() + 2 * 60 * 60 * 1000) }; // 2 hours
+  if (this.loginAttempts >= 5 && !this.isLocked) {
+    this.lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
   }
   
-  return this.updateOne(updates);
+  return this.save();
 };
 
 partnerUserSchema.methods.resetLoginAttempts = function() {
-  return this.updateOne({
-    $unset: { loginAttempts: 1, lockUntil: 1 }
-  });
+  // Reset login attempts and unlock account
+  this.loginAttempts = 0;
+  this.lockUntil = undefined;
+  return this.save();
 };
 
 // Static methods
