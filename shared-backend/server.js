@@ -237,49 +237,38 @@ app.use(compression({
 const { rateLimits, burstProtection } = require('./middleware/rate-limiting');
 const { performanceMonitoring } = require('./middleware/performance-monitoring');
 
-// Apply essential middleware only (simplified to prevent conflicts)
+// Apply minimal essential middleware only (to prevent conflicts)
 app.use(performanceMonitoring);
 app.use(requestTiming);
 app.use(externalServiceProtection);
 app.use(connectionPoolOptimization);
 app.use(responseCompression);
 
-// Apply cost optimization middleware (CRITICAL for cost reduction)
+// Apply basic cost optimization
 app.use(costOptimization);
 app.use(costMemoryOptimization);
-app.use(databaseCostOptimization);
-app.use(bandwidthOptimization);
-app.use(cacheOptimization);
 
-// Apply aggressive compression (70-85% bandwidth cost reduction)
+// Apply basic compression
 app.use(aggressiveCompression);
 app.use(brotliCompression);
-app.use(responseSizeOptimization);
-app.use(assetOptimization);
-app.use(trackCompressionStats);
 
-// Apply request optimization middleware
+// Apply basic request optimization
 app.use(perfMonitor);
 app.use(reqDbOptimization);
-app.use(reqCompression);
 
-// Apply request caching for GET requests (5 minutes TTL)
+// Apply basic caching
 app.use(reqCaching2(300));
 
 // Apply request timeouts
 app.use(requestTimeout(20000)); // 20 seconds default timeout
 
-// Apply query optimization (CRITICAL for database performance)
+// Apply basic query optimization
 app.use(queryOptimization);
 app.use(queryCaching);
-app.use(cacheQueryResults);
 
-// Apply horizontal scaling middleware (CRITICAL for millions of users)
+// Apply basic horizontal scaling
 app.use(healthCheckMiddleware);
-app.use(stickySessionMiddleware);
 app.use(sessionMiddleware);
-app.use(sessionSyncMiddleware);
-app.use(autoScalingMiddleware);
 
 // Apply burst protection (most restrictive)
 app.use(burstProtection);
