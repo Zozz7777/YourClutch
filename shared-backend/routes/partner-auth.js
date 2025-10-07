@@ -588,7 +588,8 @@ router.post('/auth/partner-login', validatePartnerLogin, async (req, res) => {
     }
 
     // Reset login attempts and update last login
-    await partner.resetLoginAttempts();
+    partner.loginAttempts = 0;
+    partner.lockUntil = undefined;
     partner.lastLogin = new Date();
     await partner.save();
 

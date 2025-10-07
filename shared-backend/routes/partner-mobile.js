@@ -5,7 +5,7 @@ const PartnerOrder = require('../models/PartnerOrder');
 const PartnerPayment = require('../models/PartnerPayment');
 const PartnerRequest = require('../models/PartnerRequest');
 const { authenticateToken: auth } = require('../middleware/auth');
-const logger = require('../config/logger');
+const { logger } = require('../config/logger');
 
 const router = express.Router();
 
@@ -68,8 +68,22 @@ const sendCustomerNotification = async (order, type, data) => {
 router.post('/auth/request-to-join', [
   body('businessName').notEmpty().withMessage('Business name is required'),
   body('ownerName').notEmpty().withMessage('Owner name is required'),
-  body('phone').isMobilePhone().withMessage('Valid phone number is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
+  body('phone').isMobilePhone().withMessage('Valid phone number is required').custom((value) => {
+    // Egyptian phone number validation (11 digits starting with 01)
+    const egyptianPhoneRegex = /^01[0-9]{9}$/;
+    if (!egyptianPhoneRegex.test(value)) {
+      throw new Error('Please enter a valid Egyptian phone number (11 digits starting with 01)');
+    }
+    return true;
+  }),
+  body('email').isEmail().withMessage('Valid email is required').custom((value) => {
+    // Check for proper email format with domain
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(value)) {
+      throw new Error('Please enter a valid email address with proper domain');
+    }
+    return true;
+  }),
   body('address').notEmpty().withMessage('Address is required'),
   body('partnerType').isIn(['repair_center', 'auto_parts_shop', 'accessories_shop', 'importer_manufacturer', 'service_center']).withMessage('Valid partner type is required')
 ], async (req, res) => {
