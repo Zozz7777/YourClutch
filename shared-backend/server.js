@@ -115,6 +115,7 @@ const notificationsRoutes = require('./routes/notifications');
 const partnersRoutes = require('./routes/partners');
 const partnerAuthRoutes = require('./routes/partner-auth');
 const partnerMobileRoutes = require('./routes/partner-mobile');
+const partnerApprovalsRoutes = require('./routes/partner-approvals');
 const rbacRoutes = require('./routes/rbac');
 
 // New partner routes
@@ -272,6 +273,7 @@ app.use(`${apiPrefix}/communication`, communicationRoutes);
 app.use(`${apiPrefix}/partners`, partnersRoutes);
 app.use(`${apiPrefix}/partner-auth`, partnerAuthRoutes);
 app.use(`${apiPrefix}/partners`, partnerMobileRoutes);
+app.use(`${apiPrefix}/partner-approvals`, partnerApprovalsRoutes);
 app.use(`${apiPrefix}/rbac`, rbacRoutes);
 
 // Mount new partner routes

@@ -9,6 +9,29 @@ const logger = require('../config/logger');
 
 const router = express.Router();
 
+// Helper functions
+const sendAdminNotification = async (type, data) => {
+  try {
+    logger.info(`Sending admin notification: ${type}`, data);
+    // In production, this would send actual notifications to admin team
+    return true;
+  } catch (error) {
+    logger.error('Error sending admin notification:', error);
+    return false;
+  }
+};
+
+const sendCustomerNotification = async (order, type, data) => {
+  try {
+    logger.info(`Sending customer notification: ${type}`, data);
+    // In production, this would send actual notifications to customer
+    return true;
+  } catch (error) {
+    logger.error('Error sending customer notification:', error);
+    return false;
+  }
+};
+
 // ============================================================================
 // MOBILE PARTNERS APP ENDPOINTS
 // ============================================================================
@@ -748,28 +771,5 @@ router.get('/dashboard/revenue', auth, async (req, res) => {
     });
   }
 });
-
-// Helper functions
-const sendAdminNotification = async (type, data) => {
-  try {
-    logger.info(`Sending admin notification: ${type}`, data);
-    // In production, this would send actual notifications to admin team
-    return true;
-  } catch (error) {
-    logger.error('Error sending admin notification:', error);
-    return false;
-  }
-};
-
-const sendCustomerNotification = async (order, type, data) => {
-  try {
-    logger.info(`Sending customer notification: ${type}`, data);
-    // In production, this would send actual notifications to customer
-    return true;
-  } catch (error) {
-    logger.error('Error sending customer notification:', error);
-    return false;
-  }
-};
 
 module.exports = router;

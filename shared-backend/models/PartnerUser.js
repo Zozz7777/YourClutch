@@ -5,7 +5,7 @@ const partnerUserSchema = new mongoose.Schema({
   partnerId: {
     type: String,
     required: true,
-    unique: true,
+    // Removed unique constraint to allow multiple users per partner
     trim: true
   },
   email: {
@@ -100,8 +100,8 @@ const partnerUserSchema = new mongoose.Schema({
   // Role-Based Access Control
   role: {
     type: String,
-    enum: ['owner', 'manager', 'staff', 'accountant'],
-    default: 'owner'
+    enum: ['partner_owner', 'partner_manager', 'partner_employee'],
+    default: 'partner_owner'
   },
   permissions: [{
     type: String,
@@ -176,11 +176,15 @@ const partnerUserSchema = new mongoose.Schema({
 });
 
 // Indexes
-// Note: email, phone, and partnerId indexes are automatically created by unique: true in schema
+// Note: email and phone indexes are automatically created by unique: true in schema
+// partnerId is no longer unique to allow multiple users per partner
+partnerUserSchema.index({ partnerId: 1 }); // Non-unique index for partnerId
 partnerUserSchema.index({ status: 1 });
 partnerUserSchema.index({ partnerType: 1 });
+partnerUserSchema.index({ role: 1 }); // Index for role-based queries
 partnerUserSchema.index({ 'businessAddress.city': 1 });
 partnerUserSchema.index({ 'joinRequest.status': 1 });
+partnerUserSchema.index({ partnerId: 1, role: 1 }); // Compound index for partner + role queries
 
 // Virtuals
 partnerUserSchema.virtual('isActive').get(function() {
@@ -208,24 +212,21 @@ partnerUserSchema.pre('save', function(next) {
 // Instance methods
 partnerUserSchema.methods.setDefaultPermissions = function() {
   const rolePermissions = {
-    owner: [
+    partner_owner: [
       'view_orders', 'manage_orders', 'view_payments', 'manage_payments',
       'view_settings', 'manage_settings', 'view_dashboard', 'manage_dashboard',
       'view_invoices', 'manage_invoices', 'view_analytics', 'manage_analytics'
     ],
-    manager: [
+    partner_manager: [
       'view_orders', 'manage_orders', 'view_payments', 'view_settings', 'manage_settings',
       'view_dashboard', 'view_invoices', 'manage_invoices', 'view_analytics'
     ],
-    staff: [
+    partner_employee: [
       'view_orders', 'manage_orders', 'view_invoices', 'manage_invoices'
-    ],
-    accountant: [
-      'view_orders', 'view_payments', 'view_invoices', 'view_analytics'
     ]
   };
   
-  this.permissions = rolePermissions[this.role] || rolePermissions.staff;
+  this.permissions = rolePermissions[this.role] || rolePermissions.partner_employee;
 };
 
 partnerUserSchema.methods.hasPermission = function(permission) {

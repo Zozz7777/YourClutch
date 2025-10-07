@@ -73,7 +73,8 @@ const validatePartnerSignup = [
   body('businessAddress.street').notEmpty().withMessage('Street is required'),
   body('businessAddress.city').notEmpty().withMessage('City is required'),
   body('businessAddress.state').notEmpty().withMessage('State is required'),
-  body('businessAddress.zipCode').notEmpty().withMessage('Zip code is required')
+  body('businessAddress.zipCode').notEmpty().withMessage('Zip code is required'),
+  body('role').optional().isIn(['partner_owner', 'partner_manager', 'partner_employee']).withMessage('Invalid role')
 ];
 
 // Helper function to generate JWT token
@@ -218,7 +219,8 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       partnerType,
       businessAddress,
       workingHours,
-      businessSettings
+      businessSettings,
+      role = 'partner_owner' // Default to owner for first user
     } = req.body;
 
     console.log('🔐 Partner signup attempt:', { partnerId, email, businessName });
@@ -241,18 +243,51 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       });
     }
 
-    // Check if partner user account already exists
+    // Check if this specific email already exists (allow multiple users per partner)
     const existingPartnerUser = await PartnerUser.findOne({
-      $or: [
-        { partnerId },
-        { email: email.toLowerCase() }
-      ]
+      email: email.toLowerCase()
     });
 
     if (existingPartnerUser) {
       return res.status(409).json({
         success: false,
-        message: 'Partner account already exists. Please use the sign in option.'
+        message: 'User account with this email already exists. Please use the sign in option.'
+      });
+    }
+
+    // Check if there are existing users for this partner
+    const existingUsers = await PartnerUser.find({ partnerId });
+    const hasOwner = existingUsers.some(user => user.role === 'partner_owner');
+
+    // If there are existing users and we have an owner, create approval request
+    if (existingUsers.length > 0 && hasOwner) {
+      const PartnerUserApproval = require('../models/PartnerUserApproval');
+      
+      // Create approval request
+      const approvalRequest = new PartnerUserApproval({
+        partnerId,
+        requesterEmail: email.toLowerCase(),
+        requesterPhone: phone,
+        requesterName: ownerName,
+        requestedRole: role,
+        requestedPermissions: [], // Will be set based on role
+        businessJustification: `New team member request for ${businessName}`,
+        status: 'pending'
+      });
+
+      await approvalRequest.save();
+
+      // Send notification to partner owner
+      await approvalRequest.sendOwnerNotification();
+
+      return res.status(202).json({
+        success: true,
+        message: 'Registration request submitted for approval. The partner owner will review your request.',
+        data: {
+          approvalId: approvalRequest._id,
+          status: 'pending_approval',
+          estimatedResponseTime: '24-48 hours'
+        }
       });
     }
 
@@ -268,6 +303,7 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       businessName: existingPartnerRecord.name || businessName,
       ownerName: existingPartnerRecord.primaryContact?.name || ownerName,
       partnerType: existingPartnerRecord.type || partnerType,
+      role: role, // Include the role field
       businessAddress: businessAddress || {
         street: existingPartnerRecord.addresses?.[0]?.line1 || '',
         city: existingPartnerRecord.addresses?.[0]?.city || '',
