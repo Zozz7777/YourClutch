@@ -530,8 +530,16 @@ router.post('/:partnerId/register-device', validateDeviceRegistration, async (re
 // @access  Public
 router.post('/auth/partner-login', validatePartnerLogin, async (req, res) => {
   try {
+    console.log('🔐 BACKEND: ===== LOGIN REQUEST RECEIVED =====');
+    console.log('🔐 BACKEND: Request body:', JSON.stringify(req.body, null, 2));
+    console.log('🔐 BACKEND: Request headers:', req.headers);
+    console.log('🔐 BACKEND: Request IP:', req.ip);
+    console.log('🔐 BACKEND: Request method:', req.method);
+    console.log('🔐 BACKEND: Request URL:', req.url);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ BACKEND: Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation errors',
@@ -540,16 +548,32 @@ router.post('/auth/partner-login', validatePartnerLogin, async (req, res) => {
     }
 
     const { emailOrPhone, password, deviceId } = req.body;
+    console.log('🔐 BACKEND: Processing login for:', emailOrPhone);
 
     // Find partner by email or phone
     let partner;
+    console.log('🔐 BACKEND: Searching for partner with emailOrPhone:', emailOrPhone);
     if (emailOrPhone.includes('@')) {
+      console.log('🔐 BACKEND: Searching by email...');
       partner = await PartnerUser.findByEmail(emailOrPhone);
     } else {
+      console.log('🔐 BACKEND: Searching by phone...');
       partner = await PartnerUser.findByPhone(emailOrPhone);
+    }
+    
+    console.log('🔐 BACKEND: Partner found:', partner ? 'YES' : 'NO');
+    if (partner) {
+      console.log('🔐 BACKEND: Partner details:', {
+        id: partner._id,
+        email: partner.email,
+        phone: partner.phone,
+        status: partner.status,
+        isLocked: partner.isLocked
+      });
     }
 
     if (!partner) {
+      console.log('❌ BACKEND: No partner found for:', emailOrPhone);
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
