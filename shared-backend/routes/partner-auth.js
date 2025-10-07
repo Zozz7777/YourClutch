@@ -306,9 +306,12 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
     }
 
     // Hash password
+    console.log('🔐 Hashing password...');
     const hashedPassword = await bcrypt.hash(password, 12);
+    console.log('✅ Password hashed successfully');
 
     // Create partner user account using data from partners collection
+    console.log('👤 Creating new partner user...');
     const newPartnerUser = new PartnerUser({
       partnerId,
       email: cleanEmail?.toLowerCase() || '',
@@ -342,8 +345,8 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       }
     });
 
+    console.log('💾 Saving new partner user to database...');
     await newPartnerUser.save();
-
     console.log('✅ Partner user account created successfully:', partnerId);
 
     // Generate token
@@ -365,10 +368,14 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
     });
 
   } catch (error) {
+    console.error('❌ Partner signup error:', error);
+    console.error('❌ Error stack:', error.stack);
     logger.error('Partner signup error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
