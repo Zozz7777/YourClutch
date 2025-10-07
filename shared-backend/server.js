@@ -49,6 +49,17 @@ const {
   analyzeAndTune
 } = require('./middleware/performance-tuning');
 
+// Import request optimization
+const {
+  requestTimeout,
+  performanceMonitor,
+  databaseOptimization,
+  requestCaching,
+  requestCompression,
+  getPerformanceMetrics,
+  healthCheck
+} = require('./middleware/request-optimization');
+
 // Import WebSocket server
 const webSocketServer = require('./services/websocket-server');
 const PartnerWebSocketService = require('./services/partner-websocket');

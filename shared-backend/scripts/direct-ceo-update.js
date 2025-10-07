@@ -64,8 +64,6 @@ async function updateCEODirectly() {
     // Connect to MongoDB
     console.log('\n🔌 Connecting to MongoDB...');
     client = new MongoClient(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 10000
     });
     

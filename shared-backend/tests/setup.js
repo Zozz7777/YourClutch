@@ -14,9 +14,7 @@ beforeAll(async () => {
   
   // Connect to test database
   await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+    });
   
   console.log('✅ Test database connected');
 });

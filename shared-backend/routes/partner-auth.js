@@ -357,10 +357,25 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
     // Generate token
     const token = generateToken(partnerId);
 
-    // Remove password from response
-    const partnerData = newPartnerUser.toObject();
-    delete partnerData.password;
-    delete partnerData.verificationCode;
+    // Create response object manually to avoid toObject issues
+    const partnerData = {
+      id: newPartnerUser._id,
+      partnerId: newPartnerUser.partnerId,
+      email: newPartnerUser.email,
+      phone: newPartnerUser.phone,
+      businessName: newPartnerUser.businessName,
+      ownerName: newPartnerUser.ownerName,
+      partnerType: newPartnerUser.partnerType,
+      role: newPartnerUser.role,
+      status: newPartnerUser.status,
+      isVerified: newPartnerUser.isVerified,
+      businessAddress: newPartnerUser.businessAddress,
+      workingHours: newPartnerUser.workingHours,
+      businessSettings: newPartnerUser.businessSettings,
+      appPreferences: newPartnerUser.appPreferences,
+      createdAt: newPartnerUser.createdAt,
+      updatedAt: newPartnerUser.updatedAt
+    };
 
     res.status(201).json({
       success: true,

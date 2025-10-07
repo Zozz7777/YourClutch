@@ -808,8 +808,6 @@ class DatabaseAuditor {
     try {
       console.log('🔌 Connecting to MongoDB Atlas...');
       this.client = new MongoClient(MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
         maxPoolSize: 10,
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,

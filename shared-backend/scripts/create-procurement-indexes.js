@@ -17,9 +17,7 @@ async function createProcurementIndexes() {
   try {
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/clutch', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+      });
 
     console.log('Connected to MongoDB');
 

@@ -186,8 +186,6 @@ const connectToDatabase = async () => {
     if (mongoose.connection.readyState === 0) {
       try {
         const mongooseOptions = {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
           maxPoolSize: parseInt(process.env.DB_MAX_POOL_SIZE) || 50,
           minPoolSize: parseInt(process.env.DB_MIN_POOL_SIZE) || 5,
           connectTimeoutMS: parseInt(process.env.DB_CONNECT_TIMEOUT_MS) || 30000,

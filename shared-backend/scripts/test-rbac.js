@@ -10,9 +10,7 @@ async function testRBAC() {
     
     // Connect to database
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/clutch', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+      });
     console.log('✅ Connected to database');
 
     // Test 1: Check if permissions were created

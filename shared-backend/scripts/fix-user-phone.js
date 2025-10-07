@@ -27,9 +27,7 @@ async function fixUserPhone(email, realPhone) {
     // Connect to database
     console.log('🔌 Connecting to database...');
     client = new MongoClient(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+      });
     
     await client.connect();
     const db = client.db();

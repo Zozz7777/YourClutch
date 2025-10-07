@@ -113,9 +113,7 @@ class TestUserCleanup {
     try {
       console.log('🔌 Connecting to database...');
       this.client = new MongoClient(MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
+        });
       
       await this.client.connect();
       this.db = this.client.db();
