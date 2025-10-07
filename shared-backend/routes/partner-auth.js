@@ -69,7 +69,10 @@ const validatePartnerSignup = [
   body('role').optional().isIn(['partner_owner', 'partner_manager', 'partner_employee']).withMessage('Invalid role'),
   // Custom validation to ensure either email or phone is provided
   body().custom((value) => {
-    if (!value.email && !value.phone) {
+    const hasEmail = value.email && value.email !== 'undefined' && value.email !== 'null';
+    const hasPhone = value.phone && value.phone !== 'undefined' && value.phone !== 'null';
+    
+    if (!hasEmail && !hasPhone) {
       throw new Error('Either email or phone is required');
     }
     return true;
@@ -216,18 +219,30 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       role = 'partner_owner' // Default to owner for first user
     } = req.body;
 
-    console.log('🔐 Partner signup attempt:', { partnerId, email, phone });
+    // Clean up undefined values
+    const cleanEmail = email && email !== 'undefined' && email !== 'null' ? email : null;
+    const cleanPhone = phone && phone !== 'undefined' && phone !== 'null' ? phone : null;
+    
+    // Ensure we have either email or phone
+    if (!cleanEmail && !cleanPhone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Either email or phone number is required for registration'
+      });
+    }
+
+    console.log('🔐 Partner signup attempt:', { partnerId, email: cleanEmail, phone: cleanPhone });
 
     // First, verify that the partner exists in the main partners collection
     const { getCollection } = require('../config/database');
     const partnersCollection = await getCollection('partners');
     
+    console.log('🔍 Looking up partner:', partnerId);
+    const startTime = Date.now();
     const existingPartnerRecord = await partnersCollection.findOne({
-      $or: [
-        { partnerId },
-        { 'primaryContact.email': email.toLowerCase() }
-      ]
+      partnerId: partnerId
     });
+    console.log(`⏱️ Partner lookup took: ${Date.now() - startTime}ms`);
 
     if (!existingPartnerRecord) {
       return res.status(404).json({
@@ -237,12 +252,15 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
     }
 
     // Check if this specific email or phone already exists (allow multiple users per partner)
+    console.log('🔍 Checking for existing user...');
+    const userCheckStart = Date.now();
     const existingPartnerUser = await PartnerUser.findOne({
       $or: [
-        ...(email ? [{ email: email.toLowerCase() }] : []),
-        ...(phone ? [{ phone }] : [])
+        ...(cleanEmail ? [{ email: cleanEmail.toLowerCase() }] : []),
+        ...(cleanPhone ? [{ phone: cleanPhone }] : [])
       ]
     });
+    console.log(`⏱️ User check took: ${Date.now() - userCheckStart}ms`);
 
     if (existingPartnerUser) {
       return res.status(409).json({
@@ -262,9 +280,9 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       // Create approval request
       const approvalRequest = new PartnerUserApproval({
         partnerId,
-        requesterEmail: email?.toLowerCase() || '',
-        requesterPhone: phone || '',
-        requesterName: email || phone, // Use email or phone as identifier
+        requesterEmail: cleanEmail?.toLowerCase() || '',
+        requesterPhone: cleanPhone || '',
+        requesterName: cleanEmail || cleanPhone, // Use email or phone as identifier
         requestedRole: role,
         requestedPermissions: [], // Will be set based on role
         businessJustification: `New team member request for ${existingPartnerRecord.name}`,
@@ -293,8 +311,8 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
     // Create partner user account using data from partners collection
     const newPartnerUser = new PartnerUser({
       partnerId,
-      email: email?.toLowerCase() || '',
-      phone: phone || '',
+      email: cleanEmail?.toLowerCase() || '',
+      phone: cleanPhone || '',
       password: hashedPassword,
       businessName: existingPartnerRecord.name,
       ownerName: existingPartnerRecord.primaryContact?.name || 'Partner User',
@@ -341,7 +359,8 @@ router.post('/auth/signup', validatePartnerSignup, async (req, res) => {
       message: 'Partner account created successfully',
       data: {
         partner: partnerData,
-        token
+        token,
+        signupMethod: cleanEmail ? 'email' : 'phone'
       }
     });
 
