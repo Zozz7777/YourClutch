@@ -93,6 +93,24 @@ const {
   getCompressionStats
 } = require('./middleware/aggressive-compression');
 
+// Import query optimization
+const {
+  queryOptimization,
+  queryCaching,
+  cacheQueryResults,
+  getQueryStatistics
+} = require('./middleware/query-optimization');
+
+// Import horizontal scaling
+const {
+  sessionMiddleware,
+  healthCheckMiddleware,
+  stickySessionMiddleware,
+  autoScalingMiddleware,
+  sessionSyncMiddleware,
+  getScalingStatistics
+} = require('./middleware/horizontal-scaling');
+
 // Import WebSocket server
 const webSocketServer = require('./services/websocket-server');
 const PartnerWebSocketService = require('./services/partner-websocket');
@@ -256,6 +274,18 @@ app.use(reqCaching(300)); // Additional caching layer
 // Apply request timeouts
 app.use(requestTimeout(20000)); // 20 seconds default timeout
 
+// Apply query optimization (CRITICAL for database performance)
+app.use(queryOptimization);
+app.use(queryCaching);
+app.use(cacheQueryResults);
+
+// Apply horizontal scaling middleware (CRITICAL for millions of users)
+app.use(healthCheckMiddleware);
+app.use(stickySessionMiddleware);
+app.use(sessionMiddleware);
+app.use(sessionSyncMiddleware);
+app.use(autoScalingMiddleware);
+
 // Apply burst protection (most restrictive)
 app.use(burstProtection);
 
@@ -363,6 +393,64 @@ app.get(`${apiPrefix}/analytics/cost-optimization`, authenticateToken, async (re
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve cost optimization metrics'
+    });
+  }
+});
+
+// Query optimization analytics endpoint
+app.get(`${apiPrefix}/analytics/query-optimization`, authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    const queryStats = getQueryStatistics();
+    
+    res.json({
+      success: true,
+      data: {
+        queryOptimization: queryStats,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Error getting query optimization metrics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve query optimization metrics'
+    });
+  }
+});
+
+// Horizontal scaling analytics endpoint
+app.get(`${apiPrefix}/analytics/horizontal-scaling`, authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    const scalingStats = getScalingStatistics();
+    
+    res.json({
+      success: true,
+      data: {
+        horizontalScaling: scalingStats,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Error getting horizontal scaling metrics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve horizontal scaling metrics'
     });
   }
 });
