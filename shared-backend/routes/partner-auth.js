@@ -589,9 +589,13 @@ router.post('/auth/partner-login', validatePartnerLogin, async (req, res) => {
 
     // Reset login attempts and update last login
     await PartnerUser.findByIdAndUpdate(partner._id, {
-      loginAttempts: 0,
-      lockUntil: undefined,
-      lastLogin: new Date()
+      $set: {
+        loginAttempts: 0,
+        lastLogin: new Date()
+      },
+      $unset: {
+        lockUntil: 1
+      }
     });
 
     // Generate token
