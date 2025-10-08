@@ -88,7 +88,44 @@ app.use(cors(corsOptions));
 
 // Apply basic middleware only
 app.use(compression());
-app.use(express.json());
+
+// Enhanced JSON parsing with error handling
+app.use(express.json({
+  limit: '10mb',
+  verify: (req, res, buf, encoding) => {
+    try {
+      // Check if JSON is already parsed
+      if (req.body && typeof req.body === 'object') {
+        return;
+      }
+      
+      // Try to parse the buffer
+      const body = buf.toString(encoding);
+      
+      // Check for double-encoded JSON
+      if (body.startsWith('"') && body.endsWith('"')) {
+        try {
+          const decoded = JSON.parse(body);
+          if (typeof decoded === 'string') {
+            // This is double-encoded, decode it
+            req.body = JSON.parse(decoded);
+            return;
+          }
+        } catch (e) {
+          // Not double-encoded, continue normally
+        }
+      }
+      
+      // Normal JSON parsing
+      JSON.parse(body);
+    } catch (error) {
+      // Log the error but don't throw it
+      console.error('JSON parsing error:', error.message);
+      console.error('Raw body:', buf.toString(encoding));
+    }
+  }
+}));
+
 app.use(express.urlencoded({ extended: true }));
 
 // Apply basic rate limiting
@@ -217,6 +254,17 @@ app.use((req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   logger.error('Server error:', err);
+  
+  // Handle JSON parsing errors specifically
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({
+      success: false,
+      error: 'INVALID_JSON',
+      message: 'Invalid JSON format in request body',
+      timestamp: new Date().toISOString()
+    });
+  }
+  
   res.status(500).json({
     success: false,
     error: 'INTERNAL_SERVER_ERROR',
