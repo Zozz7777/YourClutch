@@ -895,5 +895,781 @@ class ApiService @Inject constructor() {
             expiresAt = json.getString("expiresAt")
         )
     }
+
+    // ============================================================================
+    // APPOINTMENTS API METHODS
+    // ============================================================================
+
+    suspend fun getAppointments(
+        status: String? = null,
+        date: String? = null,
+        page: Int = 1,
+        limit: Int = 20,
+        token: String
+    ): Result<Pair<List<Appointment>, Pagination>> = withContext(Dispatchers.IO) {
+        try {
+            val urlBuilder = "$baseUrl/partners/appointments".toHttpUrl().newBuilder()
+                .addQueryParameter("page", page.toString())
+                .addQueryParameter("limit", limit.toString())
+            
+            status?.let { urlBuilder.addQueryParameter("status", it) }
+            date?.let { urlBuilder.addQueryParameter("date", it) }
+            
+            val request = Request.Builder()
+                .url(urlBuilder.build())
+                .get()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val json = JSONObject(responseBody)
+                    if (json.getBoolean("success")) {
+                        val data = json.getJSONObject("data")
+                        val appointmentsArray = data.getJSONArray("appointments")
+                        val paginationJson = data.getJSONObject("pagination")
+                        
+                        val appointments = mutableListOf<Appointment>()
+                        for (i in 0 until appointmentsArray.length()) {
+                            val appointmentJson = appointmentsArray.getJSONObject(i)
+                            appointments.add(parseAppointmentFromJson(appointmentJson))
+                        }
+                        
+                        val pagination = Pagination(
+                            page = paginationJson.getInt("page"),
+                            limit = paginationJson.getInt("limit"),
+                            total = paginationJson.getInt("total"),
+                            pages = paginationJson.getInt("pages")
+                        )
+                        
+                        Result.success(Pair(appointments, pagination))
+                    } else {
+                        Result.failure(Exception("Failed to load appointments: ${json.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to load appointments: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getAppointmentDetails(appointmentId: String, token: String): Result<Appointment> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$baseUrl/partners/appointments/$appointmentId")
+                .get()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val json = JSONObject(responseBody)
+                    if (json.getBoolean("success")) {
+                        val data = json.getJSONObject("data")
+                        Result.success(parseAppointmentFromJson(data))
+                    } else {
+                        Result.failure(Exception("Failed to load appointment: ${json.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to load appointment: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun createAppointment(appointmentRequest: AppointmentRequest, token: String): Result<Appointment> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("customerName", appointmentRequest.customerName)
+                put("customerPhone", appointmentRequest.customerPhone)
+                put("customerEmail", appointmentRequest.customerEmail)
+                put("serviceName", appointmentRequest.serviceName)
+                put("description", appointmentRequest.description)
+                put("scheduledDate", appointmentRequest.scheduledDate.toISOString())
+                put("estimatedTime", appointmentRequest.estimatedTime)
+                put("vehicleMake", appointmentRequest.vehicleMake)
+                put("vehicleModel", appointmentRequest.vehicleModel)
+                put("vehicleYear", appointmentRequest.vehicleYear)
+                put("vehiclePlate", appointmentRequest.vehiclePlate)
+                put("priority", appointmentRequest.priority.name.lowercase())
+            }
+            
+            val requestBody = json.toString().toRequestBody("application/json".toMediaType())
+            val request = Request.Builder()
+                .url("$baseUrl/partners/appointments")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val jsonResponse = JSONObject(responseBody)
+                    if (jsonResponse.getBoolean("success")) {
+                        val data = jsonResponse.getJSONObject("data")
+                        Result.success(parseAppointmentFromJson(data))
+                    } else {
+                        Result.failure(Exception("Failed to create appointment: ${jsonResponse.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to create appointment: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateAppointmentStatus(
+        appointmentId: String,
+        status: AppointmentStatus,
+        notes: String?,
+        estimatedTime: String?,
+        token: String
+    ): Result<Appointment> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("status", status.name.lowercase())
+                notes?.let { put("notes", it) }
+                estimatedTime?.let { put("estimatedTime", it) }
+            }
+            
+            val requestBody = json.toString().toRequestBody("application/json".toMediaType())
+            val request = Request.Builder()
+                .url("$baseUrl/partners/appointments/$appointmentId/status")
+                .patch(requestBody)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val jsonResponse = JSONObject(responseBody)
+                    if (jsonResponse.getBoolean("success")) {
+                        val data = jsonResponse.getJSONObject("data")
+                        Result.success(parseAppointmentFromJson(data))
+                    } else {
+                        Result.failure(Exception("Failed to update appointment: ${jsonResponse.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to update appointment: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // ============================================================================
+    // QUOTATIONS API METHODS
+    // ============================================================================
+
+    suspend fun getQuotations(
+        status: String? = null,
+        page: Int = 1,
+        limit: Int = 20,
+        token: String
+    ): Result<QuotationResponse> = withContext(Dispatchers.IO) {
+        try {
+            val urlBuilder = "$baseUrl/partners/quotations".toHttpUrl().newBuilder()
+                .addQueryParameter("page", page.toString())
+                .addQueryParameter("limit", limit.toString())
+            
+            status?.let { urlBuilder.addQueryParameter("status", it) }
+            
+            val request = Request.Builder()
+                .url(urlBuilder.build())
+                .get()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val json = JSONObject(responseBody)
+                    if (json.getBoolean("success")) {
+                        val data = json.getJSONObject("data")
+                        val quotationsArray = data.getJSONArray("quotations")
+                        val paginationJson = data.getJSONObject("pagination")
+                        
+                        val quotations = mutableListOf<Quotation>()
+                        for (i in 0 until quotationsArray.length()) {
+                            val quotationJson = quotationsArray.getJSONObject(i)
+                            quotations.add(parseQuotationFromJson(quotationJson))
+                        }
+                        
+                        val pagination = Pagination(
+                            page = paginationJson.getInt("page"),
+                            limit = paginationJson.getInt("limit"),
+                            total = paginationJson.getInt("total"),
+                            pages = paginationJson.getInt("pages")
+                        )
+                        
+                        Result.success(QuotationResponse(quotations, pagination))
+                    } else {
+                        Result.failure(Exception("Failed to load quotations: ${json.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to load quotations: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun createQuotation(quotationRequest: QuotationRequest, token: String): Result<Quotation> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("customerName", quotationRequest.customerName)
+                put("customerPhone", quotationRequest.customerPhone)
+                put("customerEmail", quotationRequest.customerEmail)
+                put("serviceName", quotationRequest.serviceName)
+                put("description", quotationRequest.description)
+                put("total", quotationRequest.total)
+                put("validUntil", quotationRequest.validUntil?.toISOString())
+                put("items", quotationRequest.items.map { item ->
+                    JSONObject().apply {
+                        put("name", item.name)
+                        put("description", item.description)
+                        put("quantity", item.quantity)
+                        put("unitPrice", item.unitPrice)
+                        put("total", item.total)
+                    }
+                })
+            }
+            
+            val requestBody = json.toString().toRequestBody("application/json".toMediaType())
+            val request = Request.Builder()
+                .url("$baseUrl/partners/quotations")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val jsonResponse = JSONObject(responseBody)
+                    if (jsonResponse.getBoolean("success")) {
+                        val data = jsonResponse.getJSONObject("data")
+                        Result.success(parseQuotationFromJson(data))
+                    } else {
+                        Result.failure(Exception("Failed to create quotation: ${jsonResponse.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to create quotation: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // ============================================================================
+    // INVENTORY API METHODS
+    // ============================================================================
+
+    suspend fun getInventory(
+        category: String? = null,
+        status: String? = null,
+        search: String? = null,
+        page: Int = 1,
+        limit: Int = 20,
+        token: String
+    ): Result<InventoryResponse> = withContext(Dispatchers.IO) {
+        try {
+            val urlBuilder = "$baseUrl/partners/inventory".toHttpUrl().newBuilder()
+                .addQueryParameter("page", page.toString())
+                .addQueryParameter("limit", limit.toString())
+            
+            category?.let { urlBuilder.addQueryParameter("category", it) }
+            status?.let { urlBuilder.addQueryParameter("status", it) }
+            search?.let { urlBuilder.addQueryParameter("search", it) }
+            
+            val request = Request.Builder()
+                .url(urlBuilder.build())
+                .get()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val json = JSONObject(responseBody)
+                    if (json.getBoolean("success")) {
+                        val data = json.getJSONObject("data")
+                        val inventoryArray = data.getJSONArray("inventory")
+                        val paginationJson = data.getJSONObject("pagination")
+                        
+                        val inventory = mutableListOf<InventoryItem>()
+                        for (i in 0 until inventoryArray.length()) {
+                            val itemJson = inventoryArray.getJSONObject(i)
+                            inventory.add(parseInventoryItemFromJson(itemJson))
+                        }
+                        
+                        val pagination = Pagination(
+                            page = paginationJson.getInt("page"),
+                            limit = paginationJson.getInt("limit"),
+                            total = paginationJson.getInt("total"),
+                            pages = paginationJson.getInt("pages")
+                        )
+                        
+                        Result.success(InventoryResponse(inventory, pagination))
+                    } else {
+                        Result.failure(Exception("Failed to load inventory: ${json.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to load inventory: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun addInventoryItem(inventoryRequest: InventoryRequest, token: String): Result<InventoryItem> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("name", inventoryRequest.name)
+                put("sku", inventoryRequest.sku)
+                put("description", inventoryRequest.description)
+                put("category", inventoryRequest.category)
+                put("price", inventoryRequest.price)
+                put("cost", inventoryRequest.cost)
+                put("stock", inventoryRequest.stock)
+                put("minStock", inventoryRequest.minStock)
+                put("maxStock", inventoryRequest.maxStock)
+                put("image", inventoryRequest.image)
+            }
+            
+            val requestBody = json.toString().toRequestBody("application/json".toMediaType())
+            val request = Request.Builder()
+                .url("$baseUrl/partners/inventory")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val jsonResponse = JSONObject(responseBody)
+                    if (jsonResponse.getBoolean("success")) {
+                        val data = jsonResponse.getJSONObject("data")
+                        Result.success(parseInventoryItemFromJson(data))
+                    } else {
+                        Result.failure(Exception("Failed to add inventory item: ${jsonResponse.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to add inventory item: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateInventoryItem(
+        itemId: String,
+        update: InventoryUpdate,
+        token: String
+    ): Result<InventoryItem> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                update.name?.let { put("name", it) }
+                update.description?.let { put("description", it) }
+                update.category?.let { put("category", it) }
+                update.price?.let { put("price", it) }
+                update.cost?.let { put("cost", it) }
+                update.stock?.let { put("stock", it) }
+                update.minStock?.let { put("minStock", it) }
+                update.maxStock?.let { put("maxStock", it) }
+                update.status?.let { put("status", it.name.lowercase()) }
+                update.image?.let { put("image", it) }
+            }
+            
+            val requestBody = json.toString().toRequestBody("application/json".toMediaType())
+            val request = Request.Builder()
+                .url("$baseUrl/partners/inventory/$itemId")
+                .patch(requestBody)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val jsonResponse = JSONObject(responseBody)
+                    if (jsonResponse.getBoolean("success")) {
+                        val data = jsonResponse.getJSONObject("data")
+                        Result.success(parseInventoryItemFromJson(data))
+                    } else {
+                        Result.failure(Exception("Failed to update inventory item: ${jsonResponse.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to update inventory item: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // ============================================================================
+    // STORE PROFILE API METHODS
+    // ============================================================================
+
+    suspend fun getStoreProfile(token: String): Result<StoreProfile> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$baseUrl/partners/profile")
+                .get()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val json = JSONObject(responseBody)
+                    if (json.getBoolean("success")) {
+                        val data = json.getJSONObject("data")
+                        Result.success(parseStoreProfileFromJson(data))
+                    } else {
+                        Result.failure(Exception("Failed to load store profile: ${json.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to load store profile: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateStoreProfile(update: StoreProfileUpdate, token: String): Result<StoreProfile> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                update.businessName?.let { put("businessName", it) }
+                update.ownerName?.let { put("ownerName", it) }
+                update.phone?.let { put("phone", it) }
+                update.email?.let { put("email", it) }
+                update.businessAddress?.let { address ->
+                    put("businessAddress", JSONObject().apply {
+                        put("street", address.street)
+                        put("city", address.city)
+                        put("state", address.state)
+                        put("zipCode", address.zipCode)
+                        put("country", address.country)
+                        address.coordinates?.let { coords ->
+                            put("coordinates", JSONObject().apply {
+                                put("latitude", coords.latitude)
+                                put("longitude", coords.longitude)
+                            })
+                        }
+                    })
+                }
+                update.workingHours?.let { hours ->
+                    put("workingHours", JSONObject().apply {
+                        put("monday", parseDayHoursToJson(hours.monday))
+                        put("tuesday", parseDayHoursToJson(hours.tuesday))
+                        put("wednesday", parseDayHoursToJson(hours.wednesday))
+                        put("thursday", parseDayHoursToJson(hours.thursday))
+                        put("friday", parseDayHoursToJson(hours.friday))
+                        put("saturday", parseDayHoursToJson(hours.saturday))
+                        put("sunday", parseDayHoursToJson(hours.sunday))
+                    })
+                }
+                update.businessSettings?.let { settings ->
+                    put("businessSettings", JSONObject().apply {
+                        put("currency", settings.currency)
+                        put("timezone", settings.timezone)
+                        put("language", settings.language)
+                        put("notificationPreferences", parseNotificationPreferencesToJson(settings.notificationPreferences))
+                        settings.posSettings?.let { pos ->
+                            put("posSettings", JSONObject().apply {
+                                put("isConnected", pos.isConnected)
+                                put("systemName", pos.systemName)
+                                put("lastSync", pos.lastSync?.toISOString())
+                                put("autoSync", pos.autoSync)
+                            })
+                        }
+                    })
+                }
+                update.services?.let { put("services", JSONArray().apply { it.forEach { service -> put(service) } }) }
+                update.isConnectedToPOS?.let { put("isConnectedToPOS", it) }
+            }
+            
+            val requestBody = json.toString().toRequestBody("application/json".toMediaType())
+            val request = Request.Builder()
+                .url("$baseUrl/partners/profile")
+                .patch(requestBody)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    val jsonResponse = JSONObject(responseBody)
+                    if (jsonResponse.getBoolean("success")) {
+                        val data = jsonResponse.getJSONObject("data")
+                        Result.success(parseStoreProfileFromJson(data))
+                    } else {
+                        Result.failure(Exception("Failed to update store profile: ${jsonResponse.getString("message")}"))
+                    }
+                } else {
+                    Result.failure(Exception("Empty response from server"))
+                }
+            } else {
+                Result.failure(Exception("Failed to update store profile: HTTP ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // ============================================================================
+    // PARSING HELPER METHODS
+    // ============================================================================
+
+    private fun parseAppointmentFromJson(json: JSONObject): Appointment {
+        return Appointment(
+            id = json.getString("id"),
+            appointmentId = json.getString("appointmentId"),
+            customer = parseCustomerFromJson(json.getJSONObject("customer")),
+            vehicle = parseVehicleFromJson(json.getJSONObject("vehicle")),
+            service = json.getString("service"),
+            description = json.optString("description").takeIf { it.isNotEmpty() },
+            scheduledDate = java.util.Date(json.getLong("scheduledDate")),
+            estimatedTime = json.optString("estimatedTime").takeIf { it.isNotEmpty() },
+            status = AppointmentStatus.valueOf(json.getString("status").uppercase()),
+            priority = Priority.valueOf(json.getString("priority").uppercase()),
+            notes = json.optString("notes").takeIf { it.isNotEmpty() },
+            createdAt = java.util.Date(json.getLong("createdAt")),
+            updatedAt = json.optLong("updatedAt").takeIf { it > 0 }?.let { java.util.Date(it) },
+            isUrgent = json.optBoolean("isUrgent", false)
+        )
+    }
+
+    private fun parseCustomerFromJson(json: JSONObject): Customer {
+        return Customer(
+            name = json.getString("name"),
+            phone = json.getString("phone"),
+            email = json.optString("email").takeIf { it.isNotEmpty() }
+        )
+    }
+
+    private fun parseVehicleFromJson(json: JSONObject): Vehicle {
+        return Vehicle(
+            make = json.optString("make").takeIf { it.isNotEmpty() },
+            model = json.optString("model").takeIf { it.isNotEmpty() },
+            year = json.optInt("year").takeIf { it > 0 },
+            plate = json.optString("plate").takeIf { it.isNotEmpty() }
+        )
+    }
+
+    private fun parseQuotationFromJson(json: JSONObject): Quotation {
+        return Quotation(
+            id = json.getString("id"),
+            quotationId = json.getString("quotationId"),
+            customer = parseCustomerFromJson(json.getJSONObject("customer")),
+            service = json.getString("service"),
+            description = json.optString("description").takeIf { it.isNotEmpty() },
+            total = json.getDouble("total"),
+            status = QuotationStatus.valueOf(json.getString("status").uppercase()),
+            validUntil = java.util.Date(json.getLong("validUntil")),
+            items = json.optJSONArray("items")?.let { array ->
+                (0 until array.length()).map { i ->
+                    val itemJson = array.getJSONObject(i)
+                    QuotationItem(
+                        name = itemJson.getString("name"),
+                        description = itemJson.optString("description").takeIf { it.isNotEmpty() },
+                        quantity = itemJson.getInt("quantity"),
+                        unitPrice = itemJson.getDouble("unitPrice"),
+                        total = itemJson.getDouble("total")
+                    )
+                }
+            } ?: emptyList(),
+            createdAt = java.util.Date(json.getLong("createdAt")),
+            isExpired = json.optBoolean("isExpired", false)
+        )
+    }
+
+    private fun parseInventoryItemFromJson(json: JSONObject): InventoryItem {
+        return InventoryItem(
+            id = json.getString("id"),
+            sku = json.getString("sku"),
+            name = json.getString("name"),
+            description = json.optString("description").takeIf { it.isNotEmpty() },
+            category = json.getString("category"),
+            price = json.getDouble("price"),
+            cost = json.getDouble("cost"),
+            stock = json.getInt("stock"),
+            minStock = json.getInt("minStock"),
+            maxStock = json.optInt("maxStock").takeIf { it > 0 },
+            status = ItemStatus.valueOf(json.getString("status").uppercase()),
+            isLowStock = json.optBoolean("isLowStock", false),
+            isOutOfStock = json.optBoolean("isOutOfStock", false),
+            lastUpdated = java.util.Date(json.getLong("lastUpdated")),
+            image = json.optString("image").takeIf { it.isNotEmpty() }
+        )
+    }
+
+    private fun parseStoreProfileFromJson(json: JSONObject): StoreProfile {
+        return StoreProfile(
+            businessName = json.getString("businessName"),
+            ownerName = json.getString("ownerName"),
+            email = json.getString("email"),
+            phone = json.getString("phone"),
+            partnerType = PartnerType.valueOf(json.getString("partnerType").uppercase()),
+            businessAddress = parseBusinessAddressFromJson(json.getJSONObject("businessAddress")),
+            workingHours = parseWorkingHoursFromJson(json.getJSONObject("workingHours")),
+            businessSettings = parseBusinessSettingsFromJson(json.getJSONObject("businessSettings")),
+            services = json.optJSONArray("services")?.let { array ->
+                (0 until array.length()).map { array.getString(it) }
+            } ?: emptyList(),
+            isConnectedToPOS = json.optBoolean("isConnectedToPOS", false),
+            isVerified = json.optBoolean("isVerified", false),
+            status = PartnerStatus.valueOf(json.getString("status").uppercase()),
+            createdAt = java.util.Date(json.getLong("createdAt"))
+        )
+    }
+
+    private fun parseBusinessAddressFromJson(json: JSONObject): BusinessAddress {
+        return BusinessAddress(
+            street = json.getString("street"),
+            city = json.getString("city"),
+            state = json.getString("state"),
+            zipCode = json.getString("zipCode"),
+            country = json.getString("country"),
+            coordinates = json.optJSONObject("coordinates")?.let { coords ->
+                Coordinates(
+                    latitude = coords.getDouble("latitude"),
+                    longitude = coords.getDouble("longitude")
+                )
+            }
+        )
+    }
+
+    private fun parseWorkingHoursFromJson(json: JSONObject): WorkingHours {
+        return WorkingHours(
+            monday = parseDayHoursFromJson(json.getJSONObject("monday")),
+            tuesday = parseDayHoursFromJson(json.getJSONObject("tuesday")),
+            wednesday = parseDayHoursFromJson(json.getJSONObject("wednesday")),
+            thursday = parseDayHoursFromJson(json.getJSONObject("thursday")),
+            friday = parseDayHoursFromJson(json.getJSONObject("friday")),
+            saturday = parseDayHoursFromJson(json.getJSONObject("saturday")),
+            sunday = parseDayHoursFromJson(json.getJSONObject("sunday"))
+        )
+    }
+
+    private fun parseDayHoursFromJson(json: JSONObject): DayHours {
+        return DayHours(
+            isOpen = json.getBoolean("isOpen"),
+            openTime = json.optString("openTime").takeIf { it.isNotEmpty() },
+            closeTime = json.optString("closeTime").takeIf { it.isNotEmpty() },
+            breakStart = json.optString("breakStart").takeIf { it.isNotEmpty() },
+            breakEnd = json.optString("breakEnd").takeIf { it.isNotEmpty() }
+        )
+    }
+
+    private fun parseBusinessSettingsFromJson(json: JSONObject): BusinessSettings {
+        return BusinessSettings(
+            currency = json.getString("currency"),
+            timezone = json.getString("timezone"),
+            language = json.getString("language"),
+            notificationPreferences = parseNotificationPreferencesFromJson(json.getJSONObject("notificationPreferences")),
+            posSettings = json.optJSONObject("posSettings")?.let { pos ->
+                POSSettings(
+                    isConnected = pos.getBoolean("isConnected"),
+                    systemName = pos.optString("systemName").takeIf { it.isNotEmpty() },
+                    lastSync = pos.optString("lastSync").takeIf { it.isNotEmpty() }?.let { java.util.Date(it) },
+                    autoSync = pos.optBoolean("autoSync", false)
+                )
+            }
+        )
+    }
+
+    private fun parseNotificationPreferencesFromJson(json: JSONObject): NotificationPreferences {
+        return NotificationPreferences(
+            pushNotifications = json.getBoolean("pushNotifications"),
+            emailNotifications = json.getBoolean("emailNotifications"),
+            smsNotifications = json.getBoolean("smsNotifications"),
+            orderUpdates = json.getBoolean("orderUpdates"),
+            paymentUpdates = json.getBoolean("paymentUpdates"),
+            systemUpdates = json.getBoolean("systemUpdates"),
+            quietHours = json.optJSONObject("quietHours")?.let { qh ->
+                QuietHours(
+                    startTime = qh.getString("startTime"),
+                    endTime = qh.getString("endTime"),
+                    days = qh.optJSONArray("days")?.let { array ->
+                        (0 until array.length()).map { array.getString(it) }
+                    } ?: emptyList()
+                )
+            }
+        )
+    }
+
+    private fun parseDayHoursToJson(dayHours: DayHours): JSONObject {
+        return JSONObject().apply {
+            put("isOpen", dayHours.isOpen)
+            dayHours.openTime?.let { put("openTime", it) }
+            dayHours.closeTime?.let { put("closeTime", it) }
+            dayHours.breakStart?.let { put("breakStart", it) }
+            dayHours.breakEnd?.let { put("breakEnd", it) }
+        }
+    }
+
+    private fun parseNotificationPreferencesToJson(preferences: NotificationPreferences): JSONObject {
+        return JSONObject().apply {
+            put("pushNotifications", preferences.pushNotifications)
+            put("emailNotifications", preferences.emailNotifications)
+            put("smsNotifications", preferences.smsNotifications)
+            put("orderUpdates", preferences.orderUpdates)
+            put("paymentUpdates", preferences.paymentUpdates)
+            put("systemUpdates", preferences.systemUpdates)
+            preferences.quietHours?.let { qh ->
+                put("quietHours", JSONObject().apply {
+                    put("startTime", qh.startTime)
+                    put("endTime", qh.endTime)
+                    put("days", JSONArray().apply { qh.days.forEach { put(it) } })
+                })
+            }
+        }
+    }
     
 }
