@@ -97,30 +97,7 @@ app.use(compression());
 // Enhanced JSON parsing with error handling
 app.use(express.json({
   limit: '10mb',
-  strict: false, // Allow non-strict JSON
-  verify: (req, res, buf, encoding) => {
-    try {
-      const body = buf.toString(encoding);
-      
-      // Skip empty bodies
-      if (!body || body.trim() === '') {
-        return;
-      }
-      
-      // Check for malformed JSON starting with just {
-      if (body.trim() === '{\\' || body.trim() === '{\\') {
-        console.error('Malformed JSON detected:', body);
-        return;
-      }
-      
-      // Try to parse normally
-      JSON.parse(body);
-    } catch (error) {
-      console.error('JSON parsing error:', error.message);
-      console.error('Raw body:', buf.toString(encoding));
-      // Don't throw the error, let it be handled by the error handler
-    }
-  }
+  strict: false // Allow non-strict JSON
 }));
 
 app.use(express.urlencoded({ extended: true }));

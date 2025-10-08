@@ -1,10 +1,10 @@
 package com.clutch.partners.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.clutch.partners.data.model.KYCDocument
 import com.clutch.partners.data.model.User
 import com.clutch.partners.data.repository.AuthRepository
+import com.clutch.partners.utils.ErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,8 +14,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
-) : ViewModel() {
+    private val authRepository: AuthRepository,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
     
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
@@ -26,20 +27,22 @@ class AuthViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
             println("🔐 AuthViewModel: Calling authRepository.testConnection")
-            authRepository.testConnection()
-                .onSuccess { 
-                    println("🔐 AuthViewModel: Connection test successful")
-                    _uiState.value = _uiState.value.copy(isLoading = false)
-                    onResult(true)
-                }
-                .onFailure { error ->
-                    println("🔐 AuthViewModel: Connection test failed: ${error.message}")
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = error.message
-                    )
-                    onResult(false)
-                }
+            val result = executeWithRetry {
+                authRepository.testConnection().getOrThrow()
+            }
+            
+            if (result.isSuccess) {
+                println("🔐 AuthViewModel: Connection test successful")
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                onResult(true)
+            } else {
+                println("🔐 AuthViewModel: Connection test failed: ${result.exceptionOrNull()?.message}")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = result.exceptionOrNull()?.message
+                )
+                onResult(false)
+            }
         }
     }
     
@@ -49,30 +52,23 @@ class AuthViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
             println("🔐 AuthViewModel: Calling authRepository.login")
-            try {
-                authRepository.login(email, password)
-                    .onSuccess { user ->
-                        println("🔐 AuthViewModel: Login successful for user: ${user.email}")
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            user = user,
-                            isAuthenticated = true
-                        )
-                        onResult(true)
-                    }
-                    .onFailure { error ->
-                        println("🔐 AuthViewModel: Login failed with error: ${error.message}")
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            error = error.message
-                        )
-                        onResult(false)
-                    }
-            } catch (e: Exception) {
-                println("🔐 AuthViewModel: Exception during login: ${e.message}")
+            val result = executeWithRetry {
+                authRepository.login(email, password).getOrThrow()
+            }
+            
+            if (result.isSuccess) {
+                println("🔐 AuthViewModel: Login successful for user: ${result.getOrNull()?.email}")
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = e.message
+                    user = result.getOrNull(),
+                    isAuthenticated = true
+                )
+                onResult(true)
+            } else {
+                println("🔐 AuthViewModel: Login failed with error: ${result.exceptionOrNull()?.message}")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = result.exceptionOrNull()?.message
                 )
                 onResult(false)
             }

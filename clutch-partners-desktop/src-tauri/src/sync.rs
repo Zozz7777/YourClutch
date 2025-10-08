@@ -14,7 +14,7 @@ pub struct SyncStatus {
     pub sync_in_progress: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SyncOperation {
     pub id: String,
     pub operation_type: String,

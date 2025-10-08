@@ -225,6 +225,70 @@ fun SettingsScreen(
 }
 
 @Composable
+fun ProfileHeader(
+    businessName: String,
+    email: String,
+    onEditProfile: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Profile Avatar
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Business,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = businessName,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = email,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                )
+            }
+            
+            IconButton(onClick = onEditProfile) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Profile",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun SettingsSection(
     title: String,
     content: @Composable () -> Unit
@@ -238,7 +302,6 @@ fun SettingsSection(
             modifier = Modifier.padding(vertical = 8.dp)
         )
         content()
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -295,4 +358,210 @@ fun SettingItem(
             )
         }
     }
+}
+
+@Composable
+fun LanguageDialog(
+    onDismiss: () -> Unit,
+    onLanguageSelected: (String) -> Unit
+) {
+    val languages = listOf("English", "العربية", "Français", "Español")
+    var selectedLanguage by remember { mutableStateOf("English") }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Select Language") },
+        text = {
+            Column {
+                languages.forEach { language ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedLanguage == language,
+                            onClick = { selectedLanguage = language }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = language)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onLanguageSelected(selectedLanguage)
+                    onDismiss()
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun ThemeDialog(
+    onDismiss: () -> Unit,
+    onThemeSelected: (String) -> Unit
+) {
+    val themes = listOf("System", "Light", "Dark")
+    var selectedTheme by remember { mutableStateOf("System") }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Select Theme") },
+        text = {
+            Column {
+                themes.forEach { theme ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedTheme == theme,
+                            onClick = { selectedTheme = theme }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = theme)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onThemeSelected(selectedTheme)
+                    onDismiss()
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun NotificationSettingsDialog(
+    onDismiss: () -> Unit
+) {
+    var pushNotifications by remember { mutableStateOf(true) }
+    var emailNotifications by remember { mutableStateOf(true) }
+    var orderUpdates by remember { mutableStateOf(true) }
+    var appointmentReminders by remember { mutableStateOf(true) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Notification Settings") },
+        text = {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Switch(
+                        checked = pushNotifications,
+                        onCheckedChange = { pushNotifications = it }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Push Notifications")
+                }
+                
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Switch(
+                        checked = emailNotifications,
+                        onCheckedChange = { emailNotifications = it }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Email Notifications")
+                }
+                
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Switch(
+                        checked = orderUpdates,
+                        onCheckedChange = { orderUpdates = it }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Order Updates")
+                }
+                
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Switch(
+                        checked = appointmentReminders,
+                        onCheckedChange = { appointmentReminders = it }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Appointment Reminders")
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun AboutDialog(
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("About Clutch Partners") },
+        text = {
+            Column {
+                Text("Version: 1.0.0")
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Build: 2024.01.15")
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("© 2024 Clutch. All rights reserved.")
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("A comprehensive platform for managing your automotive business.")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("OK")
+            }
+        }
+    )
 }
