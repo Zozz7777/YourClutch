@@ -602,7 +602,7 @@ router.post('/auth/partner-login', validatePartnerLogin, async (req, res) => {
     const token = generateToken(partner.partnerId, deviceId);
 
     // Remove password from response
-    const partnerData = partner.toObject();
+    const partnerData = partner.toObject ? partner.toObject() : partner;
     delete partnerData.password;
     delete partnerData.verificationCode;
 
@@ -681,7 +681,7 @@ router.post('/auth/partner-otp', validateOTP, async (req, res) => {
     const token = generateToken(partner.partnerId, deviceId);
 
     // Remove password from response
-    const partnerData = partner.toObject();
+    const partnerData = partner.toObject ? partner.toObject() : partner;
     delete partnerData.password;
     delete partnerData.verificationCode;
 

@@ -77,7 +77,7 @@ const rbacRoutes = require('./routes/rbac');
 const app = express();
 
 // Trust proxy for rate limiting (required for Render deployment)
-app.set('trust proxy', true);
+app.set('trust proxy', 1); // Trust first proxy
 
 // CORS configuration
 const corsOptions = {
