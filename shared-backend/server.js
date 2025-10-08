@@ -76,6 +76,9 @@ const rbacRoutes = require('./routes/rbac');
 
 const app = express();
 
+// Trust proxy for rate limiting (required for Render deployment)
+app.set('trust proxy', true);
+
 // CORS configuration
 const corsOptions = {
   origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
@@ -89,39 +92,55 @@ app.use(cors(corsOptions));
 // Apply basic middleware only
 app.use(compression());
 
+// Raw body parser to catch malformed JSON before express.json()
+app.use((req, res, next) => {
+  if (req.get('Content-Type') === 'application/json') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      // Check for malformed JSON
+      if (body.trim() === '{\\' || body.trim() === '{\\') {
+        return res.status(400).json({
+          success: false,
+          error: 'MALFORMED_JSON',
+          message: 'Invalid JSON format in request body',
+          timestamp: new Date().toISOString()
+        });
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+});
+
 // Enhanced JSON parsing with error handling
 app.use(express.json({
   limit: '10mb',
+  strict: false, // Allow non-strict JSON
   verify: (req, res, buf, encoding) => {
     try {
-      // Check if JSON is already parsed
-      if (req.body && typeof req.body === 'object') {
+      const body = buf.toString(encoding);
+      
+      // Skip empty bodies
+      if (!body || body.trim() === '') {
         return;
       }
       
-      // Try to parse the buffer
-      const body = buf.toString(encoding);
-      
-      // Check for double-encoded JSON
-      if (body.startsWith('"') && body.endsWith('"')) {
-        try {
-          const decoded = JSON.parse(body);
-          if (typeof decoded === 'string') {
-            // This is double-encoded, decode it
-            req.body = JSON.parse(decoded);
-            return;
-          }
-        } catch (e) {
-          // Not double-encoded, continue normally
-        }
+      // Check for malformed JSON starting with just {
+      if (body.trim() === '{\\' || body.trim() === '{\\') {
+        console.error('Malformed JSON detected:', body);
+        return;
       }
       
-      // Normal JSON parsing
+      // Try to parse normally
       JSON.parse(body);
     } catch (error) {
-      // Log the error but don't throw it
       console.error('JSON parsing error:', error.message);
       console.error('Raw body:', buf.toString(encoding));
+      // Don't throw the error, let it be handled by the error handler
     }
   }
 }));

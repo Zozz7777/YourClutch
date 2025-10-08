@@ -1722,4 +1722,708 @@ router.patch('/services', auth, [
   }
 });
 
+// ============================================================================
+// APPOINTMENTS ENDPOINTS
+// ============================================================================
+
+const PartnerAppointment = require('../models/PartnerAppointment');
+const PartnerQuote = require('../models/PartnerQuote');
+const PartnerInventory = require('../models/PartnerInventory');
+
+// @route   GET /partners/appointments
+// @desc    Get partner appointments with filters
+// @access  Private
+router.get('/appointments', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { status, date, serviceType, page = 1, limit = 20 } = req.query;
+
+    const query = { partnerId };
+    
+    if (status) {
+      query.status = status;
+    }
+    
+    if (date) {
+      const startDate = new Date(date);
+      const endDate = new Date(date);
+      endDate.setDate(endDate.getDate() + 1);
+      query.scheduledDate = { $gte: startDate, $lt: endDate };
+    }
+    
+    if (serviceType) {
+      query.serviceType = serviceType;
+    }
+
+    const appointments = await PartnerAppointment.find(query)
+      .sort({ scheduledDate: 1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await PartnerAppointment.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: {
+        appointments,
+        pagination: {
+          current: page,
+          pages: Math.ceil(total / limit),
+          total
+        }
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get appointments error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   GET /partners/appointments/:id
+// @desc    Get appointment details
+// @access  Private
+router.get('/appointments/:id', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const appointmentId = req.params.id;
+
+    const appointment = await PartnerAppointment.findOne({
+      _id: appointmentId,
+      partnerId
+    });
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Appointment not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: appointment
+    });
+
+  } catch (error) {
+    logger.error('Get appointment details error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /partners/appointments
+// @desc    Create new appointment
+// @access  Private
+router.post('/appointments', auth, [
+  body('customerName').notEmpty().withMessage('Customer name is required'),
+  body('customerPhone').notEmpty().withMessage('Customer phone is required'),
+  body('vehicleInfo.make').notEmpty().withMessage('Vehicle make is required'),
+  body('vehicleInfo.model').notEmpty().withMessage('Vehicle model is required'),
+  body('serviceType').isIn(['maintenance', 'repair', 'inspection', 'diagnostic', 'installation', 'consultation']).withMessage('Valid service type is required'),
+  body('description').notEmpty().withMessage('Service description is required'),
+  body('scheduledDate').isISO8601().withMessage('Valid scheduled date is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const appointmentData = {
+      ...req.body,
+      partnerId
+    };
+
+    const appointment = new PartnerAppointment(appointmentData);
+    await appointment.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Appointment created successfully',
+      data: appointment
+    });
+
+  } catch (error) {
+    logger.error('Create appointment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PATCH /partners/appointments/:id/status
+// @desc    Update appointment status
+// @access  Private
+router.patch('/appointments/:id/status', auth, [
+  body('status').isIn(['pending', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show']).withMessage('Valid status is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const appointmentId = req.params.id;
+    const { status } = req.body;
+
+    const appointment = await PartnerAppointment.findOne({
+      _id: appointmentId,
+      partnerId
+    });
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Appointment not found'
+      });
+    }
+
+    appointment.status = status;
+    
+    // Update completion data if status is completed
+    if (status === 'completed') {
+      appointment.completion.completed = true;
+      appointment.completion.completedAt = new Date();
+    }
+
+    await appointment.save();
+
+    res.json({
+      success: true,
+      message: 'Appointment status updated successfully',
+      data: appointment
+    });
+
+  } catch (error) {
+    logger.error('Update appointment status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ============================================================================
+// QUOTATIONS ENDPOINTS
+// ============================================================================
+
+// @route   GET /partners/quotations
+// @desc    Get partner quotations
+// @access  Private
+router.get('/quotations', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { status, quoteType, page = 1, limit = 20 } = req.query;
+
+    const query = { partnerId };
+    
+    if (status) {
+      query.status = status;
+    }
+    
+    if (quoteType) {
+      query.quoteType = quoteType;
+    }
+
+    const quotations = await PartnerQuote.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await PartnerQuote.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: {
+        quotations,
+        pagination: {
+          current: page,
+          pages: Math.ceil(total / limit),
+          total
+        }
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get quotations error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   GET /partners/quotations/:id
+// @desc    Get quotation details
+// @access  Private
+router.get('/quotations/:id', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const quotationId = req.params.id;
+
+    const quotation = await PartnerQuote.findOne({
+      _id: quotationId,
+      partnerId
+    });
+
+    if (!quotation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quotation not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: quotation
+    });
+
+  } catch (error) {
+    logger.error('Get quotation details error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /partners/quotations
+// @desc    Create new quotation
+// @access  Private
+router.post('/quotations', auth, [
+  body('customerName').notEmpty().withMessage('Customer name is required'),
+  body('customerPhone').notEmpty().withMessage('Customer phone is required'),
+  body('vehicleInfo.make').notEmpty().withMessage('Vehicle make is required'),
+  body('vehicleInfo.model').notEmpty().withMessage('Vehicle model is required'),
+  body('quoteType').isIn(['service', 'repair', 'maintenance', 'installation', 'consultation']).withMessage('Valid quote type is required'),
+  body('description').notEmpty().withMessage('Service description is required'),
+  body('items').isArray().withMessage('Items array is required'),
+  body('validUntil').isISO8601().withMessage('Valid until date is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    
+    // Generate quote number
+    const quoteNumber = `Q-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    
+    const quotationData = {
+      ...req.body,
+      partnerId,
+      quoteNumber
+    };
+
+    // Calculate totals
+    const subtotal = quotationData.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    const taxAmount = subtotal * quotationData.taxRate;
+    const total = subtotal + taxAmount;
+
+    quotationData.subtotal = subtotal;
+    quotationData.taxAmount = taxAmount;
+    quotationData.total = total;
+
+    const quotation = new PartnerQuote(quotationData);
+    await quotation.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Quotation created successfully',
+      data: quotation
+    });
+
+  } catch (error) {
+    logger.error('Create quotation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PATCH /partners/quotations/:id
+// @desc    Update quotation
+// @access  Private
+router.patch('/quotations/:id', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const quotationId = req.params.id;
+    const updateData = req.body;
+
+    const quotation = await PartnerQuote.findOne({
+      _id: quotationId,
+      partnerId
+    });
+
+    if (!quotation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quotation not found'
+      });
+    }
+
+    // Only allow updates if status is draft
+    if (quotation.status !== 'draft') {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot update quotation that is not in draft status'
+      });
+    }
+
+    // Update fields
+    Object.keys(updateData).forEach(key => {
+      if (quotation.schema.paths[key]) {
+        quotation[key] = updateData[key];
+      }
+    });
+
+    // Recalculate totals if items changed
+    if (updateData.items) {
+      const subtotal = quotation.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+      const taxAmount = subtotal * quotation.taxRate;
+      const total = subtotal + taxAmount;
+
+      quotation.subtotal = subtotal;
+      quotation.taxAmount = taxAmount;
+      quotation.total = total;
+    }
+
+    await quotation.save();
+
+    res.json({
+      success: true,
+      message: 'Quotation updated successfully',
+      data: quotation
+    });
+
+  } catch (error) {
+    logger.error('Update quotation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /partners/quotations/:id/send
+// @desc    Send quotation to customer
+// @access  Private
+router.post('/quotations/:id/send', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const quotationId = req.params.id;
+
+    const quotation = await PartnerQuote.findOne({
+      _id: quotationId,
+      partnerId
+    });
+
+    if (!quotation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quotation not found'
+      });
+    }
+
+    if (quotation.status !== 'draft') {
+      return res.status(400).json({
+        success: false,
+        message: 'Quotation has already been sent'
+      });
+    }
+
+    quotation.status = 'sent';
+    quotation.sentAt = new Date();
+    await quotation.save();
+
+    // TODO: Send email/SMS to customer with quotation details
+
+    res.json({
+      success: true,
+      message: 'Quotation sent successfully',
+      data: quotation
+    });
+
+  } catch (error) {
+    logger.error('Send quotation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ============================================================================
+// INVENTORY ENDPOINTS
+// ============================================================================
+
+// @route   GET /partners/inventory
+// @desc    Get partner inventory
+// @access  Private
+router.get('/inventory', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { category, status, search, page = 1, limit = 20 } = req.query;
+
+    const query = { partnerId };
+    
+    if (category) {
+      query.category = category;
+    }
+    
+    if (status) {
+      query.status = status;
+    }
+    
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { sku: { $regex: search, $options: 'i' } },
+        { barcode: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const inventory = await PartnerInventory.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await PartnerInventory.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: {
+        inventory,
+        pagination: {
+          current: page,
+          pages: Math.ceil(total / limit),
+          total
+        }
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get inventory error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   GET /partners/inventory/:id
+// @desc    Get inventory item details
+// @access  Private
+router.get('/inventory/:id', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const itemId = req.params.id;
+
+    const item = await PartnerInventory.findOne({
+      _id: itemId,
+      partnerId
+    });
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventory item not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: item
+    });
+
+  } catch (error) {
+    logger.error('Get inventory item error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /partners/inventory
+// @desc    Add new inventory item
+// @access  Private
+router.post('/inventory', auth, [
+  body('name').notEmpty().withMessage('Product name is required'),
+  body('category').notEmpty().withMessage('Category is required'),
+  body('costPrice').isNumeric().withMessage('Cost price must be a number'),
+  body('salePrice').isNumeric().withMessage('Sale price must be a number'),
+  body('quantity').isNumeric().withMessage('Quantity must be a number')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const itemData = {
+      ...req.body,
+      partnerId
+    };
+
+    const item = new PartnerInventory(itemData);
+    await item.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Inventory item added successfully',
+      data: item
+    });
+
+  } catch (error) {
+    logger.error('Add inventory item error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PATCH /partners/inventory/:id
+// @desc    Update inventory item
+// @access  Private
+router.patch('/inventory/:id', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const itemId = req.params.id;
+    const updateData = req.body;
+
+    const item = await PartnerInventory.findOne({
+      _id: itemId,
+      partnerId
+    });
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventory item not found'
+      });
+    }
+
+    // Update fields
+    Object.keys(updateData).forEach(key => {
+      if (item.schema.paths[key]) {
+        item[key] = updateData[key];
+      }
+    });
+
+    await item.save();
+
+    res.json({
+      success: true,
+      message: 'Inventory item updated successfully',
+      data: item
+    });
+
+  } catch (error) {
+    logger.error('Update inventory item error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   DELETE /partners/inventory/:id
+// @desc    Delete inventory item
+// @access  Private
+router.delete('/inventory/:id', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const itemId = req.params.id;
+
+    const item = await PartnerInventory.findOne({
+      _id: itemId,
+      partnerId
+    });
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventory item not found'
+      });
+    }
+
+    await PartnerInventory.findByIdAndDelete(itemId);
+
+    res.json({
+      success: true,
+      message: 'Inventory item deleted successfully'
+    });
+
+  } catch (error) {
+    logger.error('Delete inventory item error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   GET /partners/inventory/stats
+// @desc    Get inventory statistics
+// @access  Private
+router.get('/inventory/stats', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+
+    const stats = await PartnerInventory.getInventoryStats(partnerId);
+
+    res.json({
+      success: true,
+      data: stats[0] || {
+        totalProducts: 0,
+        totalValue: 0,
+        lowStockCount: 0,
+        outOfStockCount: 0,
+        publishedCount: 0,
+        averagePrice: 0,
+        totalQuantity: 0
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get inventory stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 module.exports = router;

@@ -1672,4 +1672,600 @@ class ApiService @Inject constructor() {
         }
     }
     
+    // ============================================================================
+    // APPOINTMENTS ENDPOINTS
+    // ============================================================================
+    
+    suspend fun getAppointments(
+        status: String? = null,
+        date: String? = null,
+        serviceType: String? = null,
+        page: Int = 1,
+        limit: Int = 20
+    ): Result<AppointmentResponse> = withContext(Dispatchers.IO) {
+        try {
+            val urlBuilder = HttpUrl.parse("$baseUrl/partners/appointments")?.newBuilder()
+                ?: throw Exception("Invalid URL")
+            
+            status?.let { urlBuilder.addQueryParameter("status", it) }
+            date?.let { urlBuilder.addQueryParameter("date", it) }
+            serviceType?.let { urlBuilder.addQueryParameter("serviceType", it) }
+            urlBuilder.addQueryParameter("page", page.toString())
+            urlBuilder.addQueryParameter("limit", limit.toString())
+            
+            val request = Request.Builder()
+                .url(urlBuilder.build())
+                .get()
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+                
+                if (json.getBoolean("success")) {
+                    val data = json.getJSONObject("data")
+                    val appointments = data.getJSONArray("appointments").let { array ->
+                        (0 until array.length()).map { i ->
+                            parseAppointmentFromJson(array.getJSONObject(i))
+                        }
+                    }
+                    val pagination = data.getJSONObject("pagination")
+                    
+                    Result.success(AppointmentResponse(
+                        appointments = appointments,
+                        pagination = Pagination(
+                            page = pagination.getInt("current"),
+                            limit = limit,
+                            total = pagination.getInt("total"),
+                            pages = pagination.getInt("pages")
+                        )
+                    ))
+                } else {
+                    Result.failure(Exception(json.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to get appointments: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun getAppointmentDetails(appointmentId: String): Result<Appointment> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$baseUrl/partners/appointments/$appointmentId")
+                .get()
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+                
+                if (json.getBoolean("success")) {
+                    val appointment = parseAppointmentFromJson(json.getJSONObject("data"))
+                    Result.success(appointment)
+                } else {
+                    Result.failure(Exception(json.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to get appointment details: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun createAppointment(appointmentRequest: AppointmentRequest): Result<Appointment> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("customerName", appointmentRequest.customerName)
+                put("customerPhone", appointmentRequest.customerPhone)
+                appointmentRequest.customerEmail?.let { put("customerEmail", it) }
+                put("vehicleInfo", JSONObject().apply {
+                    put("make", appointmentRequest.vehicleMake ?: "")
+                    put("model", appointmentRequest.vehicleModel ?: "")
+                    appointmentRequest.vehicleYear?.let { put("year", it) }
+                    appointmentRequest.vehiclePlate?.let { put("licensePlate", it) }
+                })
+                put("serviceType", appointmentRequest.serviceName)
+                put("description", appointmentRequest.description ?: "")
+                put("scheduledDate", appointmentRequest.scheduledDate.time)
+                appointmentRequest.estimatedTime?.let { put("estimatedDuration", it) }
+            }
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partners/appointments")
+                .post(json.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val jsonResponse = JSONObject(responseBody ?: "{}")
+                
+                if (jsonResponse.getBoolean("success")) {
+                    val appointment = parseAppointmentFromJson(jsonResponse.getJSONObject("data"))
+                    Result.success(appointment)
+                } else {
+                    Result.failure(Exception(jsonResponse.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to create appointment: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun updateAppointmentStatus(appointmentId: String, status: AppointmentStatus): Result<Appointment> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("status", status.name.lowercase())
+            }
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partners/appointments/$appointmentId/status")
+                .patch(json.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val jsonResponse = JSONObject(responseBody ?: "{}")
+                
+                if (jsonResponse.getBoolean("success")) {
+                    val appointment = parseAppointmentFromJson(jsonResponse.getJSONObject("data"))
+                    Result.success(appointment)
+                } else {
+                    Result.failure(Exception(jsonResponse.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to update appointment status: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    // ============================================================================
+    // QUOTATIONS ENDPOINTS
+    // ============================================================================
+    
+    suspend fun getQuotations(
+        status: String? = null,
+        quoteType: String? = null,
+        page: Int = 1,
+        limit: Int = 20
+    ): Result<QuotationResponse> = withContext(Dispatchers.IO) {
+        try {
+            val urlBuilder = HttpUrl.parse("$baseUrl/partners/quotations")?.newBuilder()
+                ?: throw Exception("Invalid URL")
+            
+            status?.let { urlBuilder.addQueryParameter("status", it) }
+            quoteType?.let { urlBuilder.addQueryParameter("quoteType", it) }
+            urlBuilder.addQueryParameter("page", page.toString())
+            urlBuilder.addQueryParameter("limit", limit.toString())
+            
+            val request = Request.Builder()
+                .url(urlBuilder.build())
+                .get()
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+                
+                if (json.getBoolean("success")) {
+                    val data = json.getJSONObject("data")
+                    val quotations = data.getJSONArray("quotations").let { array ->
+                        (0 until array.length()).map { i ->
+                            parseQuotationFromJson(array.getJSONObject(i))
+                        }
+                    }
+                    val pagination = data.getJSONObject("pagination")
+                    
+                    Result.success(QuotationResponse(
+                        quotations = quotations,
+                        pagination = Pagination(
+                            page = pagination.getInt("current"),
+                            limit = limit,
+                            total = pagination.getInt("total"),
+                            pages = pagination.getInt("pages")
+                        )
+                    ))
+                } else {
+                    Result.failure(Exception(json.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to get quotations: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun getQuotationDetails(quotationId: String): Result<Quotation> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$baseUrl/partners/quotations/$quotationId")
+                .get()
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+                
+                if (json.getBoolean("success")) {
+                    val quotation = parseQuotationFromJson(json.getJSONObject("data"))
+                    Result.success(quotation)
+                } else {
+                    Result.failure(Exception(json.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to get quotation details: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun createQuotation(quotationRequest: QuotationRequest): Result<Quotation> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("customerName", quotationRequest.customerName)
+                put("customerPhone", quotationRequest.customerPhone)
+                quotationRequest.customerEmail?.let { put("customerEmail", it) }
+                put("vehicleInfo", JSONObject().apply {
+                    put("make", "Unknown") // Default values
+                    put("model", "Unknown")
+                })
+                put("quoteType", quotationRequest.serviceName)
+                put("description", quotationRequest.description ?: "")
+                put("items", quotationRequest.items.map { item ->
+                    JSONObject().apply {
+                        put("name", item.name)
+                        put("description", item.description ?: "")
+                        put("quantity", item.quantity)
+                        put("unitPrice", item.unitPrice)
+                        put("total", item.total)
+                    }
+                })
+                put("validUntil", quotationRequest.validUntil?.time ?: System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000L)
+                put("taxRate", 0.14) // 14% VAT
+            }
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partners/quotations")
+                .post(json.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val jsonResponse = JSONObject(responseBody ?: "{}")
+                
+                if (jsonResponse.getBoolean("success")) {
+                    val quotation = parseQuotationFromJson(jsonResponse.getJSONObject("data"))
+                    Result.success(quotation)
+                } else {
+                    Result.failure(Exception(jsonResponse.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to create quotation: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun updateQuotation(quotationId: String, updateData: Map<String, Any>): Result<Quotation> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject(updateData)
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partners/quotations/$quotationId")
+                .patch(json.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val jsonResponse = JSONObject(responseBody ?: "{}")
+                
+                if (jsonResponse.getBoolean("success")) {
+                    val quotation = parseQuotationFromJson(jsonResponse.getJSONObject("data"))
+                    Result.success(quotation)
+                } else {
+                    Result.failure(Exception(jsonResponse.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to update quotation: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun sendQuotation(quotationId: String): Result<Quotation> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$baseUrl/partners/quotations/$quotationId/send")
+                .post("".toRequestBody("application/json".toMediaType()))
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val jsonResponse = JSONObject(responseBody ?: "{}")
+                
+                if (jsonResponse.getBoolean("success")) {
+                    val quotation = parseQuotationFromJson(jsonResponse.getJSONObject("data"))
+                    Result.success(quotation)
+                } else {
+                    Result.failure(Exception(jsonResponse.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to send quotation: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    // ============================================================================
+    // INVENTORY ENDPOINTS
+    // ============================================================================
+    
+    suspend fun getInventory(
+        category: String? = null,
+        status: String? = null,
+        search: String? = null,
+        page: Int = 1,
+        limit: Int = 20
+    ): Result<InventoryResponse> = withContext(Dispatchers.IO) {
+        try {
+            val urlBuilder = HttpUrl.parse("$baseUrl/partners/inventory")?.newBuilder()
+                ?: throw Exception("Invalid URL")
+            
+            category?.let { urlBuilder.addQueryParameter("category", it) }
+            status?.let { urlBuilder.addQueryParameter("status", it) }
+            search?.let { urlBuilder.addQueryParameter("search", it) }
+            urlBuilder.addQueryParameter("page", page.toString())
+            urlBuilder.addQueryParameter("limit", limit.toString())
+            
+            val request = Request.Builder()
+                .url(urlBuilder.build())
+                .get()
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+                
+                if (json.getBoolean("success")) {
+                    val data = json.getJSONObject("data")
+                    val inventory = data.getJSONArray("inventory").let { array ->
+                        (0 until array.length()).map { i ->
+                            parseInventoryItemFromJson(array.getJSONObject(i))
+                        }
+                    }
+                    val pagination = data.getJSONObject("pagination")
+                    
+                    Result.success(InventoryResponse(
+                        inventory = inventory,
+                        pagination = Pagination(
+                            page = pagination.getInt("current"),
+                            limit = limit,
+                            total = pagination.getInt("total"),
+                            pages = pagination.getInt("pages")
+                        )
+                    ))
+                } else {
+                    Result.failure(Exception(json.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to get inventory: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun getInventoryItemDetails(itemId: String): Result<InventoryItem> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$baseUrl/partners/inventory/$itemId")
+                .get()
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+                
+                if (json.getBoolean("success")) {
+                    val item = parseInventoryItemFromJson(json.getJSONObject("data"))
+                    Result.success(item)
+                } else {
+                    Result.failure(Exception(json.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to get inventory item details: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun addInventoryItem(inventoryRequest: InventoryRequest): Result<InventoryItem> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("name", inventoryRequest.name)
+                inventoryRequest.sku?.let { put("sku", it) }
+                inventoryRequest.description?.let { put("description", it) }
+                put("category", inventoryRequest.category)
+                put("costPrice", inventoryRequest.cost ?: 0.0)
+                put("salePrice", inventoryRequest.price)
+                put("quantity", inventoryRequest.stock)
+                put("minQuantity", inventoryRequest.minStock)
+                inventoryRequest.maxStock?.let { put("maxQuantity", it) }
+                inventoryRequest.image?.let { put("image", it) }
+            }
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partners/inventory")
+                .post(json.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val jsonResponse = JSONObject(responseBody ?: "{}")
+                
+                if (jsonResponse.getBoolean("success")) {
+                    val item = parseInventoryItemFromJson(jsonResponse.getJSONObject("data"))
+                    Result.success(item)
+                } else {
+                    Result.failure(Exception(jsonResponse.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to add inventory item: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun updateInventoryItem(itemId: String, updateData: Map<String, Any>): Result<InventoryItem> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject(updateData)
+            
+            val request = Request.Builder()
+                .url("$baseUrl/partners/inventory/$itemId")
+                .patch(json.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val jsonResponse = JSONObject(responseBody ?: "{}")
+                
+                if (jsonResponse.getBoolean("success")) {
+                    val item = parseInventoryItemFromJson(jsonResponse.getJSONObject("data"))
+                    Result.success(item)
+                } else {
+                    Result.failure(Exception(jsonResponse.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to update inventory item: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun deleteInventoryItem(itemId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$baseUrl/partners/inventory/$itemId")
+                .delete()
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+                
+                if (json.getBoolean("success")) {
+                    Result.success(true)
+                } else {
+                    Result.failure(Exception(json.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to delete inventory item: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun getInventoryStats(): Result<Map<String, Any>> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$baseUrl/partners/inventory/stats")
+                .get()
+                .build()
+            
+            val response = client.newCall(request).execute()
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                val json = JSONObject(responseBody ?: "{}")
+                
+                if (json.getBoolean("success")) {
+                    val stats = json.getJSONObject("data")
+                    val statsMap = mutableMapOf<String, Any>()
+                    stats.keys().forEach { key ->
+                        statsMap[key] = stats.get(key)
+                    }
+                    Result.success(statsMap)
+                } else {
+                    Result.failure(Exception(json.getString("message")))
+                }
+            } else {
+                Result.failure(Exception("Failed to get inventory stats: ${response.code}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    // Helper function to parse appointment from JSON
+    private fun parseAppointmentFromJson(json: JSONObject): Appointment {
+        return Appointment(
+            id = json.getString("_id"),
+            appointmentId = json.optString("appointmentId", json.getString("_id")),
+            customer = Customer(
+                name = json.getString("customerName"),
+                phone = json.getString("customerPhone"),
+                email = json.optString("customerEmail").takeIf { it.isNotEmpty() }
+            ),
+            vehicle = Vehicle(
+                make = json.optJSONObject("vehicleInfo")?.optString("make"),
+                model = json.optJSONObject("vehicleInfo")?.optString("model"),
+                year = json.optJSONObject("vehicleInfo")?.optInt("year")?.takeIf { it > 0 },
+                plate = json.optJSONObject("vehicleInfo")?.optString("licensePlate")
+            ),
+            service = json.getString("serviceType"),
+            description = json.optString("description").takeIf { it.isNotEmpty() },
+            scheduledDate = java.util.Date(json.getLong("scheduledDate")),
+            estimatedTime = json.optString("estimatedDuration").takeIf { it.isNotEmpty() },
+            status = AppointmentStatus.valueOf(json.getString("status").uppercase()),
+            priority = Priority.NORMAL, // Default priority
+            notes = json.optString("notes").takeIf { it.isNotEmpty() },
+            createdAt = java.util.Date(json.getLong("createdAt")),
+            updatedAt = json.optLong("updatedAt").takeIf { it > 0 }?.let { java.util.Date(it) }
+        )
+    }
+    
 }

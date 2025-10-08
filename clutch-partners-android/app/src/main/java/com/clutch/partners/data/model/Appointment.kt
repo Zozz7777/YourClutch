@@ -73,3 +73,9 @@ data class AppointmentUpdate(
     val notes: String?,
     val estimatedTime: String?
 ) : Parcelable
+
+@Parcelize
+data class AppointmentResponse(
+    val appointments: List<Appointment>,
+    val pagination: Pagination
+) : Parcelable
