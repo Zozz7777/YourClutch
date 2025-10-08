@@ -12,7 +12,6 @@ const apiPrefix = `/api/${process.env.API_VERSION || 'v1'}`;
 
 // Import essential middleware
 const { authenticateToken } = require('./middleware/auth');
-const { connectToDatabase } = require('./config/database');
 const { connectToDatabase: connectOptimizedDatabase } = require('./config/optimized-database');
 
 // Import ALL routes that the app needs
@@ -199,7 +198,7 @@ app.use((err, req, res, next) => {
 });
 
 // Database connection
-async function connectToDatabase() {
+async function initializeDatabase() {
   try {
     await connectOptimizedDatabase();
     console.log('✅ Database connected successfully');
@@ -215,7 +214,7 @@ async function startServer() {
     console.log('🚀 Starting Clutch Backend Server...');
     
     // Connect to database
-    await connectToDatabase();
+    await initializeDatabase();
     
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
