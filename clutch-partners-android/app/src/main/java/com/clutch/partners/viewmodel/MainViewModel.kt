@@ -6,6 +6,7 @@ import com.clutch.partners.data.model.DashboardData
 import com.clutch.partners.data.model.Notification
 import com.clutch.partners.data.model.Order
 import com.clutch.partners.data.model.Product
+import com.clutch.partners.data.model.PartnerType
 import com.clutch.partners.data.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,9 @@ class MainViewModel @Inject constructor(
     
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+    
+    private val _partnerType = MutableStateFlow(PartnerType.REPAIR_CENTER)
+    val partnerType: StateFlow<PartnerType> = _partnerType.asStateFlow()
     
     fun loadDashboardData() {
         viewModelScope.launch {
@@ -98,6 +102,18 @@ class MainViewModel @Inject constructor(
                         isLoading = false,
                         error = error.message
                     )
+                }
+        }
+    }
+    
+    fun loadPartnerType() {
+        viewModelScope.launch {
+            mainRepository.getPartnerType()
+                .onSuccess { partnerType ->
+                    _partnerType.value = partnerType
+                }
+                .onFailure { error ->
+                    _uiState.value = _uiState.value.copy(error = error.message)
                 }
         }
     }

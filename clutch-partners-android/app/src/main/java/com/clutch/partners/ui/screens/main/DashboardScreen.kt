@@ -18,6 +18,9 @@ import androidx.navigation.NavController
 import com.clutch.partners.ClutchPartnersTheme
 import com.clutch.partners.data.model.DashboardData
 import com.clutch.partners.viewmodel.MainViewModel
+import com.clutch.partners.ui.components.*
+import com.clutch.partners.ui.components.Charts.*
+import com.clutch.partners.ui.components.Cards.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,45 +66,94 @@ fun DashboardScreen(
                     }
                 } else {
                     uiState.dashboardData?.let { data ->
-                        // Revenue Card
+                        // Revenue Chart
                         item {
-                            RevenueCard(
-                                title = "Revenue",
-                                today = data.revenue.today,
-                                thisWeek = data.revenue.thisWeek,
-                                thisMonth = data.revenue.thisMonth,
-                                growthRate = data.revenue.growthRate
+                            RevenueChart(
+                                data = listOf(
+                                    ChartDataPoint("Mon", 1200f),
+                                    ChartDataPoint("Tue", 1500f),
+                                    ChartDataPoint("Wed", 1800f),
+                                    ChartDataPoint("Thu", 2200f),
+                                    ChartDataPoint("Fri", 1900f),
+                                    ChartDataPoint("Sat", 1600f),
+                                    ChartDataPoint("Sun", 1400f)
+                                ),
+                                title = "Weekly Revenue Trend"
                             )
                         }
                         
-                        // Orders Card
+                        // Orders Chart
                         item {
-                            OrdersCard(
-                                total = data.orders.total,
-                                pending = data.orders.pending,
-                                completed = data.orders.completed,
-                                cancelled = data.orders.cancelled
+                            OrdersChart(
+                                data = listOf(
+                                    ChartDataPoint("Jan", 45f),
+                                    ChartDataPoint("Feb", 52f),
+                                    ChartDataPoint("Mar", 48f),
+                                    ChartDataPoint("Apr", 61f),
+                                    ChartDataPoint("May", 55f),
+                                    ChartDataPoint("Jun", 67f)
+                                ),
+                                title = "Monthly Orders"
                             )
                         }
                         
-                        // Inventory Card
+                        // Performance Metrics
                         item {
-                            InventoryCard(
-                                totalProducts = data.inventory.totalProducts,
-                                lowStock = data.inventory.lowStock,
-                                outOfStock = data.inventory.outOfStock,
-                                totalValue = data.inventory.totalValue
+                            PerformanceChart(
+                                metrics = listOf(
+                                    PerformanceMetric("Completion Rate", "94.5%", 0.945f, Color(0xFF4CAF50)),
+                                    PerformanceMetric("Customer Satisfaction", "4.7/5", 0.94f, Color(0xFF2196F3)),
+                                    PerformanceMetric("Response Time", "2.3h", 0.85f, Color(0xFFFF9800)),
+                                    PerformanceMetric("Order Accuracy", "98.2%", 0.982f, Color(0xFF9C27B0))
+                                ),
+                                title = "Performance Metrics"
                             )
                         }
                         
-                        // Performance Card
+                        // Revenue Distribution Pie Chart
                         item {
-                            PerformanceCard(
-                                averageOrderValue = data.performance.averageOrderValue,
-                                customerSatisfaction = data.performance.customerSatisfaction,
-                                completionRate = data.performance.completionRate,
-                                responseTime = data.performance.responseTime
+                            PieChart(
+                                data = listOf(
+                                    PieChartData("Service", 0.4f, Color(0xFF4CAF50)),
+                                    PieChartData("Parts", 0.35f, Color(0xFF2196F3)),
+                                    PieChartData("Accessories", 0.15f, Color(0xFFFF9800)),
+                                    PieChartData("Other", 0.1f, Color(0xFF9C27B0))
+                                ),
+                                title = "Revenue by Category"
                             )
+                        }
+                        
+                        // Quick Stats Row
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                StatCard(
+                                    title = "Today's Revenue",
+                                    value = "EGP ${String.format("%.0f", data.revenue.today)}",
+                                    icon = Icons.Default.AttachMoney,
+                                    iconTint = Color(0xFF4CAF50),
+                                    modifier = Modifier.weight(1f)
+                                )
+                                StatCard(
+                                    title = "Active Orders",
+                                    value = data.orders.pending.toString(),
+                                    icon = Icons.Default.ShoppingCart,
+                                    iconTint = Color(0xFFFF9800),
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                        
+                        // Inventory Alerts
+                        if (data.inventory.lowStock > 0 || data.inventory.outOfStock > 0) {
+                            item {
+                                InventoryAlertsCard(
+                                    lowStock = data.inventory.lowStock,
+                                    outOfStock = data.inventory.outOfStock
+                                )
+                            }
                         }
                     }
                 }
@@ -111,17 +163,14 @@ fun DashboardScreen(
 }
 
 @Composable
-fun RevenueCard(
-    title: String,
-    today: Double,
-    thisWeek: Double,
-    thisMonth: Double,
-    growthRate: Double
+fun InventoryAlertsCard(
+    lowStock: Int,
+    outOfStock: Int
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = if (outOfStock > 0) Color(0xFFFFEBEE) else Color(0xFFFFF3E0)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -130,263 +179,40 @@ fun RevenueCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                RevenueItem("Today", today)
-                RevenueItem("This Week", thisWeek)
-                RevenueItem("This Month", thisMonth)
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.TrendingUp,
+                    imageVector = if (outOfStock > 0) Icons.Default.Error else Icons.Default.Warning,
                     contentDescription = null,
-                    tint = Color(0xFF27AE60)
+                    tint = if (outOfStock > 0) Color(0xFFF44336) else Color(0xFFFF9800)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "+${growthRate}% growth",
+                    text = "Inventory Alerts",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (outOfStock > 0) Color(0xFFF44336) else Color(0xFFFF9800)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            if (outOfStock > 0) {
+                Text(
+                    text = "$outOfStock items are out of stock",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF27AE60)
+                    color = Color(0xFFF44336)
+                )
+            }
+            
+            if (lowStock > 0) {
+                Text(
+                    text = "$lowStock items are running low",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFFFF9800)
                 )
             }
         }
-    }
-}
-
-@Composable
-fun RevenueItem(
-    label: String,
-    value: Double
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "$${String.format("%.0f", value)}",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-    }
-}
-
-@Composable
-fun OrdersCard(
-    total: Int,
-    pending: Int,
-    completed: Int,
-    cancelled: Int
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Orders",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                OrderStatItem("Total", total, MaterialTheme.colorScheme.primary)
-                OrderStatItem("Pending", pending, Color(0xFFF39C12))
-                OrderStatItem("Completed", completed, Color(0xFF27AE60))
-                OrderStatItem("Cancelled", cancelled, MaterialTheme.colorScheme.error)
-            }
-        }
-    }
-}
-
-@Composable
-fun OrderStatItem(
-    label: String,
-    value: Int,
-    color: Color
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value.toString(),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-    }
-}
-
-@Composable
-fun InventoryCard(
-    totalProducts: Int,
-    lowStock: Int,
-    outOfStock: Int,
-    totalValue: Double
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Inventory",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                InventoryStatItem("Total Products", totalProducts.toString(), MaterialTheme.colorScheme.primary)
-                InventoryStatItem("Low Stock", lowStock.toString(), Color(0xFFF39C12))
-                InventoryStatItem("Out of Stock", outOfStock.toString(), MaterialTheme.colorScheme.error)
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(
-                text = "Total Value: $${String.format("%.0f", totalValue)}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
-@Composable
-fun InventoryStatItem(
-    label: String,
-    value: String,
-    color: Color
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-    }
-}
-
-@Composable
-fun PerformanceCard(
-    averageOrderValue: Double,
-    customerSatisfaction: Double,
-    completionRate: Double,
-    responseTime: Double
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Performance",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                PerformanceStatItem("Avg Order", "$${String.format("%.0f", averageOrderValue)}", MaterialTheme.colorScheme.primary)
-                PerformanceStatItem("Satisfaction", "${String.format("%.1f", customerSatisfaction)}/5", Color(0xFF27AE60))
-                PerformanceStatItem("Completion", "${String.format("%.1f", completionRate)}%", Color(0xFF27AE60))
-                PerformanceStatItem("Response", "${String.format("%.1f", responseTime)}h", Color(0xFF3498DB))
-            }
-        }
-    }
-}
-
-@Composable
-fun PerformanceStatItem(
-    label: String,
-    value: String,
-    color: Color
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
     }
 }

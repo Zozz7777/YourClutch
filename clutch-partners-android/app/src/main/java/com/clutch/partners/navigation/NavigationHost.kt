@@ -47,10 +47,20 @@ fun NavigationHost(
         composable(Screen.Audit.route) { AuditScreen(navController) }
         composable(Screen.Warranty.route) { WarrantyScreen(navController) }
         composable(Screen.Export.route) { ExportScreen(navController) }
+        
+        // Partner-type specific screens
+        composable(Screen.Orders.route) { OrdersScreen(navController) }
+        composable(Screen.Appointments.route) { AppointmentsScreen(navController) }
+        composable(Screen.Quotations.route) { QuotationsScreen(navController) }
+        composable(Screen.Inventory.route) { InventoryScreen(navController) }
+        composable(Screen.MyStore.route) { MyStoreScreen(navController) }
+        composable(Screen.More.route) { MoreMenuScreen(
+            onNavigate = { route -> navController.navigate(route) },
+            onBack = { navController.popBackStack() }
+        ) }
 
         // Advanced Screens
         composable(Screen.POS.route) { POSScreen(navController) }
-        composable(Screen.Inventory.route) { InventoryScreen(navController) }
         composable(Screen.PurchaseOrders.route) { PurchaseOrdersScreen(navController) }
         composable(Screen.Suppliers.route) { SuppliersScreen(navController) }
         composable(Screen.Devices.route) { DevicesScreen(navController) }

@@ -15,7 +15,10 @@ import com.clutch.partners.ClutchPartnersTheme
 import com.clutch.partners.navigation.Screen
 import com.clutch.partners.viewmodel.MainViewModel
 import com.clutch.partners.data.model.Permission
+import com.clutch.partners.data.model.PartnerType
 import com.clutch.partners.ui.components.PermissionGate
+import com.clutch.partners.ui.components.DynamicBottomNavigation
+import com.clutch.partners.ui.components.MoreMenuScreen
 
 @Composable
 fun MainScreen(
@@ -24,14 +27,18 @@ fun MainScreen(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val partnerType by viewModel.partnerType.collectAsState()
     
     ClutchPartnersTheme {
         Scaffold(
             bottomBar = {
-                BottomNavigationBar(
-                    currentRoute = currentRoute,
-                    onNavigate = { route -> navController.navigate(route) }
-                )
+                if (currentRoute != Screen.More.route) {
+                    DynamicBottomNavigation(
+                        currentRoute = currentRoute ?: "",
+                        onNavigate = { route -> navController.navigate(route) },
+                        partnerType = partnerType
+                    )
+                }
             }
         ) { paddingValues ->
             Box(
@@ -40,10 +47,26 @@ fun MainScreen(
                     .padding(paddingValues)
             ) {
                 when (currentRoute) {
+                    // Home/Dashboard screens
                     Screen.Home.route -> HomeScreen(navController)
                     Screen.Dashboard.route -> DashboardScreen(navController)
-                    Screen.POS.route -> com.clutch.partners.ui.screens.pos.POSScreen(navController)
+                    
+                    // Partner-type specific screens
+                    Screen.Orders.route -> OrdersScreen(navController)
+                    Screen.Appointments.route -> AppointmentsScreen(navController)
+                    Screen.Quotations.route -> QuotationsScreen(navController)
+                    Screen.Inventory.route -> InventoryScreen(navController)
+                    
+                    // Common screens
                     Screen.Payments.route -> PaymentsScreen(navController)
+                    Screen.MyStore.route -> MyStoreScreen(navController)
+                    Screen.More.route -> MoreMenuScreen(
+                        onNavigate = { route -> navController.navigate(route) },
+                        onBack = { navController.popBackStack() }
+                    )
+                    
+                    // Legacy screens for backward compatibility
+                    Screen.POS.route -> com.clutch.partners.ui.screens.pos.POSScreen(navController)
                     Screen.Settings.route -> SettingsScreen(navController)
                 }
             }

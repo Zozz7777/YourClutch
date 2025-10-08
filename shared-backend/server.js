@@ -92,29 +92,7 @@ app.use(cors(corsOptions));
 // Apply basic middleware only
 app.use(compression());
 
-// Raw body parser to catch malformed JSON before express.json()
-app.use((req, res, next) => {
-  if (req.get('Content-Type') === 'application/json') {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      // Check for malformed JSON
-      if (body.trim() === '{\\' || body.trim() === '{\\') {
-        return res.status(400).json({
-          success: false,
-          error: 'MALFORMED_JSON',
-          message: 'Invalid JSON format in request body',
-          timestamp: new Date().toISOString()
-        });
-      }
-      next();
-    });
-  } else {
-    next();
-  }
-});
+// Raw body parser removed - using enhanced JSON parser instead
 
 // Enhanced JSON parsing with error handling
 app.use(express.json({

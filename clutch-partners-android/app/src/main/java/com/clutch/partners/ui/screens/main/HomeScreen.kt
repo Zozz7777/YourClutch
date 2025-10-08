@@ -20,6 +20,8 @@ import com.clutch.partners.ClutchPartnersTheme
 import com.clutch.partners.data.model.*
 import com.clutch.partners.navigation.Screen
 import com.clutch.partners.ui.components.*
+import com.clutch.partners.ui.components.Cards.*
+import com.clutch.partners.ui.components.Charts.*
 import com.clutch.partners.viewmodel.MainViewModel
 import com.clutch.partners.viewmodel.AppointmentsViewModel
 import com.clutch.partners.viewmodel.QuotationsViewModel
@@ -179,6 +181,7 @@ fun QuickStatsSection(
             color = MaterialTheme.colorScheme.onBackground
         )
         
+        // First row of stats
         when (partnerType) {
             PartnerType.REPAIR_CENTER, PartnerType.SERVICE_CENTER -> {
                 Row(
@@ -226,6 +229,7 @@ fun QuickStatsSection(
             }
         }
         
+        // Second row of stats
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -244,6 +248,18 @@ fun QuickStatsSection(
                 value = quotationsUiState.quotations.count { it.status == QuotationStatus.PENDING }.toString(),
                 icon = Icons.Default.Description,
                 modifier = Modifier.weight(1f)
+            )
+        }
+        
+        // Performance metrics chart
+        if (partnerType == PartnerType.REPAIR_CENTER || partnerType == PartnerType.SERVICE_CENTER) {
+            PerformanceChart(
+                metrics = listOf(
+                    PerformanceMetric("Completion Rate", "94.5%", 0.945f, Color(0xFF4CAF50)),
+                    PerformanceMetric("Customer Satisfaction", "4.7/5", 0.94f, Color(0xFF2196F3)),
+                    PerformanceMetric("Response Time", "2.3h", 0.85f, Color(0xFFFF9800))
+                ),
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -416,54 +432,16 @@ fun AppointmentCard(
     appointment: Appointment,
     onClick: () -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = appointment.customer.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                
-                AppointmentStatusBadge(
-                    status = appointment.status.name,
-                    modifier = Modifier
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = appointment.service,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            Text(
-                text = "Scheduled: ${appointment.scheduledDate}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+    com.clutch.partners.ui.components.Cards.AppointmentCard(
+        appointmentId = appointment.id,
+        customerName = appointment.customer.name,
+        service = appointment.service,
+        scheduledDate = appointment.scheduledDate,
+        status = appointment.status.name,
+        vehicleInfo = "${appointment.vehicle.make} ${appointment.vehicle.model}",
+        onCardClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable
@@ -471,72 +449,16 @@ fun QuotationCard(
     quotation: Quotation,
     onClick: () -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Quote #${quotation.quotationId}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                
-                Text(
-                    text = "EGP ${quotation.total}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = quotation.customer.name,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                StatusBadge(
-                    text = quotation.status.name,
-                    color = when (quotation.status) {
-                        QuotationStatus.PENDING -> Color(0xFFFF9800)
-                        QuotationStatus.ACCEPTED -> Color(0xFF4CAF50)
-                        QuotationStatus.REJECTED -> Color(0xFFF44336)
-                        QuotationStatus.EXPIRED -> Color(0xFF9E9E9E)
-                        else -> MaterialTheme.colorScheme.outline
-                    }
-                )
-                
-                if (quotation.isExpired) {
-                    StatusBadge(
-                        text = "EXPIRED",
-                        color = Color(0xFF9E9E9E)
-                    )
-                }
-            }
-        }
-    }
+    com.clutch.partners.ui.components.Cards.QuotationCard(
+        quotationId = quotation.quotationId,
+        customerName = quotation.customer.name,
+        totalAmount = quotation.total,
+        status = quotation.status.name,
+        validUntil = quotation.validUntil,
+        itemCount = quotation.items.size,
+        onCardClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable
@@ -544,54 +466,19 @@ fun InventoryItemCard(
     item: InventoryItem,
     onClick: () -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = item.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                
-                StatusBadge(
-                    text = if (item.isOutOfStock) "OUT OF STOCK" else "LOW STOCK",
-                    color = if (item.isOutOfStock) Color(0xFFF44336) else Color(0xFFFF9800)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = "Stock: ${item.stock} units",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            Text(
-                text = "Price: EGP ${item.price}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+    com.clutch.partners.ui.components.Cards.InventoryItemCard(
+        itemId = item.id,
+        name = item.name,
+        sku = item.sku,
+        price = item.price,
+        stock = item.stock,
+        minStock = item.minStock,
+        category = item.category,
+        isLowStock = item.isLowStock,
+        isOutOfStock = item.isOutOfStock,
+        onCardClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable
@@ -599,62 +486,15 @@ fun OrderCard(
     order: Order,
     onClick: () -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Order #${order.id}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                
-                Text(
-                    text = "EGP ${order.totalAmount}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = order.customerName,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OrderStatusBadge(
-                    status = order.status.name,
-                    modifier = Modifier
-                )
-                PaymentStatusBadge(
-                    status = order.paymentStatus.name,
-                    modifier = Modifier
-                )
-            }
-        }
-    }
+    com.clutch.partners.ui.components.Cards.OrderCard(
+        orderId = order.id,
+        customerName = order.customerName,
+        totalAmount = order.totalAmount,
+        status = order.status.name,
+        date = order.createdAt,
+        itemCount = order.items.size,
+        onCardClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 

@@ -133,7 +133,7 @@ impl AuthService {
     pub async fn login(&self, email: &str, password: &str) -> Result<AuthResponse> {
         log::info!("Login attempt for email: {}", email);
         
-        let url = format!("{}/api/v1/partners/auth/partner-login", self.base_url);
+        let url = format!("{}/api/v1/partner-auth/auth/partner-login", self.base_url);
         let request_body = serde_json::json!({
             "emailOrPhone": email,
             "password": password
@@ -159,7 +159,7 @@ impl AuthService {
     pub async fn signup(&self, partner_id: &str, email: &str, phone: &str, password: &str, business_name: &str, owner_name: &str) -> Result<AuthResponse> {
         log::info!("Signup attempt for partner: {}", partner_id);
         
-        let url = format!("{}/api/v1/partners/auth/signup", self.base_url);
+        let url = format!("{}/api/v1/partner-auth/auth/signup", self.base_url);
         let request_body = serde_json::json!({
             "partnerId": partner_id,
             "email": email,

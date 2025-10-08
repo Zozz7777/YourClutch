@@ -4,6 +4,7 @@ import com.clutch.partners.data.model.DashboardData
 import com.clutch.partners.data.model.Notification
 import com.clutch.partners.data.model.Order
 import com.clutch.partners.data.model.Product
+import com.clutch.partners.data.model.PartnerType
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -86,5 +87,11 @@ class MainService @Inject constructor(
     
     suspend fun getNotifications(): Result<List<Notification>> {
         return apiService.getNotifications()
+    }
+    
+    suspend fun getPartnerType(): Result<PartnerType> {
+        // TODO: Implement actual API call to get partner type from user profile
+        // For now, return a default value
+        return Result.success(PartnerType.REPAIR_CENTER)
     }
 }

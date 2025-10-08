@@ -4,6 +4,7 @@ import com.clutch.partners.data.model.DashboardData
 import com.clutch.partners.data.model.Notification
 import com.clutch.partners.data.model.Order
 import com.clutch.partners.data.model.Product
+import com.clutch.partners.data.model.PartnerType
 import com.clutch.partners.data.service.MainService
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,5 +28,9 @@ class MainRepository @Inject constructor(
     
     suspend fun getNotifications(): Result<List<Notification>> {
         return mainService.getNotifications()
+    }
+    
+    suspend fun getPartnerType(): Result<PartnerType> {
+        return mainService.getPartnerType()
     }
 }
