@@ -169,7 +169,7 @@ app.use(`${apiPrefix}/mobile-cms`, mobileCmsRoutes);
 app.use(`${apiPrefix}/ops`, opsRoutes);
 app.use(`${apiPrefix}/performance`, performanceRoutes);
 app.use(`${apiPrefix}/dashboard`, dashboardRoutes);
-app.use(`${apiPrefix}/notifications`, notificationsRoutes);
+app.use(`${apiPrefix}/notifications`, notificationsRoutes.router);
 app.use(`${apiPrefix}/partners`, partnersRoutes);
 app.use(`${apiPrefix}/partner-auth`, partnerAuthRoutes);
 app.use(`${apiPrefix}/partners`, partnerMobileRoutes);
