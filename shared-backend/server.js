@@ -116,6 +116,34 @@ app.get('/ping', (req, res) => {
   });
 });
 
+// Test database connection endpoint
+app.get('/test-db', async (req, res) => {
+  try {
+    const { getCollection } = require('./config/optimized-database');
+    const testCollection = await getCollection('users');
+    
+    if (testCollection) {
+      res.json({
+        success: true,
+        message: 'Database connection working',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Database connection failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Database error: ' + error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Mount routes
 app.use(`${apiPrefix}/auth`, authRoutes);
 app.use('/health', healthRoutes);
