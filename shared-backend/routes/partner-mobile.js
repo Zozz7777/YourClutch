@@ -2426,4 +2426,707 @@ router.get('/inventory/stats', auth, async (req, res) => {
   }
 });
 
+// ========================================
+// LOYALTY & REWARDS SYSTEM
+// ========================================
+
+// Get loyalty program status
+// @route   GET /api/v1/partners/loyalty/status
+// @desc    Get partner's loyalty program status
+// @access  Private
+router.get('/loyalty/status', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+
+    // Get loyalty status from partner profile
+    const partner = await PartnerUser.findById(partnerId);
+    
+    res.json({
+      success: true,
+      data: {
+        isEnrolled: partner.loyaltyEnrolled || false,
+        tier: partner.loyaltyTier || 'BRONZE',
+        points: partner.loyaltyPoints || 0,
+        nextTierPoints: partner.loyaltyTier === 'BRONZE' ? 1000 : 
+                       partner.loyaltyTier === 'SILVER' ? 2500 : 0,
+        benefits: partner.loyaltyBenefits || []
+      }
+    });
+
+  } catch (error) {
+    logger.error('Get loyalty status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// Enroll in loyalty program
+// @route   POST /api/v1/partners/loyalty/enroll
+// @desc    Enroll partner in loyalty program
+// @access  Private
+router.post('/loyalty/enroll', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+
+    await PartnerUser.findByIdAndUpdate(partnerId, {
+      loyaltyEnrolled: true,
+      loyaltyTier: 'BRONZE',
+      loyaltyPoints: 0,
+      loyaltyEnrolledAt: new Date()
+    });
+
+    res.json({
+      success: true,
+      message: 'Successfully enrolled in loyalty program'
+    });
+
+  } catch (error) {
+    logger.error('Loyalty enrollment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ========================================
+// RATINGS & REVIEWS SYSTEM
+// ========================================
+
+// Get partner ratings
+// @route   GET /api/v1/partners/ratings
+// @desc    Get partner's ratings and reviews
+// @access  Private
+router.get('/ratings', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { page = 1, limit = 10 } = req.query;
+
+    // This would typically query a ratings collection
+    // For now, return mock data
+    const ratings = {
+      averageRating: 4.5,
+      totalReviews: 127,
+      ratingBreakdown: {
+        5: 89,
+        4: 23,
+        3: 10,
+        2: 3,
+        1: 2
+      },
+      recentReviews: [
+        {
+          id: '1',
+          customerName: 'Ahmed M.',
+          rating: 5,
+          comment: 'Excellent service and fast delivery!',
+          date: new Date(),
+          orderId: 'ORD-001'
+        }
+      ]
+    };
+
+    res.json({
+      success: true,
+      data: ratings
+    });
+
+  } catch (error) {
+    logger.error('Get ratings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ========================================
+// VEHICLE MANAGEMENT SYSTEM
+// ========================================
+
+// Get customer vehicles
+// @route   GET /api/v1/partners/vehicles
+// @desc    Get vehicles associated with partner
+// @access  Private
+router.get('/vehicles', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { customerId, page = 1, limit = 10 } = req.query;
+
+    // This would typically query a vehicles collection
+    // For now, return mock data
+    const vehicles = [
+      {
+        id: '1',
+        customerId: customerId || 'CUST-001',
+        customerName: 'Ahmed Hassan',
+        make: 'Toyota',
+        model: 'Camry',
+        year: 2020,
+        plateNumber: 'ABC-123',
+        vin: '1HGBH41JXMN109186',
+        lastServiceDate: new Date(),
+        nextServiceDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        serviceHistory: []
+      }
+    ];
+
+    res.json({
+      success: true,
+      data: vehicles
+    });
+
+  } catch (error) {
+    logger.error('Get vehicles error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// Add vehicle
+// @route   POST /api/v1/partners/vehicles
+// @desc    Add customer vehicle
+// @access  Private
+router.post('/vehicles', [
+  auth,
+  body('customerId').notEmpty().withMessage('Customer ID is required'),
+  body('make').notEmpty().withMessage('Make is required'),
+  body('model').notEmpty().withMessage('Model is required'),
+  body('year').isNumeric().withMessage('Year must be numeric'),
+  body('plateNumber').notEmpty().withMessage('Plate number is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors: errors.array()
+      });
+    }
+
+    const partnerId = req.user.partnerId;
+    const { customerId, make, model, year, plateNumber, vin } = req.body;
+
+    // This would typically save to a vehicles collection
+    const vehicle = {
+      id: Date.now().toString(),
+      partnerId,
+      customerId,
+      make,
+      model,
+      year,
+      plateNumber,
+      vin,
+      createdAt: new Date()
+    };
+
+    res.json({
+      success: true,
+      message: 'Vehicle added successfully',
+      data: vehicle
+    });
+
+  } catch (error) {
+    logger.error('Add vehicle error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ========================================
+// PROMOTIONS & OFFERS SYSTEM
+// ========================================
+
+// Get promotions
+// @route   GET /api/v1/partners/promotions
+// @desc    Get available promotions
+// @access  Private
+router.get('/promotions', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { status = 'active' } = req.query;
+
+    // This would typically query a promotions collection
+    const promotions = [
+      {
+        id: '1',
+        title: 'New Partner Bonus',
+        description: 'Get 500 points for your first 10 orders',
+        type: 'POINTS',
+        value: 500,
+        conditions: 'First 10 orders',
+        validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        isActive: true
+      }
+    ];
+
+    res.json({
+      success: true,
+      data: promotions
+    });
+
+  } catch (error) {
+    logger.error('Get promotions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ========================================
+// TRAINING & CERTIFICATIONS SYSTEM
+// ========================================
+
+// Get training materials
+// @route   GET /api/v1/partners/training
+// @desc    Get training materials and certifications
+// @access  Private
+router.get('/training', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+
+    const training = {
+      availableCourses: [
+        {
+          id: '1',
+          title: 'Clutch Platform Basics',
+          description: 'Learn the fundamentals of using Clutch platform',
+          duration: '30 minutes',
+          type: 'VIDEO',
+          isCompleted: false,
+          progress: 0
+        },
+        {
+          id: '2',
+          title: 'Inventory Management',
+          description: 'Best practices for inventory management',
+          duration: '45 minutes',
+          type: 'VIDEO',
+          isCompleted: true,
+          progress: 100
+        }
+      ],
+      certifications: [
+        {
+          id: '1',
+          name: 'Certified Partner',
+          description: 'Basic partner certification',
+          earnedAt: new Date(),
+          validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+        }
+      ]
+    };
+
+    res.json({
+      success: true,
+      data: training
+    });
+
+  } catch (error) {
+    logger.error('Get training error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ========================================
+// PERFORMANCE & KPIs SYSTEM
+// ========================================
+
+// Get performance metrics
+// @route   GET /api/v1/partners/performance
+// @desc    Get partner performance metrics and KPIs
+// @access  Private
+router.get('/performance', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { period = 'month' } = req.query;
+
+    const performance = {
+      sales: {
+        current: 45000,
+        previous: 38000,
+        growth: 18.4
+      },
+      orders: {
+        current: 127,
+        previous: 98,
+        growth: 29.6
+      },
+      rating: {
+        current: 4.5,
+        previous: 4.2,
+        growth: 7.1
+      },
+      customerSatisfaction: 92,
+      responseTime: '2.3 hours',
+      completionRate: 96.5,
+      benchmarks: {
+        sales: { target: 50000, current: 45000, percentage: 90 },
+        orders: { target: 150, current: 127, percentage: 84.7 },
+        rating: { target: 4.5, current: 4.5, percentage: 100 }
+      }
+    };
+
+    res.json({
+      success: true,
+      data: performance
+    });
+
+  } catch (error) {
+    logger.error('Get performance error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ========================================
+// COMMISSION TRACKING SYSTEM
+// ========================================
+
+// Get commission breakdown
+// @route   GET /api/v1/partners/commission
+// @desc    Get commission breakdown and history
+// @access  Private
+router.get('/commission', auth, async (req, res) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { period = 'month' } = req.query;
+
+    const commission = {
+      totalEarnings: 2250.50,
+      commissionRate: 5.0,
+      breakdown: {
+        orders: 1800.00,
+        bonuses: 300.00,
+        loyalty: 150.50
+      },
+      history: [
+        {
+          date: new Date(),
+          orderId: 'ORD-001',
+          amount: 45.00,
+          commission: 2.25,
+          status: 'PAID'
+        }
+      ],
+      nextPayout: {
+        date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        amount: 450.00
+      }
+    };
+
+    res.json({
+      success: true,
+      data: commission
+    });
+
+  } catch (error) {
+    logger.error('Get commission error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// ===== APPOINTMENTS ROUTES =====
+
+// Get all appointments for a partner
+router.get('/appointments', auth, async (req, res) => {
+  try {
+    const { page = 1, limit = 20, status, date } = req.query;
+    const partnerId = req.user.partnerId;
+    
+    // Mock appointments data
+    const appointments = [
+      {
+        id: 'apt-001',
+        customerId: 'cust-001',
+        customerName: 'Ahmed Hassan',
+        customerPhone: '+201234567890',
+        vehicleId: 'veh-001',
+        vehicleInfo: {
+          make: 'Toyota',
+          model: 'Camry',
+          year: 2020,
+          plateNumber: 'ABC-123'
+        },
+        serviceType: 'Oil Change',
+        description: 'Regular oil change service',
+        scheduledDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+        duration: 60, // minutes
+        status: 'scheduled',
+        priority: 'normal',
+        estimatedCost: 150,
+        notes: 'Customer prefers morning appointment',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'apt-002',
+        customerId: 'cust-002',
+        customerName: 'Sarah Johnson',
+        customerPhone: '+201234567891',
+        vehicleId: 'veh-002',
+        vehicleInfo: {
+          make: 'Honda',
+          model: 'Civic',
+          year: 2019,
+          plateNumber: 'XYZ-789'
+        },
+        serviceType: 'Brake Inspection',
+        description: 'Full brake system inspection and repair',
+        scheduledDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Day after tomorrow
+        duration: 120,
+        status: 'confirmed',
+        priority: 'high',
+        estimatedCost: 300,
+        notes: 'Customer reported squeaking sounds',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    res.json({
+      success: true,
+      data: {
+        appointments: appointments,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total: appointments.length,
+          totalPages: Math.ceil(appointments.length / limit)
+        }
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching appointments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// Get appointment details
+router.get('/appointments/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Mock appointment details
+    const appointment = {
+      id: id,
+      customerId: 'cust-001',
+      customerName: 'Ahmed Hassan',
+      customerPhone: '+201234567890',
+      customerEmail: 'ahmed@example.com',
+      vehicleId: 'veh-001',
+      vehicleInfo: {
+        make: 'Toyota',
+        model: 'Camry',
+        year: 2020,
+        plateNumber: 'ABC-123',
+        vin: '1HGBH41JXMN109186',
+        mileage: 45000
+      },
+      serviceType: 'Oil Change',
+      description: 'Regular oil change service',
+      scheduledDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      duration: 60,
+      status: 'scheduled',
+      priority: 'normal',
+      estimatedCost: 150,
+      actualCost: null,
+      notes: 'Customer prefers morning appointment',
+      serviceHistory: [
+        {
+          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          service: 'Oil Change',
+          cost: 120,
+          notes: 'Previous service'
+        }
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    res.json({
+      success: true,
+      data: appointment
+    });
+  } catch (error) {
+    logger.error('Error fetching appointment details:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// Create new appointment
+router.post('/appointments', auth, [
+  body('customerName').notEmpty().withMessage('Customer name is required'),
+  body('customerPhone').notEmpty().withMessage('Customer phone is required'),
+  body('serviceType').notEmpty().withMessage('Service type is required'),
+  body('scheduledDate').isISO8601().withMessage('Valid scheduled date is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors: errors.array()
+      });
+    }
+    
+    const {
+      customerName,
+      customerPhone,
+      customerEmail,
+      vehicleInfo,
+      serviceType,
+      description,
+      scheduledDate,
+      duration,
+      priority,
+      estimatedCost,
+      notes
+    } = req.body;
+    
+    // Mock appointment creation
+    const newAppointment = {
+      id: `apt-${Date.now()}`,
+      customerId: `cust-${Date.now()}`,
+      customerName,
+      customerPhone,
+      customerEmail,
+      vehicleId: vehicleInfo ? `veh-${Date.now()}` : null,
+      vehicleInfo,
+      serviceType,
+      description,
+      scheduledDate: new Date(scheduledDate),
+      duration: duration || 60,
+      status: 'scheduled',
+      priority: priority || 'normal',
+      estimatedCost,
+      actualCost: null,
+      notes,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    res.status(201).json({
+      success: true,
+      data: newAppointment,
+      message: 'Appointment created successfully'
+    });
+  } catch (error) {
+    logger.error('Error creating appointment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// Update appointment status
+router.patch('/appointments/:id/status', auth, [
+  body('status').isIn(['scheduled', 'confirmed', 'in-progress', 'completed', 'cancelled']).withMessage('Invalid status')
+], async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, notes } = req.body;
+    
+    // Mock status update
+    const updatedAppointment = {
+      id,
+      status,
+      notes,
+      updatedAt: new Date()
+    };
+    
+    res.json({
+      success: true,
+      data: updatedAppointment,
+      message: 'Appointment status updated successfully'
+    });
+  } catch (error) {
+    logger.error('Error updating appointment status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// Reschedule appointment
+router.patch('/appointments/:id/reschedule', auth, [
+  body('scheduledDate').isISO8601().withMessage('Valid scheduled date is required')
+], async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { scheduledDate, notes } = req.body;
+    
+    // Mock reschedule
+    const rescheduledAppointment = {
+      id,
+      scheduledDate: new Date(scheduledDate),
+      notes,
+      updatedAt: new Date()
+    };
+    
+    res.json({
+      success: true,
+      data: rescheduledAppointment,
+      message: 'Appointment rescheduled successfully'
+    });
+  } catch (error) {
+    logger.error('Error rescheduling appointment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// Cancel appointment
+router.delete('/appointments/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    
+    // Mock cancellation
+    res.json({
+      success: true,
+      message: 'Appointment cancelled successfully',
+      data: {
+        id,
+        status: 'cancelled',
+        cancellationReason: reason,
+        cancelledAt: new Date()
+      }
+    });
+  } catch (error) {
+    logger.error('Error cancelling appointment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 module.exports = router;

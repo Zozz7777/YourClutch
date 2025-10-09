@@ -2,8 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
+const http = require('http');
 require('dotenv').config();
 const logger = require('./utils/logger');
+
+// Import services
+const websocketService = require('./services/websocket');
+const notificationService = require('./services/notification');
+const auditService = require('./services/audit');
+const securityService = require('./services/security');
+const syncService = require('./services/sync');
 
 // Environment variables are loaded via dotenv
 
@@ -91,6 +99,9 @@ app.use(cors(corsOptions));
 
 // Apply basic middleware only
 app.use(compression());
+
+// Apply security headers
+app.use(securityService.createSecurityHeaders());
 
 // Raw body parser removed - using enhanced JSON parser instead
 
@@ -213,6 +224,9 @@ app.use(`${apiPrefix}/partners`, partnersRoutes);
 app.use(`${apiPrefix}/partner-auth`, partnerAuthRoutes);
 app.use(`${apiPrefix}/partners`, partnerMobileRoutes);
 app.use(`${apiPrefix}/partner-approvals`, partnerApprovalsRoutes);
+app.use(`${apiPrefix}/partners/inventory`, require('./routes/partner-inventory'));
+app.use(`${apiPrefix}/partners/orders`, require('./routes/partner-orders'));
+app.use(`${apiPrefix}/partners/reports`, require('./routes/partner-reports'));
 app.use(`${apiPrefix}/rbac`, rbacRoutes);
 
 // 404 handler
@@ -267,10 +281,23 @@ async function startServer() {
     await initializeDatabase();
     
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
+    const server = http.createServer(app);
+    
+    // Initialize WebSocket service
+    websocketService.initialize(server);
+    
+    // Initialize services
+    console.log('🔧 Initializing services...');
+    console.log('📧 Notification service:', notificationService.getStats());
+    console.log('🔒 Security service:', securityService.getSecurityStats());
+    console.log('📊 Audit service initialized');
+    console.log('🔄 Sync service initialized');
+    
+    server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🔗 API prefix: ${apiPrefix}`);
+      console.log(`🔌 WebSocket service active`);
     });
   } catch (error) {
     console.error('❌ Server startup failed:', error);

@@ -1,65 +1,74 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const PartnerInventory = require('../models/PartnerInventory');
-const PartnerUser = require('../models/PartnerUser');
 const { authenticateToken } = require('../middleware/auth');
-const logger = require('../config/logger');
+const { getCollection } = require('../config/database');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
-// Validation middleware
-const validateProduct = [
-  body('name').notEmpty().withMessage('Product name is required'),
-  body('category').notEmpty().withMessage('Category is required'),
-  body('costPrice').isNumeric().withMessage('Cost price must be a number'),
-  body('salePrice').isNumeric().withMessage('Sale price must be a number'),
-  body('quantity').isInt({ min: 0 }).withMessage('Quantity must be a non-negative integer')
-];
-
-const validateBulkImport = [
-  body('products').isArray({ min: 1 }).withMessage('Products array is required'),
-  body('products.*.name').notEmpty().withMessage('Product name is required'),
-  body('products.*.category').notEmpty().withMessage('Category is required'),
-  body('products.*.costPrice').isNumeric().withMessage('Cost price must be a number'),
-  body('products.*.salePrice').isNumeric().withMessage('Sale price must be a number')
-];
-
-// @route   GET /api/v1/partners/:id/catalog
-// @desc    Get partner's published catalog
-// @access  Private
-router.get('/:id/catalog', authenticateToken, async (req, res) => {
+// GET /api/v1/partners/inventory - Get all products for partner
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const { id: partnerId } = req.params;
-    const { page = 1, limit = 20, category, search, status = 'active' } = req.query;
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const { partnerId } = req.user;
+    const { 
+      page = 1, 
+      limit = 50, 
+      search = '', 
+      category = '', 
+      brand = '', 
+      min_stock = '', 
+      max_stock = '',
+      sort_by = 'name',
+      sort_order = 'asc'
+    } = req.query;
 
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
-
-    const filters = { partnerId, status };
-    if (category) filters.category = category;
+    const productsCollection = await getCollection('products');
+    
+    // Build query
+    const query = { partnerId };
+    
     if (search) {
-      filters.$or = [
+      query.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
         { sku: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
         { barcode: { $regex: search, $options: 'i' } }
       ];
     }
-
-    const [products, total] = await Promise.all([
-      PartnerInventory.find(filters)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit)),
-      PartnerInventory.countDocuments(filters)
-    ]);
-
+    
+    if (category) {
+      query.category = category;
+    }
+    
+    if (brand) {
+      query.brand = brand;
+    }
+    
+    if (min_stock !== '') {
+      query.stockQuantity = { ...query.stockQuantity, $gte: parseInt(min_stock) };
+    }
+    
+    if (max_stock !== '') {
+      query.stockQuantity = { ...query.stockQuantity, $lte: parseInt(max_stock) };
+    }
+    
+    // Build sort
+    const sort = {};
+    sort[sort_by] = sort_order === 'desc' ? -1 : 1;
+    
+    // Calculate pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    // Execute query
+    const products = await productsCollection
+      .find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .toArray();
+    
+    const total = await productsCollection.countDocuments(query);
+    
     res.json({
       success: true,
       data: {
@@ -70,22 +79,59 @@ router.get('/:id/catalog', authenticateToken, async (req, res) => {
           total,
           pages: Math.ceil(total / parseInt(limit))
         }
-      }
+      },
+      timestamp: new Date().toISOString()
     });
-
   } catch (error) {
-    logger.error('Get catalog error:', error);
+    logger.error('Get products error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Failed to fetch products'
     });
   }
 });
 
-// @route   POST /api/v1/partners/:id/catalog
-// @desc    Create/update product in catalog
-// @access  Private
-router.post('/:id/catalog', authenticateToken, validateProduct, async (req, res) => {
+// GET /api/v1/partners/inventory/:id - Get specific product
+router.get('/:id', authenticateToken, async (req, res) => {
+  try {
+    const { partnerId } = req.user;
+    const { id } = req.params;
+    
+    const productsCollection = await getCollection('products');
+    const product = await productsCollection.findOne({ 
+      _id: id, 
+      partnerId 
+    });
+    
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: product,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Get product error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch product'
+    });
+  }
+});
+
+// POST /api/v1/partners/inventory - Create new product
+router.post('/', authenticateToken, [
+  body('sku').notEmpty().withMessage('SKU is required'),
+  body('name').notEmpty().withMessage('Product name is required'),
+  body('price').isNumeric().withMessage('Price must be numeric'),
+  body('stockQuantity').isInt().withMessage('Stock quantity must be integer'),
+  body('category').notEmpty().withMessage('Category is required')
+], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -96,138 +142,55 @@ router.post('/:id/catalog', authenticateToken, validateProduct, async (req, res)
       });
     }
 
-    const { id: partnerId } = req.params;
-    const productData = req.body;
+    const { partnerId } = req.user;
+    const productData = {
+      ...req.body,
+      partnerId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
 
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
+    const productsCollection = await getCollection('products');
+    
+    // Check if SKU already exists for this partner
+    const existingProduct = await productsCollection.findOne({ 
+      sku: productData.sku, 
+      partnerId 
+    });
+    
+    if (existingProduct) {
+      return res.status(409).json({
         success: false,
-        message: 'Access denied'
+        message: 'Product with this SKU already exists'
       });
     }
-
-    // Check if product with same SKU exists
-    if (productData.sku) {
-      const existingProduct = await PartnerInventory.findBySku(productData.sku);
-      if (existingProduct && existingProduct.partnerId !== partnerId) {
-        return res.status(409).json({
-          success: false,
-          message: 'Product with this SKU already exists'
-        });
-      }
-    }
-
-    const product = new PartnerInventory({
-      ...productData,
-      partnerId,
-      createdBy: req.user.id
-    });
-
-    await product.save();
-
+    
+    const result = await productsCollection.insertOne(productData);
+    
     res.status(201).json({
       success: true,
       message: 'Product created successfully',
-      data: { product }
+      data: {
+        id: result.insertedId,
+        ...productData
+      },
+      timestamp: new Date().toISOString()
     });
-
   } catch (error) {
     logger.error('Create product error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Failed to create product'
     });
   }
 });
 
-// @route   PUT /api/v1/partners/:id/catalog/:sku
-// @desc    Update product by SKU
-// @access  Private
-router.put('/:id/catalog/:sku', authenticateToken, async (req, res) => {
-  try {
-    const { id: partnerId, sku } = req.params;
-    const updateData = req.body;
-
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
-
-    const product = await PartnerInventory.findOne({ sku, partnerId });
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      });
-    }
-
-    // Update product
-    Object.assign(product, updateData);
-    product.updatedBy = req.user.id;
-    await product.save();
-
-    res.json({
-      success: true,
-      message: 'Product updated successfully',
-      data: { product }
-    });
-
-  } catch (error) {
-    logger.error('Update product error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// @route   DELETE /api/v1/partners/:id/catalog/:sku
-// @desc    Delete product from catalog
-// @access  Private
-router.delete('/:id/catalog/:sku', authenticateToken, async (req, res) => {
-  try {
-    const { id: partnerId, sku } = req.params;
-
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
-
-    const product = await PartnerInventory.findOne({ sku, partnerId });
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      });
-    }
-
-    await PartnerInventory.deleteOne({ _id: product._id });
-
-    res.json({
-      success: true,
-      message: 'Product deleted successfully'
-    });
-
-  } catch (error) {
-    logger.error('Delete product error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// @route   POST /api/v1/partners/:id/inventory/import
-// @desc    Bulk import products
-// @access  Private
-router.post('/:id/inventory/import', authenticateToken, validateBulkImport, async (req, res) => {
+// PUT /api/v1/partners/inventory/:id - Update product
+router.put('/:id', authenticateToken, [
+  body('name').optional().notEmpty().withMessage('Product name cannot be empty'),
+  body('price').optional().isNumeric().withMessage('Price must be numeric'),
+  body('stockQuantity').optional().isInt().withMessage('Stock quantity must be integer')
+], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -238,241 +201,287 @@ router.post('/:id/inventory/import', authenticateToken, validateBulkImport, asyn
       });
     }
 
-    const { id: partnerId } = req.params;
-    const { products, options = {} } = req.body;
-
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
+    const { partnerId } = req.user;
+    const { id } = req.params;
+    
+    const productsCollection = await getCollection('products');
+    
+    // Check if product exists
+    const existingProduct = await productsCollection.findOne({ 
+      _id: id, 
+      partnerId 
+    });
+    
+    if (!existingProduct) {
+      return res.status(404).json({
         success: false,
-        message: 'Access denied'
+        message: 'Product not found'
       });
     }
-
-    const results = {
-      imported: 0,
-      updated: 0,
-      failed: 0,
-      errors: []
+    
+    const updateData = {
+      ...req.body,
+      updatedAt: new Date().toISOString()
     };
-
-    for (const productData of products) {
-      try {
-        // Check if product exists
-        const existingProduct = await PartnerInventory.findOne({
-          sku: productData.sku,
-          partnerId
-        });
-
-        if (existingProduct) {
-          // Update existing product
-          Object.assign(existingProduct, productData);
-          existingProduct.updatedBy = req.user.id;
-          await existingProduct.save();
-          results.updated++;
-        } else {
-          // Create new product
-          const product = new PartnerInventory({
-            ...productData,
-            partnerId,
-            createdBy: req.user.id
-          });
-          await product.save();
-          results.imported++;
-        }
-      } catch (error) {
-        results.failed++;
-        results.errors.push({
-          product: productData.name || productData.sku,
-          error: error.message
-        });
-      }
+    
+    const result = await productsCollection.updateOne(
+      { _id: id, partnerId },
+      { $set: updateData }
+    );
+    
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Failed to update product'
+      });
     }
-
+    
     res.json({
       success: true,
-      message: 'Bulk import completed',
-      data: results
+      message: 'Product updated successfully',
+      timestamp: new Date().toISOString()
     });
-
   } catch (error) {
-    logger.error('Bulk import error:', error);
+    logger.error('Update product error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Failed to update product'
     });
   }
 });
 
-// @route   POST /api/v1/partners/:id/stock-adjust
-// @desc    Adjust stock quantity with audit reason
-// @access  Private
-router.post('/:id/stock-adjust', authenticateToken, async (req, res) => {
+// DELETE /api/v1/partners/inventory/:id - Delete product
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
-    const { id: partnerId } = req.params;
-    const { sku, quantity, reason, type = 'adjustment' } = req.body;
+    const { partnerId } = req.user;
+    const { id } = req.params;
+    
+    const productsCollection = await getCollection('products');
+    
+    const result = await productsCollection.deleteOne({ 
+      _id: id, 
+      partnerId 
+    });
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Product deleted successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Delete product error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete product'
+    });
+  }
+});
 
-    if (!sku || quantity === undefined || !reason) {
+// POST /api/v1/partners/inventory/import - Bulk import products
+router.post('/import', authenticateToken, [
+  body('products').isArray().withMessage('Products array is required'),
+  body('products.*.sku').notEmpty().withMessage('SKU is required'),
+  body('products.*.name').notEmpty().withMessage('Product name is required'),
+  body('products.*.price').isNumeric().withMessage('Price must be numeric')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'SKU, quantity, and reason are required'
+        message: 'Validation errors',
+        errors: errors.array()
       });
     }
 
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
+    const { partnerId } = req.user;
+    const { products } = req.body;
+    
+    const productsCollection = await getCollection('products');
+    
+    // Prepare products for insertion
+    const productsToInsert = products.map(product => ({
+      ...product,
+      partnerId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }));
+    
+    const result = await productsCollection.insertMany(productsToInsert);
+    
+    res.json({
+      success: true,
+      message: `${result.insertedCount} products imported successfully`,
+      data: {
+        imported: result.insertedCount,
+        failed: products.length - result.insertedCount
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Import products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to import products'
+    });
+  }
+});
+
+// GET /api/v1/partners/inventory/export - Export products
+router.get('/export', authenticateToken, async (req, res) => {
+  try {
+    const { partnerId } = req.user;
+    const { format = 'csv' } = req.query;
+    
+    const productsCollection = await getCollection('products');
+    const products = await productsCollection.find({ partnerId }).toArray();
+    
+    if (format === 'csv') {
+      // Generate CSV
+      const csvHeader = 'SKU,Name,Description,Price,Stock,Category,Brand,Barcode\n';
+      const csvData = products.map(product => 
+        `${product.sku},${product.name},${product.description || ''},${product.price},${product.stockQuantity},${product.category},${product.brand || ''},${product.barcode || ''}`
+      ).join('\n');
+      
+      const csv = csvHeader + csvData;
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=products.csv');
+      res.send(csv);
+    } else {
+      res.json({
+        success: true,
+        data: products,
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    logger.error('Export products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to export products'
+    });
+  }
+});
+
+// GET /api/v1/partners/inventory/low-stock - Get low stock products
+router.get('/low-stock', authenticateToken, async (req, res) => {
+  try {
+    const { partnerId } = req.user;
+    const { threshold = 10 } = req.query;
+    
+    const productsCollection = await getCollection('products');
+    const products = await productsCollection.find({
+      partnerId,
+      stockQuantity: { $lte: parseInt(threshold) }
+    }).toArray();
+    
+    res.json({
+      success: true,
+      data: products,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Get low stock products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch low stock products'
+    });
+  }
+});
+
+// POST /api/v1/partners/inventory/stock-adjustment - Adjust stock
+router.post('/stock-adjustment', authenticateToken, [
+  body('productId').notEmpty().withMessage('Product ID is required'),
+  body('adjustment').isNumeric().withMessage('Adjustment must be numeric'),
+  body('reason').notEmpty().withMessage('Reason is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
         success: false,
-        message: 'Access denied'
+        message: 'Validation errors',
+        errors: errors.array()
       });
     }
 
-    const product = await PartnerInventory.findOne({ sku, partnerId });
+    const { partnerId } = req.user;
+    const { productId, adjustment, reason } = req.body;
+    
+    const productsCollection = await getCollection('products');
+    
+    // Get current product
+    const product = await productsCollection.findOne({ 
+      _id: productId, 
+      partnerId 
+    });
+    
     if (!product) {
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       });
     }
-
-    // Update quantity
-    await product.updateQuantity(quantity, reason);
-
+    
+    const newStock = product.stockQuantity + adjustment;
+    
+    if (newStock < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Insufficient stock for this adjustment'
+      });
+    }
+    
+    // Update stock
+    const result = await productsCollection.updateOne(
+      { _id: productId, partnerId },
+      { 
+        $set: { 
+          stockQuantity: newStock,
+          updatedAt: new Date().toISOString()
+        },
+        $push: {
+          stockAdjustments: {
+            adjustment,
+            reason,
+            adjustedBy: req.user.userId,
+            adjustedAt: new Date().toISOString()
+          }
+        }
+      }
+    );
+    
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Failed to adjust stock'
+      });
+    }
+    
     res.json({
       success: true,
       message: 'Stock adjusted successfully',
-      data: { product }
+      data: {
+        productId,
+        oldStock: product.stockQuantity,
+        newStock,
+        adjustment
+      },
+      timestamp: new Date().toISOString()
     });
-
   } catch (error) {
     logger.error('Stock adjustment error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// @route   GET /api/v1/partners/:id/inventory/stats
-// @desc    Get inventory statistics
-// @access  Private
-router.get('/:id/inventory/stats', authenticateToken, async (req, res) => {
-  try {
-    const { id: partnerId } = req.params;
-
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
-
-    const [stats, lowStock, outOfStock] = await Promise.all([
-      PartnerInventory.getInventoryStats(partnerId),
-      PartnerInventory.findLowStock(partnerId),
-      PartnerInventory.findOutOfStock(partnerId)
-    ]);
-
-    res.json({
-      success: true,
-      data: {
-        stats: stats[0] || {
-          totalProducts: 0,
-          totalValue: 0,
-          lowStockCount: 0,
-          outOfStockCount: 0,
-          publishedCount: 0,
-          averagePrice: 0,
-          totalQuantity: 0
-        },
-        lowStock,
-        outOfStock
-      }
-    });
-
-  } catch (error) {
-    logger.error('Get inventory stats error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// @route   GET /api/v1/partners/:id/inventory/search
-// @desc    Search products
-// @access  Private
-router.get('/:id/inventory/search', authenticateToken, async (req, res) => {
-  try {
-    const { id: partnerId } = req.params;
-    const { q: searchTerm, category, limit = 20 } = req.query;
-
-    if (!searchTerm) {
-      return res.status(400).json({
-        success: false,
-        message: 'Search term is required'
-      });
-    }
-
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
-
-    const products = await PartnerInventory.searchProducts(partnerId, searchTerm)
-      .limit(parseInt(limit));
-
-    res.json({
-      success: true,
-      data: { products }
-    });
-
-  } catch (error) {
-    logger.error('Search products error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// @route   GET /api/v1/partners/:id/inventory/barcode/:barcode
-// @desc    Get product by barcode
-// @access  Private
-router.get('/:id/inventory/barcode/:barcode', authenticateToken, async (req, res) => {
-  try {
-    const { id: partnerId, barcode } = req.params;
-
-    // Verify partner access
-    if (req.user.partnerId !== partnerId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
-
-    const product = await PartnerInventory.findByBarcode(barcode);
-    if (!product || product.partnerId !== partnerId) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      data: { product }
-    });
-
-  } catch (error) {
-    logger.error('Get product by barcode error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
+      message: 'Failed to adjust stock'
     });
   }
 });
